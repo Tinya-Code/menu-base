@@ -1,0 +1,83 @@
+<form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()" class="space-y-4 p-2">
+  
+  <!-- Nombre -->
+  <div class="flex flex-col gap-1">
+    <label class="text-sm font-display  text-secondary mb-1">Nombre Completo</label>
+    <input type="text" 
+           formControlName="name" 
+           placeholder="¿Cómo te llamas?"
+           class="w-full font-body bg-gray-100 border border-primary/20 rounded-sm px-4 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/40 focus:bg-secondary/50"
+           [class.border-red-500/50]="checkoutForm.get('name')?.touched && checkoutForm.get('name')?.invalid"
+           [class.focus:ring-red-500/20]="checkoutForm.get('name')?.touched && checkoutForm.get('name')?.invalid"
+           [class.bg-red-50/5]="checkoutForm.get('name')?.touched && checkoutForm.get('name')?.invalid">
+    
+    @if (checkoutForm.get('name')?.touched && checkoutForm.get('name')?.errors?.['required']) {
+      <div class="text-xs text-red-500 mt-1 ml-1">
+        El nombre es obligatorio
+      </div>
+    }
+  </div>
+
+  @if (isDeliveryEnabled()) {
+  <!-- Dirección -->
+  <div class="flex flex-col gap-1">
+    <label class="text-sm font-display text-secondary mb-1">Dirección de Entrega</label>
+    <input type="text" 
+           formControlName="address" 
+           placeholder="Ej: Av. Los Olivos 123"
+           class="w-full bg-gray-100 font-body border border-primary/20 rounded-sm px-4 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/40 focus:bg-secondary/50"
+           [class.border-red-500/50]="checkoutForm.get('address')?.touched && checkoutForm.get('address')?.invalid"
+           [class.focus:ring-red-500/20]="checkoutForm.get('address')?.touched && checkoutForm.get('address')?.invalid"
+           [class.bg-red-50/5]="checkoutForm.get('address')?.touched && checkoutForm.get('address')?.invalid">
+    
+    @if (checkoutForm.get('address')?.touched && checkoutForm.get('address')?.errors?.['required']) {
+      <div class="text-xs text-red-500 mt-1 ml-1">
+        La dirección es obligatoria
+      </div>
+    }
+  </div>
+  }
+
+  <!-- Método de Pago -->
+  <div class="flex flex-col gap-1">
+    <label class="text-sm font-display  text-secondary mb-2">Método de Pago</label>
+    <div class="grid grid-cols-2 gap-3">
+      @for (method of paymentMethods(); track method) {
+        <label class="relative flex flex-col items-center justify-center p-4 rounded-sm border-2 transition-all cursor-pointer group"
+               [class.border-primary]="checkoutForm.get('paymentMethod')?.value === method"
+               [class.bg-primary/5]="checkoutForm.get('paymentMethod')?.value === method"
+               [class.border-primary/10]="checkoutForm.get('paymentMethod')?.value !== method"
+               [class.hover:border-primary/30]="checkoutForm.get('paymentMethod')?.value !== method">
+          
+          <input type="radio" [value]="method" formControlName="paymentMethod" class="absolute opacity-0">
+          
+          <div class="w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-transform group-hover:scale-110"
+               [style.backgroundColor]="getPaymentColor(method) + '20'"
+               [style.color]="getPaymentColor(method)">
+            <lucide-icon [img]="getPaymentIcon(method)" class="w-6 h-6"></lucide-icon>
+          </div>
+
+          <span class="text-xs font-black uppercase tracking-tighter">{{ formatPaymentMethod(method) }}</span>
+
+
+        </label>
+      }
+    </div>
+    
+    @if (checkoutForm.get('paymentMethod')?.touched && checkoutForm.get('paymentMethod')?.invalid) {
+      <div class="text-xs text-red-500 mt-2 ml-1 flex items-center gap-1">
+        <span class="w-1 h-1 bg-red-500 rounded-full"></span>
+        Selecciona un método de pago
+      </div>
+    }
+  </div>
+
+  <!-- Botón de Envío -->
+  <button type="submit" 
+          [disabled]="checkoutForm.invalid"
+          class="w-full bg-green-600 text-white font-display py-4 rounded-sm shadow-premium flex items-center justify-center gap-2 transition-all active:scale-95 disabled:bg-transparent disabled:text-muted disabled:border-2 border-gray-100 disabled:cursor-not-allowed mt-6">
+    <lucide-icon [img]="MessageCircle" class="w-5 h-5"></lucide-icon>
+    <span>PEDIR POR WHATSAPP</span>
+  </button>
+  
+</form>

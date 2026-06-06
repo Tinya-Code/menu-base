@@ -1,0 +1,24 @@
+<!-- Backdrop -->
+<div class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 transition-all duration-300 pointer-events-none opacity-0 invisible"
+     [class.!opacity-100]="isOpen()" 
+     [class.!visible]="isOpen()"
+     [class.!pointer-events-auto]="isOpen()"
+     (click)="onClose()"></div>
+
+<!-- Modal Container -->
+<div class="fixed  bottom-0 left-0 right-0 backdrop-blur-3xl bg-white   rounded-t-4xl z-50 max-h-[92vh] flex flex-col  p-6 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] translate-y-full max-w-4xl mx-auto"
+     [class.!translate-y-0]="isOpen()">
+  
+  <!-- Header -->
+  <div class="px-6 py-4 flex items-center justify-between border-b-6 border-muted border-dashed">
+    <h2 class="font-bungee text-slate-800 text-xl overflow-hidden text-ellipsis whitespace-nowrap">{{ title() }}</h2>
+    <button (click)="onClose()" class="p-2 rounded-full text-secondary hover:bg-slate-100 hover:text-slate-800 transition-all">
+      <lucide-icon [img]="X" class="w-6 h-6"></lucide-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="grow realitve overflow-y-auto p-6 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-slate-200 hover:scrollbar-thumb-slate-300">
+    <ng-content></ng-content>
+  </div>
+</div>

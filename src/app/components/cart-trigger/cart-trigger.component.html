@@ -1,0 +1,34 @@
+@if (!isEmpty()) {
+<div
+  class="fixed bottom-0 left-0 right-0 p-4 z-40 md:min-w-100 md:max-w-lg  md:left-auto  animate-in slide-in-from-bottom-10 duration-500"
+  [ngClass]="'theme-' + templateId()">
+
+  <button (click)="openCart()"
+    class="w-full bg-secondary text-primary p-4 rounded-2xl shadow-premium border border-primary/20 flex items-center justify-between group transition-all hover:scale-[1.02] active:scale-95">
+
+    <!-- Lado Izquierdo: Contador y Texto -->
+    <div class="flex items-center gap-3">
+      <div class="relative">
+        <p
+          class="bg-primary font-bold text-secondary w-8 h-8 rounded-full flex items-center justify-center font-display text-sm shadow-sm">
+          {{ count() }}
+        </p>
+        <!-- Pulsing effect -->
+        <div class="absolute inset-0 bg-primary/40 rounded-full animate-ping -z-10"></div>
+      </div>
+      <div class="text-left">
+        <p class="text-xs font-display font-bold uppercase tracking-wider ">Ver Carrito</p>
+        <p class="text-sm font-body tracking-wide text-white">Tu Pedido</p>
+      </div>
+    </div>
+
+    <!-- Lado Derecho: Total y Flecha -->
+    <div class="flex items-center gap-3">
+      <span class="text-lg font-display tracking-tight">{{ total() | precio }}</span>
+      <div class="bg-primary/10 p-2 rounded-xl group-hover:bg-primary/20 transition-colors">
+        <lucide-icon [img]="ArrowRight" class="w-5 h-5 text-primary"></lucide-icon>
+      </div>
+    </div>
+  </button>
+</div>
+}

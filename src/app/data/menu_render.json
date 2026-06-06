@@ -1,0 +1,248 @@
+{
+  "data": {
+    "blocks": [
+      {
+        "id": "block-1",
+        "categories": [
+          {
+            "id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+            "name": "Rolls",
+            "description": "",
+            "block_id": "block-1",
+            "products": [
+              {
+                "id": "1b8b78a7-5e68-4713-83f0-e062fba0c358",
+                "name": "Acevichado",
+                "description": "Relleno de langostino y palta. Cubierto de pescado blanco y salsa acevichada.",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": true,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778903645/product_1b8b78a7-5e68-4713-83f0-e062fba0c358.png",
+                "cloudinary_id": "product_1b8b78a7-5e68-4713-83f0-e062fba0c358"
+              },
+              {
+                "id": "2e0e92ca-86cd-48fa-9192-d9cfb949517a",
+                "name": "Furai",
+                "description": "Relleno de trucha, queso crema y palta. Cubierto de panko frito.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778903729/product_2e0e92ca-86cd-48fa-9192-d9cfb949517a.png",
+                "cloudinary_id": "product_2e0e92ca-86cd-48fa-9192-d9cfb949517a"
+              },
+              {
+                "id": "3becd396-d88c-4d5f-9c7e-699b4398a3b9",
+                "name": "BBQ",
+                "description": "Relleno de langostino y palta. Cubierto de lomo, salsa BBQ y semillas de ajonjolí.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778903793/product_3becd396-d88c-4d5f-9c7e-699b4398a3b9.png",
+                "cloudinary_id": "product_3becd396-d88c-4d5f-9c7e-699b4398a3b9"
+              },
+              {
+                "id": "533e8ae2-727b-4ee2-a52c-920c48eb67a1",
+                "name": "Avocado",
+                "description": "Relleno de langostino y queso crema. Cubierto de palta y salsa Tare.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778903864/product_533e8ae2-727b-4ee2-a52c-920c48eb67a1.png",
+                "cloudinary_id": "product_533e8ae2-727b-4ee2-a52c-920c48eb67a1"
+              },
+              {
+                "id": "294f810b-f61c-4f43-bd3b-95d16c8cc6f2",
+                "name": "Ikigai",
+                "description": "Relleno de langostino y palta. Cubierto de tártara de pulpa de cangrejo, pulpo, queso parmesano y salsa Tare.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": true,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778903913/product_294f810b-f61c-4f43-bd3b-95d16c8cc6f2.png",
+                "cloudinary_id": "product_294f810b-f61c-4f43-bd3b-95d16c8cc6f2"
+              },
+              {
+                "id": "afa46090-df99-4d98-88dc-5e60ea8f51ec",
+                "name": "Guacamole",
+                "description": "Relleno de langostino frito, queso crema. Cubierto de guacamole y hilos de camote.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778903975/product_afa46090-df99-4d98-88dc-5e60ea8f51ec.png",
+                "cloudinary_id": "product_afa46090-df99-4d98-88dc-5e60ea8f51ec"
+              },
+              {
+                "id": "c5fdce89-5d75-48d5-998e-f5eac3dec4ae",
+                "name": "California",
+                "description": "Relleno de trucha, queso crema y palta. Cubierto de semillas de ajonjolí, salsa Tare o maracuyá.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778904030/product_c5fdce89-5d75-48d5-998e-f5eac3dec4ae.svg",
+                "cloudinary_id": "product_c5fdce89-5d75-48d5-998e-f5eac3dec4ae"
+              },
+              {
+                "id": "cbbced22-d1d0-48cd-8692-18520cdf8b7b",
+                "name": "Banana",
+                "description": "Relleno de queso crema y langostino. Cubierto con plátano maduro frito y salsa Tare o maracuyá.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778904129/product_cbbced22-d1d0-48cd-8692-18520cdf8b7b.png",
+                "cloudinary_id": "product_cbbced22-d1d0-48cd-8692-18520cdf8b7b"
+              },
+              {
+                "id": "c0824770-660d-4286-a216-39c274aa4ee6",
+                "name": "Baby Maki",
+                "description": "Relleno de queso crema y langostino. Cubierto de láminas de trucha y salsa Tare o maracuyá.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778904224/product_c0824770-660d-4286-a216-39c274aa4ee6.png",
+                "cloudinary_id": "product_c0824770-660d-4286-a216-39c274aa4ee6"
+              },
+              {
+                "id": "980ff1a8-d540-4bd6-95fb-ef2edfb78cd1",
+                "name": "Olivo",
+                "description": "Relleno de langostino y palta. Cubierto de pulpo al olivo.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778904274/product_980ff1a8-d540-4bd6-95fb-ef2edfb78cd1.png",
+                "cloudinary_id": "product_980ff1a8-d540-4bd6-95fb-ef2edfb78cd1"
+              },
+              {
+                "id": "66277f36-dd10-4ebd-9963-7fda5767d071",
+                "name": "Parrillero",
+                "description": "Relleno de langostino, queso crema y palta. Cubierto de lomo y salsa chimichurri.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778904326/product_66277f36-dd10-4ebd-9963-7fda5767d071.png",
+                "cloudinary_id": "product_66277f36-dd10-4ebd-9963-7fda5767d071"
+              },
+              {
+                "id": "2854206e-6d9c-49ec-aeb3-2f6fc84f1f5e",
+                "name": "Maki Parmesano",
+                "description": "Relleno de palta y langostino frito. Cubierto de salsa parmesano y gotas de limón.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778904386/product_2854206e-6d9c-49ec-aeb3-2f6fc84f1f5e.png",
+                "cloudinary_id": "product_2854206e-6d9c-49ec-aeb3-2f6fc84f1f5e"
+              },
+              {
+                "id": "3ad1eefc-27d5-4675-84d5-cb6d85cfbeb9",
+                "name": "Tempura",
+                "description": "Relleno de palta y langostino frito. Cubierto de salsa anticuchera y chalaquita.\n",
+                "qty_label": "",
+                "price": "",
+                "price_range_id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+                "category_id": "56ae3ee5-e561-4c61-951d-ce335412e7a4",
+                "is_recommended": false,
+                "is_hidden": false,
+                "image_url": "https://res.cloudinary.com/dxmiykoxh/image/upload/v1778904426/product_3ad1eefc-27d5-4675-84d5-cb6d85cfbeb9.png",
+                "cloudinary_id": "product_3ad1eefc-27d5-4675-84d5-cb6d85cfbeb9"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "block-2",
+        "categories": [
+          {
+            "id": "95a8e445-5e9f-4439-86bd-60e8b6ed75e7",
+            "name": "Piqueos",
+            "description": "",
+            "block_id": "block-2",
+            "products": []
+          }
+        ]
+      },
+      {
+        "id": "block-3",
+        "categories": [
+          {
+            "id": "f1755369-b67c-4439-8e53-bea602499eab",
+            "name": "Alitas",
+            "description": "",
+            "block_id": "block-3",
+            "products": []
+          }
+        ]
+      },
+      {
+        "id": "block-4",
+        "categories": [
+          {
+            "id": "05c62a8e-5909-4740-be4b-9859a84ae397",
+            "name": "Bebidas",
+            "description": "",
+            "block_id": "block-4",
+            "products": []
+          }
+        ]
+      },
+      {
+        "id": "block-5",
+        "categories": [
+          {
+            "id": "508c6f61-36bf-425f-a045-d39b2e1e364f",
+            "name": "Bebidas Chinas",
+            "description": "",
+            "block_id": "block-5",
+            "products": []
+          }
+        ]
+      },
+      {
+        "id": "block-6",
+        "categories": [
+          {
+            "id": "3567fedd-ec0e-4b94-ba47-3fb18c6b78be",
+            "name": "Cócteles",
+            "description": "",
+            "block_id": "block-6",
+            "products": []
+          }
+        ]
+      }
+    ]
+  }
+}

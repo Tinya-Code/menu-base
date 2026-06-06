@@ -1,0 +1,29 @@
+<div class="relative">
+  <div
+    #sliderContainer
+    class="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
+    style="scrollbar-width: none; -ms-overflow-style: none;"
+  >
+    <ng-content></ng-content>
+  </div>
+
+  @if (showArrows()) {
+    <button
+      (click)="prev()"
+      class="absolute left-2 top-1/2 -translate-y-1/2 bg-secondary/80 hover:bg-secondary text-primary-text p-2 rounded-full transition-all z-10 shadow-lg"
+      aria-label="Anterior"
+      title="Anterior"
+    >
+      <lucide-icon [img]="ChevronLeft" class="w-6 h-6"></lucide-icon>
+    </button>
+
+    <button
+      (click)="next()"
+      class="absolute right-2 top-1/2 -translate-y-1/2 bg-secondary/80 hover:bg-secondary text-primary-text p-2 rounded-full transition-all z-10 shadow-lg"
+      aria-label="Siguiente"
+      title="Siguiente"
+    >
+      <lucide-icon [img]="ChevronRight" class="w-6 h-6"></lucide-icon>
+    </button>
+  }
+</div>

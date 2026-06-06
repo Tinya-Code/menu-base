@@ -1,0 +1,41 @@
+<div class="flex items-center gap-4 p-4 bg-white rounded-xl shadow-sm border border-gray-100 mb-2 transition-all hover:shadow-md animate-in fade-in slide-in-from-right-4 duration-300">
+  <!-- Imagen del Producto -->
+
+
+  <!-- Información del Producto -->
+  <div class="grow min-w-0">
+    <h4 class="text-sm font-bold text-secondary truncate">{{ item().name }}</h4>
+    <p class="text-xs text-muted font-medium mb-1">{{ item().price | precio }} c/u</p>
+    
+    <div class="flex items-center gap-3 mt-2">
+      <!-- Controles de Cantidad -->
+      <div class="flex items-center bg-gray-50 rounded-full border border-gray-200 p-0.5">
+        <button (click)="onDecrease()" 
+                class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm text-secondary transition-all active:scale-95 disabled:opacity-30"
+                [disabled]="item().quantity <= 1"
+                title="Disminuir cantidad">
+          <lucide-icon [img]="Minus" class="w-4 h-4"></lucide-icon>
+        </button>
+        <span class="w-6 text-center text-xs font-bold text-secondary">{{ item().quantity }}</span>
+        <button (click)="onIncrease()" 
+                class="w-7 h-7 flex items-center justify-center rounded-full hover:bg-white hover:shadow-sm text-secondary transition-all active:scale-95"
+                title="Aumentar cantidad">
+          <lucide-icon [img]="Plus" class="w-4 h-4"></lucide-icon>
+        </button>
+      </div>
+
+      <!-- Precio Total por Item -->
+      <span class="text-sm font-bold text-primary ml-auto">
+        {{ (item().price * item().quantity) | precio }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Botón Eliminar -->
+  <button (click)="onRemove()" 
+          class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-all active:scale-90"
+          aria-label="Eliminar producto"
+          title="Eliminar producto">
+    <lucide-icon [img]="Trash2" class="w-5 h-5"></lucide-icon>
+  </button>
+</div>

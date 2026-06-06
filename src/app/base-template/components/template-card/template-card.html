@@ -1,0 +1,102 @@
+@if (!hasPriceRange()) {
+  <!-- DISEÑO 1: Producto Estándar (Estilo Lista / Minimalista) -->
+  <div
+    (click)="productClick.emit(product())"
+    class="group relative py-6 px-4 md:px-6 transition-all duration-300 cursor-pointer hover:bg-secondary/5 border-b border-secondary/10 flex items-start gap-6"
+  >
+    <!-- Contenido Izquierdo (Info) -->
+    <div class="flex-1 space-y-2">
+      <div class="flex items-start gap-2">
+        <h3
+          class="text-4xl font-display text-primary-text tracking-tight group-hover:text-accent transition-colors"
+        >
+          {{ product().name }}
+        </h3>
+        @if (product().is_recommended) {
+          <lucide-icon [img]="Star" class="w-5 h-5 text-accent fill-accent"></lucide-icon>
+        }
+      </div>
+
+      <div class="flex items-center gap-4 pt-1">
+        <span class="text-3xl font-display text-accent tracking-tighter">
+          {{ startingPrice() | precio }}
+        </span>
+        @if (product().qty_label) {
+          <span class="text-[10px] font-bold text-secondary/40 uppercase tracking-widest">{{
+            product().qty_label
+          }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Contenido Derecho (Imagen opcional y Botón) -->
+    <div class="flex items-start gap-6">
+      @if (product().image_url) {
+        <div class="relative w-20 h-20 overflow-hidden rounded-xl bg-secondary/5">
+          <img
+            [src]="product().image_url"
+            class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+            alt="{{ product().name }}"
+          />
+        </div>
+      }
+
+      @if (canOrder()) {
+        <app-add-button
+          text=""
+          (clicked)="onAddClick($event)"
+          class="transform group-hover:scale-110 transition-transform"
+        ></app-add-button>
+      }
+    </div>
+  </div>
+} @else {
+  <!-- DISEÑO 2: Producto con Rangos de Precio (Estilo Card Prominente) -->
+  <div
+    (click)="productClick.emit(product())"
+    class="group relative p-4 justify-between items-center transition-all duration-300 overflow-hidden cursor-pointer bg-primary text-white rounded-b-xl rounded-t-[120px] flex flex-col h-full"
+  >
+    <!-- Image (Side position) -->
+    <div class="relative flex rounded-full h-40 w-40 bg-secondary justify-center">
+      @if (product().image_url) {
+        <img
+          [src]="product().image_url"
+          class="w-full h-auto object-contain drop-shadow-2xl transform group-hover:-translate-x-4 transition-transform duration-700"
+          alt="{{ product().name }}"
+        />
+      }
+    </div>
+    <!-- Title & Badge -->
+    <div class="relative flex flex-col w-full pt-4">
+      <h3
+        class="text-4xl flex items-start justify-between gap-2 font-display text-white tracking-tight transition-colors"
+      >
+        {{ product().name }}
+        @if (product().is_recommended) {
+          <lucide-icon [img]="Star" class="w-5 h-5 text-accent fill-accent"></lucide-icon>
+        }
+      </h3>
+    </div>
+
+    <!-- Bottom: Info & Selection Action -->
+    <div class="mt-auto w-full relative flex flex-col justify-between">
+      <div class="flex flex-col">
+        <span class="text-xs font-body font-bold uppercase tracking-[0.2em] text-white/70"
+          >Desde</span
+        >
+        <span class="text-3xl font-display text-accent tracking-tighter">
+          {{ startingPrice() | precio }}
+        </span>
+      </div>
+
+      @if (canOrder()) {
+        <div
+          class="flex justify-between w-full items-center gap-2 px-4 py-2 border-2 border-accent group-hover:bg-accent transition-colors"
+        >
+          <span class="text-xs font-body font-bold uppercase tracking-widest">Elegir cantidades</span>
+          <lucide-icon [img]="Plus" class="w-4 h-4 font-bold"></lucide-icon>
+        </div>
+      }
+    </div>
+  </div>
+}

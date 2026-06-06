@@ -1,0 +1,31 @@
+@if (isLoading()) {
+<app-loading-screen></app-loading-screen>
+}
+
+<div [class.hidden]="isLoading()">
+  <app-category-nav [categories]="allCategories()"></app-category-nav>
+
+
+  <app-base-template [blocks]="blocks()" [combos]="combos()" [promotions]="promotions()"
+    (productClick)="onProductClick($event)" (addToCart)="onAddToCart($event)">
+  </app-base-template>
+
+  <!-- Floating Cart Trigger -->
+  <app-cart-trigger class="fixed bottom-6 right-6 z-50"></app-cart-trigger>
+
+  <!-- Floating WhatsApp Button -->
+  <app-whatsapp-button></app-whatsapp-button>
+
+  <!-- Sidebar Cart -->
+  <app-sidebar-cart></app-sidebar-cart>
+
+  <!-- Product Detail Modal -->
+  @if (selectedProduct(); as product) {
+  <app-chifa-product-detail [product]="product" (close)="closeProductDetail()"
+    (addToCart)="onAddToCart($event.product, $event.quantity, $event.selectedEntry)"></app-chifa-product-detail>
+  }
+
+  <!-- Restaurant Closed Modal -->
+  <app-restaurant-closed-modal [isOpen]="isRestaurantClosed()" [businessHours]="businessHours()"
+    (close)="closeClosedModal()"></app-restaurant-closed-modal>
+</div>

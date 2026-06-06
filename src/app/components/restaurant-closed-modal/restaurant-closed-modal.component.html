@@ -1,0 +1,30 @@
+<app-modal [isOpen]="isOpen()" 
+           title="Restaurante Cerrado" 
+           (close)="onClose()">
+    <div class="flex flex-col items-center text-center p-4">
+        <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-6 text-red-500">
+            <lucide-icon [img]="Clock" class="w-10 h-10"></lucide-icon>
+        </div>
+        <h3 class="text-xl font-bold text-secondary mb-2">¡Lo sentimos!</h3>
+        <p class="text-muted mb-6">Actualmente no estamos recibiendo pedidos. Consulta nuestros horarios:</p>
+        
+        <div class="w-full bg-secondary/5 rounded-2xl p-4 space-y-2">
+            @for (day of days; track day.key) {
+                <div class="flex justify-between items-center py-1 border-b border-primary/5 last:border-0">
+                    <span class="text-sm font-bold text-secondary/60">{{ day.label }}</span>
+                    @if (businessHours()?.[day.key]?.isOpen) {
+                        <span class="text-sm font-bungee text-secondary">
+                            {{ businessHours()?.[day.key]?.open | timeFormat }} - {{ businessHours()?.[day.key]?.close | timeFormat }}
+                        </span>
+                    } @else {
+                        <span class="text-sm font-bold text-red-400">Cerrado</span>
+                    }
+                </div>
+            }
+        </div>
+
+        <button (click)="onClose()" class="w-full mt-8 bg-secondary text-primary py-4 rounded-2xl font-bold">
+            Entendido
+        </button>
+    </div>
+</app-modal>

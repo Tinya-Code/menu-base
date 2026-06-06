@@ -1,0 +1,112 @@
+<!-- Backdrop -->
+@if (isOpen()) {
+  <div (click)="close()"
+       class="fixed inset-0 bg-secondary/60 backdrop-blur-sm z-50 transition-opacity animate-in fade-in duration-300">
+  </div>
+}
+
+<!-- Sidebar Drawer -->
+<div class="fixed top-0 bg-white right-0 h-full w-full max-w-md z-[60] shadow-2xl flex flex-col transition-transform duration-500 ease-out"
+     [ngClass]="'theme-' + templateId()"
+     [class.translate-x-0]="isOpen()"
+     [class.translate-x-full]="!isOpen()">
+  
+  <!-- Header -->
+  <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-white">
+    <div class="flex items-center gap-2">
+      @if (showCheckout()) {
+        <button (click)="backToCart()" class="p-2 hover:bg-gray-100 rounded-full mr-2">
+          <lucide-icon [img]="ArrowLeft" class="w-5 h-5 text-secondary"></lucide-icon>
+        </button>
+      }
+      <h2 class="text-xl font-display text-secondary">{{ showCheckout() ? 'Finalizar Pedido' : 'Tu Carrito' }}</h2>
+      @if (!showCheckout()) {
+        <span class="bg-primary text-white px-2 py-0.5 rounded-full text-xs font-body font-semibold">{{ count() }}</span>
+      }
+    </div>
+    <button (click)="close()" 
+            class="p-2 hover:bg-gray-100 rounded-full transition-colors text-secondary"
+            aria-label="Cerrar carrito">
+      <lucide-icon [img]="X" class="w-6 h-6"></lucide-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="grow overflow-y-auto p-6 scroll-smooth">
+    
+    <!-- Vista de Carrito -->
+    @if (!showCheckout()) {
+        <!-- Empty State -->
+        @if (isEmpty()) {
+          <div class="h-full flex flex-col items-center justify-center text-center animate-in zoom-in-95 duration-500">
+            <div class="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mb-4 text-gray-300">
+              <lucide-icon [img]="ShoppingBag" class="w-12 h-12"></lucide-icon>
+            </div>
+            <h3 class="text-lg font-bold text-secondary mb-2">¡Tu carrito está vacío!</h3>
+            <p class="text-sm text-muted mb-6">Parece que aún no has agregado nada delicioso a tu pedido.</p>
+            <button (click)="close()" 
+                    class="px-6 py-3 bg-secondary text-primary font-bold rounded-xl hover:scale-105 active:scale-95 transition-all">
+              Explorar Menú
+            </button>
+          </div>
+        }
+
+        <!-- Items List -->
+        @if (!isEmpty()) {
+          <div class="space-y-4">
+            @for (item of items(); track item.id) {
+              <app-cart-item [item]="item"
+                             (increase)="increaseItem(item.id)"
+                             (decrease)="decreaseItem(item.id)"
+                             (remove)="removeItem(item.id)">
+              </app-cart-item>
+            }
+          </div>
+        }
+    }
+
+    <!-- Vista de Checkout -->
+    @if (showCheckout()) {
+        <app-checkout-form></app-checkout-form>
+    }
+
+  </div>
+
+  <!-- Footer (Solo en vista de carrito) -->
+  @if (!isEmpty() && !showCheckout()) {
+    <div class="p-6 bg-white border-t border-gray-100 ">
+      <div class="space-y-3 mb-6">
+        <div class="flex justify-between items-center text-sm font-medium text-muted">
+          <span>Subtotal</span>
+          <span>{{ subtotal() | precio }}</span>
+        </div>
+
+        @if (deliveryFee() > 0) {
+        <div class="flex justify-between items-center text-sm font-medium text-muted">
+          <span>Delivery</span>
+          <span>{{ deliveryFee() | precio }}</span>
+        </div>
+        }
+
+        <div class="flex justify-between items-center pt-3 border-t border-gray-0">
+          <span class="text-lg font-bold  text-secondary uppercase tracking-tight">Total</span>
+          <span class="text-2xl font-body font-bold text-primary">{{ total() | precio }}</span>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <button (click)="checkout()" 
+                class="w-full bg-secondary text-white py-4 rounded-sm font-bold text-lg shadow-lg hover:shadow-primary/10 hover:scale-[1.01] active:scale-[0.99] transition-all flex items-center justify-center gap-2">
+          <span>Finalizar Pedido</span>
+          <lucide-icon [img]="ArrowRight" class="w-5 h-5"></lucide-icon>
+        </button>
+        <button (click)="clear()" 
+                class="w-full text-red-400 hover:text-red-500 text-xs font-bold uppercase tracking-widest py-2 transition-colors">
+          Vaciar Carrito
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+

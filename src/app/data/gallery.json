@@ -1,0 +1,165 @@
+{
+  "total": 20,
+  "data": [
+    {
+      "id": "GAL000",
+      "type": "video-link",
+      "url": "https://www.facebook.com/plugins/video.php?height=476&href=https%3A%2F%2Fweb.facebook.com%2Freel%2F4497764023788013%2F&show_text=false&width=267&t=0",
+      "title": "Ambiente ",
+      "description": "Vive la experiencia Mr. Sushi en nuestro local.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL001",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.39 (1).jpeg",
+      "title": "Ambiente Mr. Sushi",
+      "description": "Vive la experiencia Mr. Sushi en nuestro local.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL002",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.39 (2).jpeg",
+      "title": "Makis de la Casa",
+      "description": "Variedad de makis preparados al momento.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL003",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.39 (3).jpeg",
+      "title": "Especialidades",
+      "description": "Nuestros platos más solicitados.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL004",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.39.jpeg",
+      "title": "Detalle de Platos",
+      "description": "Calidad y frescura en cada bocado.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL005",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.40 (2).jpeg",
+      "title": "Sabor Único",
+      "description": "Ingredientes seleccionados para el mejor sabor.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL006",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.40 (3).jpeg",
+      "title": "Presentación Gourmet",
+      "description": "Cuidamos cada detalle de nuestra presentación.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL007",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.40 (4).jpeg",
+      "title": "Nuestra Barra",
+      "description": "Los mejores cocteles para acompañar tu comida.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL008",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.40 (5).jpeg",
+      "title": "Rolls Destacados",
+      "description": "Explora nuestra variedad de rolls.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL009",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.40.jpeg",
+      "title": "Pasión por el Sushi",
+      "description": "Dedicación en cada preparación.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL010",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.41 (1).jpeg",
+      "title": "Momentos Mr. Sushi",
+      "description": "El lugar perfecto para compartir.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL011",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.41 (2).jpeg",
+      "title": "Texturas y Sabores",
+      "description": "Una explosión de sabores en tu paladar.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL012",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.41.jpeg",
+      "title": "Arte Culinario",
+      "description": "Sushi hecho arte.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL013",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.42 (1).jpeg",
+      "title": "Frescura Garantizada",
+      "description": "Pescados y mariscos del día.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL014",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.42 (2).jpeg",
+      "title": "Variedad Nikkei",
+      "description": "Lo mejor de la fusión peruano-japonesa.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL015",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.42 (3).jpeg",
+      "title": "Toque Secreto",
+      "description": "Salsas artesanales que marcan la diferencia.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL016",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-02 at 10.22.43.jpeg",
+      "title": "Experiencia Completa",
+      "description": "Mucho más que solo sushi.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL017",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-04 at 18.26.31.jpeg",
+      "title": "Nuevas Creaciones",
+      "description": "Innovando siempre para ti.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL018",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-04 at 18.26.32 (1).jpeg",
+      "title": "Mr. Sushi Night",
+      "description": "Ven y disfruta de nuestras noches.",
+      "cloudinary_id": ""
+    },
+    {
+      "id": "GAL019",
+      "type": "image",
+      "url": "/images/galery/WhatsApp Image 2026-05-04 at 18.26.32.jpeg",
+      "title": "Clásicos Eternos",
+      "description": "Los sabores que ya conoces y amas.",
+      "cloudinary_id": ""
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "data": {
+    "restaurant": {
+      "name": "MR NIKKEI6.9",
+      "slug": "mr-nikkei6.9",
+      "template_id": "chifa",
+      "phone": "918778647",
+      "address": "Av. Manchay Mz.D - Lt.14, Lima Metropolitana 15594",
+      "location": {
+        "lat": -12.113977,
+        "lng": -76.871191
+      }
+    },
+    "settings": {
+      "whatsapp_config": {
+        "number": "918778647",
+        "message_template": "Hola Mr Nikkei6.9, quisiera ordenar:"
+      },
+      "display_config": {
+        "currency": "PEN",
+        "language": "es"
+      },
+      "order_config": {
+        "delivery_fee": 8.0,
+        "payment_methods": ["cash", "yape", "plin"],
+        "delivery_enabled": true,
+        "max_order_quantity": 20
+      },
+      "business_config": {
+        "social_media": {
+          "tiktok": "@chifadragondorado",
+          "facebook": "https://web.facebook.com/profile.php?id=100088828158141",
+          "instagram": "https://www.instagram.com/sushi_nikkei6.9?fbclid=IwY2xjawRl8A9leHRuA2FlbQIxMABicmlkETFrbVlaMlpHYjBZSUI4Tlc5c3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHs3dwgEMDWk_S7_rS9zO8q2WOicYl2bl4az-nTDPD9pPY8Hb9q63YDSCfure_aem_CokNyc3QPJS0XP-q5n_kyg"
+        },
+        "business_hours": {
+          "friday": {
+            "open": "11:00",
+            "close": "23:00",
+            "isOpen": true
+          },
+          "monday": {
+            "open": "11:00",
+            "close": "22:30",
+            "isOpen": true
+          },
+          "sunday": {
+            "open": "12:00",
+            "close": "22:00",
+            "isOpen": true
+          },
+          "tuesday": {
+            "open": "11:00",
+            "close": "22:30",
+            "isOpen": true
+          },
+          "saturday": {
+            "open": "11:00",
+            "close": "23:00",
+            "isOpen": true
+          },
+          "thursday": {
+            "open": "11:00",
+            "close": "22:30",
+            "isOpen": true
+          },
+          "wednesday": {
+            "open": "11:00",
+            "close": "22:30",
+            "isOpen": true
+          }
+        },
+        "delivery_zones": ["Pachacamac", "Manchay", "3 Marías"]
+      },
+      "description": "Auténtica cocina chino-peruana con más de 25 años de tradición. Sabores del oriente fusionados con la gastronomía peruana.",
+      "tags": [
+        "chifa",
+        "comida china",
+        "peruano",
+        "tradicional",
+        "familiar",
+        "delivery",
+        "economico",
+        "chaufa",
+        "sopas",
+        "wantan",
+        "tallarines",
+        "pollo",
+        "cerdo",
+        "camarones",
+        "mariscos",
+        "yape",
+        "plin"
+      ],
+      "logo_url": null
+    }
+  }
+}

@@ -1,0 +1,68 @@
+/* You can add global styles to this file, and also import other style files */
+
+@font-face {
+  font-family: 'Bebas Neue';
+  src: url('/fonts/BebasNeue-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('/fonts/Poppins-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import 'tailwindcss';
+
+@theme {
+  /* Tipografías */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Poppins', sans-serif;
+  /* Colores base */
+  --color-primary: #d44766; /* rojo frambuesa */
+  --color-secondary: #2c4877; /* azul profundo */
+
+  /* Complementario */
+  --color-background: #fafafa; /* Blanco suave para balance */
+  --color-surface: #f4f4f5; /* Gris Zinc 100 para secciones */
+
+  /* Acentos */
+  --color-accent: #34aeb0; /* turquesa fresco */
+  --color-highlight: #f9a243; /* naranja cálido */
+  --color-accent-muted: #fbbf24; /* Ámbar suave para detalles */
+
+  /* Texto */
+  --color-primary-text: #ffffff; /* Texto sobre fondos oscuros */
+  --color-secondary-text: #0a0a0a; /* Texto sobre fondos claros */
+  --color-text-accent: #d44766; /* Destacar títulos o precios */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+img {
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}

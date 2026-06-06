@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "id": "PRM001",
+      "name": "Sabado de promo",
+      "description": "24 piezas de tus makis favoritos, ahora tus sabado son de makis.",
+      "price": 33,
+      "discountedPrice": 26,
+      "cloudinary_id": "",
+      "url": "/images/combos/combo-1.png"
+    },
+    {
+      "id": "PRM002",
+      "name": "Makilovers",
+      "description": "12 cortes (4 sabores a elección) + 6 Ebi furai",
+      "price": 38,
+      "discountedPrice": 30,
+      "cloudinary_id": "",
+      "url": "/images/combos/combo-1.png"
+    }
+  ]
+}

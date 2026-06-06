@@ -1,0 +1,44 @@
+{
+  "data": [
+    {
+      "id": "1f758435-89d7-4bdd-9005-f3bf3eec7590",
+      "name": "Alitas premium",
+      "entries": [
+        {
+          "qty": "6",
+          "price": "17"
+        },
+        {
+          "qty": "12",
+          "price": "32"
+        },
+        {
+          "price": "46",
+          "qty": "18"
+        }
+      ]
+    },
+    {
+      "id": "f59c2871-de10-405b-a601-3d4d2efed7db",
+      "name": "Makis",
+      "entries": [
+        {
+          "qty": "12",
+          "price": "18"
+        },
+        {
+          "qty": "24",
+          "price": "33"
+        },
+        {
+          "price": "49",
+          "qty": "36"
+        },
+        {
+          "price": "63",
+          "qty": "48"
+        }
+      ]
+    }
+  ]
+}
