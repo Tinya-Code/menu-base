@@ -1,0 +1,24 @@
+<div class="sticky top-0 z-40 bg-transparent backdrop-blur-md shadow-sm">
+  <div class="relative max-w-7xl mx-auto">
+
+    <!-- Banderas -->
+    <div class="flags-track">
+      @for (catData of categories(); track catData.category.id; let i = $index) {
+        <div
+          class="flag-wrapper"
+          [style.transform]="'translateY(' + getFlagY(i, categories().length) + 'px)'"
+        >
+          <div
+            class="flag"
+            [style.background-color]="getFlagColor(i)"
+            [style.transform]="'rotate(' + getFlagAngle(i, categories().length) + 'deg)'"
+            (click)="scrollToCategory('category-' + catData.category.id)"
+          >
+            <span class="flag-label">{{ catData.category.name }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>
