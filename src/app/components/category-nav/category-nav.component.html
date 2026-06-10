@@ -1,7 +1,9 @@
-<div class="sticky top-0 z-40 bg-transparent backdrop-blur-md shadow-sm">
+<div class="sticky top-0 z-40 bg-transparent">
   <div class="relative max-w-7xl mx-auto">
+    <svg class="rope-svg" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path class="rope-path" />
+    </svg>
 
-    <!-- Banderas -->
     <div class="flags-track">
       @for (catData of categories(); track catData.category.id; let i = $index) {
         <div
@@ -14,11 +16,12 @@
             [style.transform]="'rotate(' + getFlagAngle(i, categories().length) + 'deg)'"
             (click)="scrollToCategory('category-' + catData.category.id)"
           >
-            <span class="flag-label">{{ catData.category.name }}</span>
+            <span class="flag-label">
+              {{ catData.category.name }}
+            </span>
           </div>
         </div>
       }
     </div>
-
   </div>
 </div>
