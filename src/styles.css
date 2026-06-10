@@ -41,13 +41,14 @@
   /* Colores base */
   --color-primary: #d44766; /* rojo frambuesa */
   --color-secondary: #2c4877; /* azul profundo */
+  --color-tertiary: #895039; /* terciario */
 
   /* Complementario */
   --color-background: #fafafa; /* Blanco suave para balance */
   --color-surface: #f4f4f5; /* Gris Zinc 100 para secciones */
 
   /* Acentos */
-  --color-accent: #34aeb0; /* turquesa fresco */
+  --color-accent: #36836c; /* turquesa fresco */
   --color-highlight: #f9a243; /* naranja cálido */
   --color-accent-muted: #fbbf24; /* Ámbar suave para detalles */
 
