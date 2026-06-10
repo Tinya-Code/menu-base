@@ -5,7 +5,7 @@
       "name": "Combo 1",
       "description": "Chicharrón, Sarza criolla, 2 tazas de café, Camote frito y Cancha.",
       "price": 35,
-      "url": "/images/combos/combo-1.png",
+      "url": "/images/combos.jpg",
       "cloudinary_id": ""
     },
     {
@@ -13,7 +13,7 @@
       "name": "Combo 2",
       "description": "1 kg de chicharrón, Camote frito, Sarza criolla, 2 tazas de café y Cancha.",
       "price": 53,
-      "url": "/images/combos/combo-2.png",
+      "url": "/images/combos.jpg",
       "cloudinary_id": ""
     },
     {
@@ -21,7 +21,7 @@
       "name": "Combo 3",
       "description": "2 kg de chicharrón, Camote frito, Sarza criolla, 3 tazas de Chocolate Caliente y 3 panes.",
       "price": 99,
-      "url": "/images/combos/combo-3.png",
+      "url": "/images/combos.jpg",
       "cloudinary_id": ""
     },
     {
@@ -29,7 +29,7 @@
       "name": "Combo 4",
       "description": "3 tazas de café y otros.",
       "price": 15,
-      "url": "/images/combos/combo-4.png",
+      "url": "/images/combos.jpg",
       "cloudinary_id": ""
     }
   ]

@@ -1,11 +1,11 @@
 {
   "data": {
     "restaurant": {
-      "name": "MR NIKKEI6.9",
-      "slug": "mr-nikkei6.9",
+      "name": "Chicharroneria Carmen Lara",
+      "slug": "chicharroneria-carmen-lara",
       "template_id": "chifa",
-      "phone": "918778647",
-      "address": "Av. Manchay Mz.D - Lt.14, Lima Metropolitana 15594",
+      "phone": "958796138",
+      "address": "La cruz de Tambo viejo, Cieneguilla, Lima, Peru, 15001",
       "location": {
         "lat": -12.113977,
         "lng": -76.871191
@@ -29,8 +29,8 @@
       "business_config": {
         "social_media": {
           "tiktok": "@chifadragondorado",
-          "facebook": "https://web.facebook.com/profile.php?id=100088828158141",
-          "instagram": "https://www.instagram.com/sushi_nikkei6.9?fbclid=IwY2xjawRl8A9leHRuA2FlbQIxMABicmlkETFrbVlaMlpHYjBZSUI4Tlc5c3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHs3dwgEMDWk_S7_rS9zO8q2WOicYl2bl4az-nTDPD9pPY8Hb9q63YDSCfure_aem_CokNyc3QPJS0XP-q5n_kyg"
+          "facebook": "https://www.facebook.com/chicharroneriaCL/",
+          "instagram": ""
         },
         "business_hours": {
           "friday": {

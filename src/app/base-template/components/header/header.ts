@@ -63,7 +63,7 @@ import { RestaurantService } from '../../../core/services/restaurant.service';
           <!-- Menu Button -->
           @if (!isMenuRoute()) {
             <a
-              routerLink="/menu"
+              routerLink="/"
               class="group flex rounded-sm hover:border-transparent border-2 gap-2 px-4 py-2 border-primary/80 hover:bg-primary items-center "
             >
               <lucide-icon
