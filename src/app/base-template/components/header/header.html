@@ -1,0 +1,136 @@
+<header
+  class="relative font-display w-full h-[480px] flex flex-col md:h-[500px] bg-[#FAF8F5] overflow-hidden"
+>
+  <!-- SVG Clip Path Definition -->
+  <svg
+    width="0"
+    height="0"
+    viewBox="0 0 100 100"
+    preserveAspectRatio="none"
+    class="absolute hidden md:block"
+  >
+    <defs>
+      <clipPath id="left-block-curve" clipPathUnits="objectBoundingBox">
+        <path d="M0,0 V1 H0.915 c0,0 0.19,-0.242 0,-0.5 -0.205,-0.303 0,-0.5 0,-0.5 z" />
+      </clipPath>
+    </defs>
+  </svg>
+  <!-- Manta Background (Desktop Only - S-Curve) -->
+  <div class="absolute right-0 top-0 w-[60%] h-full z-0 hidden md:block">
+    <div
+      class="absolute inset-0 bg-cover bg-center"
+      style="background-image: url('/images/hero/manta.png')"
+    ></div>
+
+    <div
+      class="absolute inset-0 backdrop-blur-[4px]"
+      style="
+        mask-image: linear-gradient(to bottom, black 45%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, black 45%, transparent 100%);
+      "
+    ></div>
+  </div>
+
+  <!-- Mobile Banner -->
+  <div class="absolute top-0 left-0 w-full h-[220px] md:hidden z-0">
+    <div
+      class="w-full h-full bg-cover bg-center"
+      style="
+        mask: linear-gradient(transparent, black, black);
+        backdrop-filter: blur(8px);
+        background-image: url('/images/hero/manta.png');
+      "
+    ></div>
+  </div>
+
+  <!-- Images Container (Desktop) -->
+  <div
+    class="hidden md:flex absolute h-full w-[50%] right-1 flex-col justify-center z-20"
+  >
+    <img
+      src="/images/hero/chicharron.png"
+      alt="Chicharrón"
+      class="max-w-160 drop-shadow-xl object-cover"
+    />
+    <img
+      src="/images/hero/logo.png"
+      alt="Carmen Lara"
+      class="absolute right-1 top-1 w-[140px] object-cover"
+      style="filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.8))"
+    />
+  </div>
+
+  <!-- Info Section -->
+  <div
+    class="w-full md:w-3/5 h-full z-10 relative flex flex-col md:justify-center pt-4 md:pt-0 px-4 md:px-12 lg:px-16 bg-[#f6f5ea]"
+    style="clip-path: url(#left-block-curve)"
+  >
+    <div class="flex flex-col items-center md:block gap-4 md:mt-0 md:pr-12">
+      <img
+        src="/images/hero/logo.png"
+        alt="Carmen Lara"
+        class="md:hidden w-32 object-cover"
+      />
+      <h1
+        class="hidden md:block text-left text-4xl md:text-5xl lg:text-7xl font-black text-[#4A2A18] leading-none mb-4"
+      >
+        {{ restaurantName().split(' ')[0] }}
+        <br />
+        {{ restaurantName().slice(restaurantName().split(' ')[0].length + 1) }}
+      </h1>
+
+      <div class="flex items-center text-[#4A2A18] text-base md:text-xl md:mb-6 gap-2">
+        <lucide-icon [img]="MapPin" class="w-5 h-5"></lucide-icon>
+        <span>{{ address() }}</span>
+        <button
+          (click)="copyAddress()"
+          title="Copiar dirección"
+          class="hover:text-[#4A2A18]/70 transition-colors hover:scale-110 ml-2"
+        >
+          <lucide-icon [img]="Copy" class="w-4 h-4"></lucide-icon>
+        </button>
+        <button
+          (click)="openMaps()"
+          title="Ver en Google Maps"
+          class="hover:text-[#4A2A18]/70 transition-colors hover:scale-110"
+        >
+          <lucide-icon [img]="Map" class="w-4 h-4"></lucide-icon>
+        </button>
+      </div>
+
+      <div class="w-full flex flex-wrap gap-4">
+        @if (!isMenuRoute()) {
+          <a
+            routerLink="/"
+            class="group flex flex-1 md:flex-0 justify-center items-center gap-2 px-6 py-3 bg-white rounded-full border border-[#4A2A18]/20 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+          >
+            <lucide-icon
+              [img]="Utensils"
+              class="w-4 h-4 text-[#4A2A18] group-hover:scale-110 transition-transform"
+            ></lucide-icon>
+            <span class="text-sm font-semibold text-[#4A2A18] uppercase tracking-wider">Menú</span>
+          </a>
+        }
+        <a
+          routerLink="/gallery"
+          class="group flex flex-1 md:flex-0 justify-center items-center gap-2 px-6 py-3 bg-white rounded-full border border-[#4A2A18]/20 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+        >
+          <lucide-icon
+            [img]="Images"
+            class="w-4 h-4 text-[#4A2A18] group-hover:scale-110 transition-transform"
+          ></lucide-icon>
+          <span class="text-sm font-semibold text-[#4A2A18] uppercase tracking-wider">Galería</span>
+        </a>
+        <div class="w-full md:w-auto flex justify-center items-center">
+          <app-share-button class="w-full" />
+        </div>
+      </div>
+
+      <img
+        src="/images/hero/chicharron.png"
+        alt="Chicharrón"
+        class="md:hidden w-64 drop-shadow-xl object-cover"
+      />
+    </div>
+  </div>
+</header>
