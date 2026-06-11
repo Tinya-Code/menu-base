@@ -9,7 +9,7 @@ import { LucideAngularModule, Share2 } from 'lucide-angular';
   template: `
     <button
       (click)="shareMenu()"
-      class="w-full flex justify-center items-center gap-2 px-4 py-2 bg-primary/80 hover:bg-primary text-white rounded-xl transition-all duration-300 font-bold border border-primary/20 group backdrop-blur-sm"
+      class="w-full flex justify-center items-center gap-2 px-4 py-2 bg-primary/80 hover:bg-primary text-white rounded-full transition-all duration-300 font-bold border border-primary/20 group backdrop-blur-sm"
       title="Compartir este menú"
     >
       <lucide-icon

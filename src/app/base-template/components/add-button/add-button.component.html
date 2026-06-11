@@ -1,6 +1,10 @@
-<button (click)="handleClick($event)"
+<button
+  (click)="handleClick($event)"
   [disabled]="disabled()"
-  class="w-full flex items-center justify-center bg-accent px-1 py-1 cursor-pointer  text-primary-text  text-2xl uppercase font-display active:scale-95 transition-all duration-300 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed {{ customClass() }}">
+  class="w-full flex items-center justify-center bg-accent px-1 py-1 cursor-pointer  text-white  text-2xl uppercase font-display active:scale-95 transition-all duration-300 rounded-sm disabled:opacity-50 disabled:cursor-not-allowed {{
+    customClass()
+  }}"
+>
   {{ text() }}
   <lucide-icon [img]="Plus" class="" />
 </button>

@@ -44,16 +44,16 @@
   --color-tertiary: #895039; /* terciario */
 
   /* Complementario */
-  --color-background: #fafafa; /* Blanco suave para balance */
+  --color-background: #faf8f5; /* Blanco suave para balance */
   --color-surface: #f4f4f5; /* Gris Zinc 100 para secciones */
 
   /* Acentos */
-  --color-accent: #36836c; /* turquesa fresco */
+  --color-accent: #d44766; /* verde #36836c  */
   --color-highlight: #f9a243; /* naranja cálido */
   --color-accent-muted: #fbbf24; /* Ámbar suave para detalles */
 
   /* Texto */
-  --color-primary-text: #ffffff; /* Texto sobre fondos oscuros */
+  --color-primary-text: #4a2a18; /* Texto sobre fondos oscuros */
   --color-secondary-text: #0a0a0a; /* Texto sobre fondos claros */
   --color-text-accent: #d44766; /* Destacar títulos o precios */
 }
