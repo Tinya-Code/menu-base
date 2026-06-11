@@ -5,15 +5,8 @@ import { PrecioPipe } from '../../../core/pipes/precio.pipe';
 import { AddButtonComponent } from '../add-button/add-button.component';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 import { computed, inject } from '@angular/core';
+import { Combo } from '../../../core/models/combo.model';
 
-export interface Combo {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  url: string;
-  cloudinary_id: string;
-}
 
 @Component({
   selector: 'app-combo-card',

@@ -1,5 +1,7 @@
 <footer
+
   class="pt-24 pb-6 bg-[url('/images/hero/manta.png')] bg- border-t-[12px] border-tertiary rounded-t-[100px] overflow-hidden relative text-white"
+
 >
   <!-- Background Accents -->
   <div class="absolute inset-0 backdrop-blur-[3px]"></div>
@@ -10,7 +12,9 @@
       <!-- Left: Contact & Hours -->
       <div class="space-y-8 flex flex-col items-center text-center md:text-left">
         <div class="flex flex-col items-center md:items-start">
+
           <span class="text-xs font-black uppercase tracking-[0.4em] text-white mb-6 block"
+
             >Contacto & Horarios</span
           >
           <a
@@ -18,16 +22,19 @@
             class="group inline-flex items-center gap-4 text-3xl font-display hover:text-primary transition-colors duration-300"
           >
             <lucide-icon [img]="Phone" class="w-5 h-5 text-white/80"></lucide-icon>
+
             {{ restaurantPhone() }}
           </a>
         </div>
 
         @if (todayHours(); as schedule) {
           <div class="flex flex-col items-start">
+
             <p class="text-xs font-black text-white uppercase tracking-widest mb-1">
               Horario de Hoy
             </p>
             <p class="text-lg font-bold text-white/80">
+
               {{ schedule.open | timeFormat }} — {{ schedule.close | timeFormat }}
             </p>
           </div>
@@ -38,6 +45,7 @@
       <div class="flex flex-col items-center text-center space-y-6 order-first md:order-none">
         <div class="relative">
           <div class="absolute inset-0 bg-primary blur-2xl opacity-20"></div>
+
           @if (restaurantLogo()) {
             <img [src]="restaurantLogo()" alt="Logo" class="w-auto h-50" />
           } @else {
@@ -47,6 +55,7 @@
               <lucide-icon [img]="Utensils" class="w-12 h-12 text-white"></lucide-icon>
             </div>
           }
+
         </div>
         <h2 class="text-5xl font-display tracking-tighter text-white">
           {{ restaurantName() }}<span class="text-primary">.</span>
@@ -59,7 +68,9 @@
       <!-- Right: Social Media -->
       <div class="space-y-8 flex flex-col items-center text-center md:text-right">
         <div>
+
           <span class="text-xs font-semibold uppercase tracking-[0.4em] text-white mb-6 block"
+
             >Siguenos</span
           >
           <div class="flex items-center justify-center md:justify-end gap-5">
@@ -113,7 +124,9 @@
 
     <!-- Developer Signature -->
     <div
+
       class="w-full flex flex-col sm:flex-row justify-between items-center gap-6 mt-12 border-t border-white/10 pt-8"
+
     >
       <div class="flex items-center gap-4 group">
         <a href="https://wa.me/51924932128" target="_blank" class="relative">
@@ -122,12 +135,16 @@
           ></div>
           <img
             src="/images/gato.jpg"
-            alt="Pedro Alejandro"
+
+            alt="Logo Tinya Code"
+
             class="relative w-11 h-11 rounded-full object-cover grayscale group-hover:grayscale-0 ring-2 ring-white/10 group-hover:ring-primary transition-all duration-500 cursor-pointer"
           />
         </a>
         <div class="flex flex-col">
+
           <span class="text-white/80 text-[10px] uppercase tracking-[0.2em] font-bold mb-0.5"
+
             >Diseño & Desarrollo</span
           >
           <a
@@ -135,7 +152,9 @@
             target="_blank"
             class="text-white/90 font-display tracking-wide hover:text-white transition-colors flex items-center gap-1.5"
           >
-            Pedro Alejandro
+
+            Tinya Code
+
             <lucide-icon
               [img]="ArrowUpRight"
               class="w-3.5 h-3.5 text-primary opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all duration-300"
