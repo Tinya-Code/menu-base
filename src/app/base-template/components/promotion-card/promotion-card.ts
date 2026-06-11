@@ -6,16 +6,7 @@ import { AddButtonComponent } from '../add-button/add-button.component';
 import { Product } from '../../../core/models/product.model';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 import { computed, inject } from '@angular/core';
-
-export interface Promotion {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  discountedPrice: number;
-  cloudinary_id: string;
-  url: string;
-}
+import { Promotion } from '../../../core/models/promotion.model';
 
 @Component({
   selector: 'app-promotion-card',
