@@ -50,10 +50,8 @@ import { BlockPromotionsComponent } from './blocks/block-promotions';
     <app-template-header></app-template-header>
 
     <app-layout-scale>
-      <div
-        [style]="'background-image: url(' + backgroundImage() + ')'"
-        class="bg-repeat relative mx-2"
-      >
+      <div class="bg-repeat relative mx-2">
+        <!-- [style]="'background-image: url(' + backgroundImage() + ')'" -->
         @if (hasBlocks() || hasCombos() || hasPromotions()) {
           <div class=" h-full w-auto mx-2 py-12">
             <app-block-promotions
@@ -151,7 +149,7 @@ export class BaseTemplate implements OnInit {
   productClick = output<Product>();
   addToCart = output<Product | Combo | Promotion>();
 
-  backgroundImage = signal('/images/bg.png');
+  backgroundImage = signal('/images/fondo.jpeg');
 
   ngOnInit(): void {
     this.menuService.getTemplateImages().subscribe((data) => {

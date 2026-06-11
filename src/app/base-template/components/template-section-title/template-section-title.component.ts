@@ -2,6 +2,12 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 import { LucideAngularModule, Waves } from 'lucide-angular';
 
+interface TitleColorConfig {
+  enabled: boolean;
+  colors: string[];
+  mode: 'cycle' | 'random';
+}
+
 @Component({
   selector: 'app-template-section-title',
   standalone: true,
@@ -10,7 +16,8 @@ import { LucideAngularModule, Waves } from 'lucide-angular';
     <div class="flex flex-col  items-center justify-center z-10 gap-2 md:gap-4 mb-8">
       <div class="flex  flex-col items-center justify-center mx-auto  text-center">
         <h3
-          class="text-6xl md:text-7xl flex gap-4 items-center font-display text-transparent bg-clip-text bg-gradient-to-b from-accent from-50% to-accent-muted to-50% uppercase tracking-tight"
+          class="text-6xl md:text-7xl flex gap-4 items-center font-display tracking-tight"
+          [style.color]="titleColor"
         >
           <lucide-icon [img]="Waves" class="w-6 h-6 text-accent shrink-0"></lucide-icon>
           {{ title() }}
@@ -30,5 +37,42 @@ import { LucideAngularModule, Waves } from 'lucide-angular';
 export class TemplateSectionTitleComponent {
   title = input.required<string>();
   description = input<string>('');
+
+  private colorConfig: TitleColorConfig = {
+    enabled: true,
+    colors: [
+      '#EAB308',
+      '#EA580C',
+      '#60A5FA',
+      '#DC2626',
+      '#3B82F6',
+      '#16A34A',
+      '#9333EA',
+      '#EC4899',
+    ],
+    mode: 'random',
+  };
+
   Waves = Waves;
+
+  private defaultColorClass = 'text-tertiary';
+
+  private randomColor = this.getRandomColor();
+
+  private getRandomColor(): string {
+    if (!this.colorConfig.enabled || this.colorConfig.colors.length === 0) {
+      return '';
+    }
+
+    const randomIndex = Math.floor(Math.random() * this.colorConfig.colors.length);
+    return this.colorConfig.colors[randomIndex];
+  }
+
+  get titleColor(): string {
+    return this.randomColor;
+  }
+
+  get titleColorClass(): string {
+    return this.colorConfig.enabled ? '' : this.defaultColorClass;
+  }
 }
