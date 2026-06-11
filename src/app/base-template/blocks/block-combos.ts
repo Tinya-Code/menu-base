@@ -17,7 +17,8 @@ import { SliderComponent } from '../../components/slider/slider.component';
 
         <app-slider [showArrows]="true" [autoSlide]="false">
           @for (combo of combos(); track combo.id) {
-            <app-combo-card [combo]="combo" (addToCart)="addToCart.emit($event)"> </app-combo-card>
+            <app-combo-card class="flex-1" [combo]="combo" (addToCart)="addToCart.emit($event)">
+            </app-combo-card>
           }
         </app-slider>
       </section>
