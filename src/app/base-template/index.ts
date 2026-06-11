@@ -11,11 +11,11 @@ import {
 
 import { Product } from '../core/models/product.model';
 import { Block } from '../core/models/block.model';
+import { Combo } from '../core/models/combo.model';
+import { Promotion } from '../core/models/promotion.model';
 import { TemplateHeader } from './components/header/header';
 import { TemplateFooter } from './components/footer/footer';
 import { LayoutScaleComponent } from '../layout/layout-scale/layout-scale';
-import { Combo } from './components/combo-card/combo-card';
-import { Promotion } from './components/promotion-card/promotion-card';
 import { MenuService } from '../core/services/menu.service';
 
 // Block Components

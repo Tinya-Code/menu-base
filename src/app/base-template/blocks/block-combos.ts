@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { Combo } from '../components/combo-card/combo-card';
+import { Combo } from '../../core/models/combo.model';
 import { ComboCardComponent } from '../components/combo-card/combo-card';
 import { TemplateSectionTitleComponent } from '../components/template-section-title/template-section-title.component';
 import { SliderComponent } from '../../components/slider/slider.component';
