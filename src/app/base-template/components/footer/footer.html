@@ -1,7 +1,5 @@
 <footer
-
   class="pt-24 pb-6 bg-[url('/images/hero/manta.png')] bg- border-t-[12px] border-tertiary rounded-t-[100px] overflow-hidden relative text-white"
-
 >
   <!-- Background Accents -->
   <div class="absolute inset-0 backdrop-blur-[3px]"></div>
@@ -12,9 +10,7 @@
       <!-- Left: Contact & Hours -->
       <div class="space-y-8 flex flex-col items-center text-center md:text-left">
         <div class="flex flex-col items-center md:items-start">
-
           <span class="text-xs font-black uppercase tracking-[0.4em] text-white mb-6 block"
-
             >Contacto & Horarios</span
           >
           <a
@@ -29,12 +25,10 @@
 
         @if (todayHours(); as schedule) {
           <div class="flex flex-col items-start">
-
             <p class="text-xs font-black text-white uppercase tracking-widest mb-1">
               Horario de Hoy
             </p>
             <p class="text-lg font-bold text-white/80">
-
               {{ schedule.open | timeFormat }} — {{ schedule.close | timeFormat }}
             </p>
           </div>
@@ -55,7 +49,6 @@
               <lucide-icon [img]="Utensils" class="w-12 h-12 text-white"></lucide-icon>
             </div>
           }
-
         </div>
         <h2 class="text-5xl font-display tracking-tighter text-white">
           {{ restaurantName() }}<span class="text-primary">.</span>
@@ -68,9 +61,7 @@
       <!-- Right: Social Media -->
       <div class="space-y-8 flex flex-col items-center text-center md:text-right">
         <div>
-
           <span class="text-xs font-semibold uppercase tracking-[0.4em] text-white mb-6 block"
-
             >Siguenos</span
           >
           <div class="flex items-center justify-center md:justify-end gap-5">
@@ -79,11 +70,11 @@
                 <a
                   [href]="sm.facebook"
                   target="_blank"
-                  class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group hover:bg-primary hover:border-primary transition-all duration-300"
+                  class="w-14 h-14 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center group hover:bg-primary hover:border-primary transition-all duration-300"
                 >
                   <lucide-icon
                     [img]="Facebook"
-                    class="w-6 h-6 text-white/60 group-hover:text-white group-hover:scale-110 transition-all"
+                    class="w-6 h-6 text-white/80 group-hover:text-white group-hover:scale-110 transition-all"
                   ></lucide-icon>
                 </a>
               }
@@ -91,11 +82,11 @@
                 <a
                   [href]="sm.instagram"
                   target="_blank"
-                  class="w-14 h-14 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group hover:bg-primary hover:border-primary transition-all duration-300"
+                  class="w-14 h-14 rounded-2xl bg-white/10 border border-white/10 flex items-center justify-center group hover:bg-primary hover:border-primary transition-all duration-300"
                 >
                   <lucide-icon
                     [img]="Instagram"
-                    class="w-6 h-6 text-white/60 group-hover:text-white group-hover:scale-110 transition-all"
+                    class="w-6 h-6 text-white/80 group-hover:text-white group-hover:scale-110 transition-all"
                   ></lucide-icon>
                 </a>
               }
@@ -124,9 +115,7 @@
 
     <!-- Developer Signature -->
     <div
-
       class="w-full flex flex-col sm:flex-row justify-between items-center gap-6 mt-12 border-t border-white/10 pt-8"
-
     >
       <div class="flex items-center gap-4 group">
         <a href="https://wa.me/51924932128" target="_blank" class="relative">
@@ -135,16 +124,12 @@
           ></div>
           <img
             src="/images/gato.jpg"
-
             alt="Logo Tinya Code"
-
             class="relative w-11 h-11 rounded-full object-cover grayscale group-hover:grayscale-0 ring-2 ring-white/10 group-hover:ring-primary transition-all duration-500 cursor-pointer"
           />
         </a>
         <div class="flex flex-col">
-
           <span class="text-white/80 text-[10px] uppercase tracking-[0.2em] font-bold mb-0.5"
-
             >Diseño & Desarrollo</span
           >
           <a
@@ -152,7 +137,6 @@
             target="_blank"
             class="text-white/90 font-display tracking-wide hover:text-white transition-colors flex items-center gap-1.5"
           >
-
             Tinya Code
 
             <lucide-icon

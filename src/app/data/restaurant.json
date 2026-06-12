@@ -71,7 +71,7 @@
         },
         "delivery_zones": ["Pachacamac", "Manchay", "3 Marías"]
       },
-      "description": "Auténtica cocina chino-peruana con más de 25 años de tradición. Sabores del oriente fusionados con la gastronomía peruana.",
+      "description": "Restaurante con grato ambiente familiar platos criollos con auténtico sabor y tradición.",
       "tags": [
         "chifa",
         "comida china",
@@ -91,7 +91,7 @@
         "yape",
         "plin"
       ],
-      "logo_url": "/images/hero/logo.png"
+      "logo_url": "/images/logo-carmenLara.svg"
     }
   }
 }

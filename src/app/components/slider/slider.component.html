@@ -2,7 +2,7 @@
   <div
     #sliderContainer
     class="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
-    style="scrollbar-width: none; -ms-overflow-style: none;"
+    style="scrollbar-width: none; -ms-overflow-style: none"
   >
     <ng-content></ng-content>
   </div>
@@ -10,7 +10,7 @@
   @if (showArrows()) {
     <button
       (click)="prev()"
-      class="absolute left-2 top-1/2 -translate-y-1/2 bg-secondary/80 hover:bg-secondary text-primary-text p-2 rounded-full transition-all z-10 shadow-lg"
+      class="absolute left-2 top-1/2 -translate-y-1/2 bg-gray-100 hover:bg-secondary text-primary-text hover:text-white p-2 rounded-full transition-all z-10 shadow-lg"
       aria-label="Anterior"
       title="Anterior"
     >
@@ -19,7 +19,7 @@
 
     <button
       (click)="next()"
-      class="absolute right-2 top-1/2 -translate-y-1/2 bg-secondary/80 hover:bg-secondary text-primary-text p-2 rounded-full transition-all z-10 shadow-lg"
+      class="absolute right-2 top-1/2 -translate-y-1/2 bg-gray-100 hover:bg-secondary text-primary-text hover:text-white p-2 rounded-full transition-all z-10 shadow-lg"
       aria-label="Siguiente"
       title="Siguiente"
     >
