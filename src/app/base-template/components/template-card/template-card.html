@@ -2,7 +2,7 @@
   <!-- DISEÑO 1: Producto Estándar (Estilo Lista / Minimalista) -->
   <div
     (click)="productClick.emit(product())"
-    class="group relative py-6 px-4 md:px-6 transition-all duration-300 cursor-pointer hover:bg-secondary/5 border-b border-secondary/10 flex items-start gap-6"
+    class="group relative py-6 px-4 md:px-6 transition-all duration-300 cursor-pointer bg-white/30 hover:bg-white/50 border-b border-secondary/10 flex items-start gap-6"
   >
     <!-- Contenido Izquierdo (Info) -->
     <div class="flex-1 space-y-2">
@@ -93,7 +93,9 @@
         <div
           class="flex justify-between w-full items-center gap-2 px-4 py-2 border-2 border-accent group-hover:bg-accent transition-colors"
         >
-          <span class="text-xs font-body font-bold uppercase tracking-widest">Elegir cantidades</span>
+          <span class="text-xs font-body font-bold uppercase tracking-widest"
+            >Elegir cantidades</span
+          >
           <lucide-icon [img]="Plus" class="w-4 h-4 font-bold"></lucide-icon>
         </div>
       }

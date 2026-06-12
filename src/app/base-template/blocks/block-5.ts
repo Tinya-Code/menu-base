@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
-import { Product } from '../../core/models/product.model';
 import { Category } from '../../core/models/category.model';
+import { Product } from '../../core/models/product.model';
 import { TemplateCardComponent } from '../components/template-card/template-card';
 import { TemplateSectionTitleComponent } from '../components/template-section-title/template-section-title.component';
 
@@ -20,7 +20,7 @@ import { TemplateSectionTitleComponent } from '../components/template-section-ti
                 [description]="cat.description || ''"
               ></app-template-section-title>
 
-              <div class="grid grid-cols-2 md:grid-cols-2">
+              <div class="grid grid-cols-2 md:grid-cols-2 md:gap-4 gap-2">
                 @for (product of cat.products; track product.id) {
                   <app-template-card
                     [product]="product"
