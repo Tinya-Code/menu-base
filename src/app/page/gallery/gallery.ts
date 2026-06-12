@@ -1,20 +1,20 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  signal,
   OnInit,
-  inject,
   computed,
+  inject,
+  signal,
 } from '@angular/core';
-import { LucideAngularModule, Image as ImageIcon, Play } from 'lucide-angular';
-import { TemplateHeader } from '../../base-template/components/header/header';
+import { Image as ImageIcon, LucideAngularModule, Play } from 'lucide-angular';
 import { TemplateFooter } from '../../base-template/components/footer/footer';
+import { TemplateHeader } from '../../base-template/components/header/header';
 import {
-  ImageModalComponent,
   GalleryImage,
+  ImageModalComponent,
 } from '../../components/image-modal/image-modal.component';
-import { RestaurantService } from '../../core/services/restaurant.service';
 import { MenuService } from '../../core/services/menu.service';
+import { RestaurantService } from '../../core/services/restaurant.service';
 
 @Component({
   selector: 'app-gallery',
@@ -120,7 +120,7 @@ export class GalleryPage implements OnInit {
   private readonly _restaurantService = inject(RestaurantService);
   private readonly _menuService = inject(MenuService);
   readonly restaurantName = computed(
-    () => this._restaurantService.restaurant()?.name ?? 'Mr Sushi',
+    () => this._restaurantService.restaurant()?.name ?? 'Chicharronería Carmen Lara',
   );
 
   items = signal<GalleryImage[]>([]);

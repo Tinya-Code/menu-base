@@ -17,7 +17,7 @@ export class TemplateHeader {
   private readonly route = inject(ActivatedRoute);
 
   readonly restaurantName = computed(
-    () => this._restaurantService.restaurant()?.name ?? 'Mr Sushi',
+    () => this._restaurantService.restaurant()?.name ?? 'Chicharronería Carmen Lara',
   );
   readonly description = computed(() => this._restaurantService.settings()?.description ?? '');
   readonly address = computed(() => this._restaurantService.restaurant()?.address ?? '');
