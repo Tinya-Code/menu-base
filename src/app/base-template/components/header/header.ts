@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
-import { RouterLink, Router, ActivatedRoute } from '@angular/router';
-import { LucideAngularModule, Utensils, MapPin, Info, Images, Copy, Map } from 'lucide-angular';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Copy, Images, Info, LucideAngularModule, Map, MapPin, Utensils } from 'lucide-angular';
 import { ShareButtonComponent } from '../../../components/share-button/share-button.component';
 import { RestaurantService } from '../../../core/services/restaurant.service';
 
@@ -23,7 +23,8 @@ export class TemplateHeader {
   readonly address = computed(() => this._restaurantService.restaurant()?.address ?? '');
   readonly location = computed(() => this._restaurantService.restaurant()?.location);
 
-  readonly isMenuRoute = computed(() => this.router.url !== '/' && this.router.url !== '');
+  readonly isMenuRoute = computed(() => this.router.url === '/' || this.router.url === '');
+  readonly isGalleryRoute = computed(() => this.router.url === '/gallery');
 
   readonly Utensils = Utensils;
   readonly MapPin = MapPin;
