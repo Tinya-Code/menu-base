@@ -5,6 +5,8 @@ import {
   ElementRef,
   AfterViewInit,
   OnDestroy,
+  signal,
+  HostListener,
 } from '@angular/core';
 
 @Component({
@@ -33,6 +35,14 @@ export class CategoryNav implements AfterViewInit, OnDestroy {
   private ro: ResizeObserver | null = null;
 
   constructor(private el: ElementRef) {}
+
+  isScrolled = signal(false);
+
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    const scrollY = window.scrollY;
+    this.isScrolled.set(scrollY > 100); // cambia el umbral según lo que quieras
+  }
 
   ngAfterViewInit() {
     const track = this.el.nativeElement.querySelector('.flags-track') as HTMLElement;
