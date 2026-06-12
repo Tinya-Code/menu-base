@@ -4,7 +4,7 @@
       "name": "Chicharroneria Carmen Lara",
       "slug": "chicharroneria-carmen-lara",
       "template_id": "chifa",
-      "phone": "958796138",
+      "phone": "949145281",
       "address": "La cruz de Tambo viejo, Cieneguilla, Lima, Peru, 15001",
       "location": {
         "lat": -12.113977,
@@ -13,7 +13,7 @@
     },
     "settings": {
       "whatsapp_config": {
-        "number": "918778647",
+        "number": "949145281",
         "message_template": "Hola Chicharronería Carmen Lara, quisiera ordenar:"
       },
       "display_config": {
