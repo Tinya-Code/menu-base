@@ -3,13 +3,12 @@
  * request execution. It carries no endpoint configuration; the shared,
  * menu-API-pointed instance lives in `./api.js`.
  *
- * The builder is immutable: `with()` / `header()` return a NEW ApiClient, so
- * calls can be chained without mutating the shared client:
+ * The builder is immutable: `with()` returns a NEW ApiClient, so calls can
+ * be chained without mutating the shared client:
  *
  * ```js
  * const data = await api.with('json', 'menu').get();
  * const url  = api.with('json', 'price-range').with('lang', 'es').build();
- * const safe = await api.with('json', 'combos').getOr({ data: [] });
  * ```
  *
  * GET responses are memoised per built URL (the equivalent of the old
@@ -74,39 +73,6 @@ export class ApiClient {
   }
 
   /**
-   * Append several query parameters at once.
-   * @param {Record<string, string | number | null | undefined>} values
-   * @returns {ApiClient}
-   */
-  withAll(values) {
-    return Object.entries(values).reduce(
-      (client, [key, value]) => client.with(key, value),
-      /** @type {ApiClient} */ (this),
-    );
-  }
-
-  /**
-   * @param {string} name
-   * @param {string} value
-   * @returns {ApiClient}
-   */
-  header(name, value) {
-    return this.#clone(this.#params, { ...this.#headers, [name]: value });
-  }
-
-  /**
-   * Disable the response cache for this branch of the builder.
-   * @returns {ApiClient}
-   */
-  withoutCache() {
-    return new ApiClient(this.#baseUrl, {
-      params: this.#params,
-      headers: this.#headers,
-      cache: false,
-    });
-  }
-
-  /**
    * Resolve the final URL.
    * @returns {string}
    */
@@ -115,14 +81,6 @@ export class ApiClient {
     if (!query) return this.#baseUrl;
 
     return `${this.#baseUrl}${this.#baseUrl.includes('?') ? '&' : '?'}${query}`;
-  }
-
-  /**
-   * `build()` kept as a readable alias when the URL is used for logging.
-   * @returns {string}
-   */
-  toString() {
-    return this.build();
   }
 
   /**
@@ -180,20 +138,6 @@ export class ApiClient {
   }
 
   /**
-   * GET, returning `fallback` instead of throwing when the request fails.
-   * @template T
-   * @param {T} fallback
-   * @returns {Promise<any | T>}
-   */
-  async getOr(fallback) {
-    try {
-      return await this.get();
-    } catch {
-      return fallback;
-    }
-  }
-
-  /**
    * POST a JSON body to the built URL.
    * @param {unknown} body
    * @returns {Promise<any>}
@@ -204,14 +148,5 @@ export class ApiClient {
       body: JSON.stringify(body),
       headers: { 'content-type': 'application/json', ...this.#headers },
     });
-  }
-
-  /**
-   * Drop every memoised response.
-   * @returns {ApiClient}
-   */
-  clearCache() {
-    this.#store.entries.clear();
-    return this;
   }
 }
