@@ -65,3 +65,27 @@ img {
   user-select: none;
   pointer-events: none;
 }
+
+/* Scroll-driven parallax (block-1 "barco" image) — CSS-first replacement for
+   the rAF loop in src/scripts/animations/parallax.ts. The image eases from
+   the top to the bottom edge of its parent column while the block enters
+   the viewport (`view()` entry range ≈ the old JS scroll window), and the
+   JS fallback in that module bails out when this @supports gate matches. */
+@supports (animation-timeline: view()) {
+  [data-anim='parallax'] {
+    animation: parallax-slide ease-out both;
+    animation-timeline: view();
+    animation-range: entry;
+  }
+
+  @keyframes parallax-slide {
+    from {
+      top: 0;
+      transform: translateY(0);
+    }
+    to {
+      top: 100%;
+      transform: translateY(-100%);
+    }
+  }
+}

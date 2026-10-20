@@ -8,8 +8,11 @@
  * - `canOrder`  — whether the storefront accepts orders right now (page-loaded)
  *
  * Markup + `data-*` payloads (`data-promotion`, `data-product`) plus the
- * "Ver más" toggle: the page owns the click delegation and announces
- * `product-click` / `add-to-cart` for the `data-promotion-card` root.
+ * "Ver más" toggle: a hidden checkbox + `peer-checked` swaps the clamp with
+ * pure CSS (no script in this card). The page owns the click delegation and
+ * announces `product-click` / `add-to-cart` for the `data-promotion-card`
+ * root; the input and label keep `data-toggle-description` so the page's
+ * guard knows the toggle must never open the dialog.
  */
 import AddButton from '../ui/add-button.astro';
 import { precio } from '../../utils/format.js';
@@ -68,30 +71,22 @@ const asProduct: MenuProduct = {
   </div>
 
   <div class="flex flex-col items-start px-4">
-    <p data-promotion-description class="line-clamp-1 text-lg text-white/80">
+    <input
+      type="checkbox"
+      id={`promo-desc-${promotion.id}`}
+      data-toggle-description
+      class="peer sr-only"
+    />
+    <p class="line-clamp-1 peer-checked:line-clamp-none text-lg text-white/80">
       {promotion.description}
     </p>
 
-    <button data-toggle-description type="button" class="text-white bg-primary px-3 py-1 rounded-sm">
+    <label
+      for={`promo-desc-${promotion.id}`}
+      data-toggle-description
+      class="text-white bg-primary px-3 py-1 rounded-sm cursor-pointer peer-focus-visible:outline-2 peer-focus-visible:outline-current peer-focus-visible:outline-offset-2"
+    >
       Ver más
-    </button>
+    </label>
   </div>
 </div>
-
-<script>
-  // "Ver más" → expand / collapse the description without opening the dialog.
-  // (The clamp itself is CSS-only work, not this phase's; the click wiring is
-  // the only script this card still owns — dispatch lives in the page.)
-  document.addEventListener('click', (event) => {
-    const target = event.target instanceof Element ? event.target : null;
-    const toggle = target?.closest('[data-toggle-description]');
-    if (!toggle) return;
-
-    event.stopPropagation();
-    const description = toggle.parentElement?.querySelector('[data-promotion-description]');
-    if (!description) return;
-
-    const isClamped = description.classList.toggle('line-clamp-1');
-    description.classList.toggle('line-clamp-none', !isClamped);
-  });
-</script>

@@ -9,8 +9,10 @@
  *                  the page from `MenuBlock[]`): the component only reads
  *                  `category.id` and `category.name`.
  *
- * The anchors keep their `#category-{id}` href so the nav still works without
- * JavaScript; the script only adds the 140 px scroll offset from Angular.
+ * The anchors keep their `#category-{id}` href so the nav works without
+ * JavaScript: native fragment navigation + the global smooth-scroll CSS rule,
+ * with the old 140 px Angular header offset provided by the
+ * `scroll-mt-[140px]` class on each category section (menu-block.astro).
  */
 import type { MenuCategory } from '../../types/menu';
 
@@ -31,7 +33,6 @@ const { categories = [] } = Astro.props;
       categories.map(({ category }) => (
         <a
           href={`#category-${category.id}`}
-          data-category-link
           class="whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all bg-secondary/5 text-secondary hover:bg-primary/20 hover:text-primary active:scale-95 cursor-pointer"
         >
           {category.name}
@@ -40,28 +41,3 @@ const { categories = [] } = Astro.props;
     }
   </div>
 </div>
-
-<script>
-  /** Angular `scrollToCategory()` — smooth scroll with a fixed header offset. */
-  const HEADER_OFFSET = 140;
-
-  document.addEventListener('click', (event) => {
-    const target = event.target instanceof Element ? event.target : null;
-    const link = target?.closest<HTMLAnchorElement>('[data-category-link]');
-    if (!link) return;
-
-    const id = link.getAttribute('href')?.slice(1);
-    if (!id) return;
-
-    const element = document.getElementById(id);
-    if (!element) return;
-
-    event.preventDefault();
-
-    const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo({
-      top: elementPosition - HEADER_OFFSET,
-      behavior: 'smooth',
-    });
-  });
-</script>

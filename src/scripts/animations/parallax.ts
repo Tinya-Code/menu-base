@@ -1,6 +1,10 @@
 /**
  * Scroll-parallax for decorative images flagged with `data-anim="parallax"`.
  *
+ * Browsers with scroll-driven animation support (`animation-timeline: view()`)
+ * are served by the CSS rule in `src/styles/global.css`; this module is the
+ * rAF fallback for everyone else and must not run alongside the CSS motion.
+ *
  * Ported from the old block-1 "barco" behavior: the image eases vertically
  * inside its parent column with an ease-out curve driven by the scroll
  * position, only while the parent is inside the viewport.
@@ -66,5 +70,9 @@ function setup(image: HTMLImageElement): void {
 
 /** Initialize every parallax image under `root` (default: the whole document). */
 export function initParallax(root: ParentNode = document): void {
+  // Same feature query as the `@supports` gate in global.css: when the CSS
+  // scroll-driven animation runs, inline transforms would only fight it.
+  if (typeof CSS !== 'undefined' && CSS.supports('animation-timeline: view()')) return;
+
   root.querySelectorAll<HTMLImageElement>('[data-anim="parallax"]').forEach(setup);
 }

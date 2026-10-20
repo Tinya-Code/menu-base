@@ -8,8 +8,10 @@
  * - `phone`   — number the link opens
  * - `message` — prefilled message
  *
- * The URL is built in frontmatter, exactly like the Angular `computed()`s;
- * only the tooltip timing needs client code.
+ * The URL is built in frontmatter, exactly like the Angular `computed()`s.
+ * Tooltip visibility is split: hover shows it via CSS (`group-hover` on the
+ * wrapper), while the Angular 3 s / 8 s sequence is the only thing the client
+ * script drives — through the `data-visible` attribute, never classes.
  */
 import { WhatsApp } from '../../utils/whatsapp.js';
 import Whatsapp from '../icons/whatsapp.astro';
@@ -25,12 +27,14 @@ const whatsappUrl = WhatsApp.link(phone, message ?? 'Hola, me gustaría informac
 ---
 
 <div
-  class="fixed bottom-24 right-6 z-10 flex flex-col items-end gap-2 pb-[env(safe-area-inset-bottom)]"
+  class="group fixed bottom-24 right-6 z-10 flex flex-col items-end gap-2 pb-[env(safe-area-inset-bottom)]"
 >
-  <!-- Tooltip -->
+  <!-- Tooltip: hidden by default; hover (CSS) or the timer (JS `data-visible`)
+       flips it visible. Transitions live here so both triggers share them. -->
   <div
     data-whatsapp-tooltip
-    class="bg-slate-900 text-white px-3 py-1.5 rounded-lg shadow-lg text-[10px] font-medium tracking-wide uppercase transition-all duration-300 origin-right opacity-0 translate-x-4 pointer-events-none"
+    data-visible="false"
+    class="bg-slate-900 text-white px-3 py-1.5 rounded-lg shadow-lg text-[10px] font-medium tracking-wide uppercase transition-all duration-300 origin-right opacity-0 translate-x-4 pointer-events-none group-hover:opacity-100 group-hover:translate-x-0 group-hover:pointer-events-auto data-[visible=true]:opacity-100 data-[visible=true]:translate-x-0 data-[visible=true]:pointer-events-auto"
   >
     Escríbenos
   </div>
@@ -39,8 +43,7 @@ const whatsappUrl = WhatsApp.link(phone, message ?? 'Hola, me gustaría informac
     href={whatsappUrl}
     target="_blank"
     rel="noopener noreferrer"
-    data-whatsapp-link
-    class="w-12 h-12 bg-[#25D366] text-white rounded-full shadow-md hover:shadow-lg flex items-center justify-center transition-all duration-200 relative group"
+    class="w-12 h-12 bg-[#25D366] text-white rounded-full shadow-md hover:shadow-lg flex items-center justify-center transition-all duration-200 relative"
     aria-label="Hablar por WhatsApp"
   >
     <Whatsapp class="w-6 h-6 fill-current" />
@@ -49,18 +52,15 @@ const whatsappUrl = WhatsApp.link(phone, message ?? 'Hola, me gustaría informac
 
 <script>
   const tooltip = document.querySelector<HTMLElement>('[data-whatsapp-tooltip]');
-  const link = document.querySelector<HTMLElement>('[data-whatsapp-link]');
   if (tooltip) {
-    const show = () => tooltip.classList.remove('opacity-0', 'translate-x-4', 'pointer-events-none');
-    const hide = () => tooltip.classList.add('opacity-0', 'translate-x-4', 'pointer-events-none');
+    const setVisible = (visible: boolean) =>
+      tooltip.setAttribute('data-visible', String(visible));
 
-    // Angular: appears after 3 s, disappears 8 s later; hovering overrides it.
+    // Angular: appears after 3 s, disappears 8 s later. Hover is pure CSS
+    // (`group-hover`), so the timer only owns the `data-visible` attribute.
     window.setTimeout(() => {
-      show();
-      window.setTimeout(hide, 8000);
+      setVisible(true);
+      window.setTimeout(() => setVisible(false), 8000);
     }, 3000);
-
-    link?.addEventListener('mouseenter', show);
-    link?.addEventListener('mouseleave', hide);
   }
 </script>

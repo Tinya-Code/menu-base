@@ -63,7 +63,10 @@ const hasDecorations =
         <slot name="decoration-left" />
 
         {categories.map((cat) => (
-          <section id={`category-${cat.id}`} class={`flex flex-col ${categorySectionClass}`.trim()}>
+          <section
+            id={`category-${cat.id}`}
+            class={`flex flex-col scroll-mt-[140px] ${categorySectionClass}`.trim()}
+          >
             <TemplateSectionTitle title={cat.name ?? ''} description={cat.description || ''} />
 
             <div class={`grid ${cardsClass}`}>
