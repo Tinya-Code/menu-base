@@ -44,11 +44,11 @@ Stack context: Astro ^7.3.8 (static output, zero framework islands), Tailwind ^4
 
 Objective: visible defects first, smallest effort.
 
-- [ ] Stop destructuring `templateData` from `load()` (it never returns it) and either wire a real Postres payload path or drop the pass-through (`src/pages/index.astro`).
-- [ ] Render nothing when `images` is empty — kills the empty labeled "Postres" box (`src/components/blocks/illustration-cell.astro`: guard at top of template).
-- [ ] Remove the `/menu` and `/gallery` links — both 404 (`src/components/layout/header.astro`).
-- [ ] Fix the wrong-brand share copy "Menú Chifa" (`src/components/ui/share-button.astro`).
-- [ ] Remove no-op classes `animate-in slide-in-from-bottom md:zoom-in` and `shadow-premium` — no plugin/`@theme` token exists, grep every usage (all `.astro` + `src/styles/global.css`).
+- [x] Stop destructuring `templateData` from `load()` (it never returns it) and either wire a real Postres payload path or drop the pass-through (`src/pages/index.astro`). (done: 849ad26)
+- [x] Render nothing when `images` is empty — kills the empty labeled "Postres" box (`src/components/blocks/illustration-cell.astro`: guard at top of template). (done: 849ad26)
+- [x] Remove the `/menu` and `/gallery` links — both 404 (`src/components/layout/header.astro`). (done: 849ad26)
+- [x] Fix the wrong-brand share copy "Menú Chifa" → "Mr Nikkei" (`src/components/ui/share-button.astro`). (done: 849ad26)
+- [x] Remove no-op classes `animate-in slide-in-from-bottom md:zoom-in` and `shadow-premium` — no plugin/`@theme` token exists, grep every usage (all `.astro` + `src/styles/global.css`). (done: 849ad26)
 
 Cierre: `pnpm build` green; no empty Postres box; grep returns zero for removed classes and dead links.
 
@@ -56,13 +56,13 @@ Cierre: `pnpm build` green; no empty Postres box; grep returns zero for removed 
 
 Objective: delete everything with zero callers, verified by grep per task.
 
-- [ ] Delete `src/services/data-store.service.js` (zero importers — grep `data-store` returns 0).
-- [ ] Remove the 13 dead callback props never passed by any caller: `add-button.onClicked`; `template-card.onProductClick/onAddToCart`; `product-detail.onAddToCart/onClose`; `combo-card.onAddToCart`; `promotion-card.onAddToCart/onProductClick`; `block-combos.addToCart`; `block-promotions.addToCart/productClick` (grep each prop name before/after).
-- [ ] Remove zero-caller methods `withAll`, `header`, `withoutCache`, `getOr`, `clearCache`, `toString` (`src/services/api-client.js`).
-- [ ] Remove `getGalleryData`, `gallery`, `setUseApi`, `withLocalData` (`src/services/menu.service.js` — grep `setUseApi|withLocalData|getGalleryData` returns 0).
-- [ ] Remove `computed`, `combineSubscriptions`, `hasSubscribers`, `reset` (`src/utils/reactive.js`).
-- [ ] Remove never-passed props: `id` + `sectionClass` (`src/components/blocks/menu-block.astro`); `autoSlide` + `autoSlideInterval` (`src/components/ui/slider.astro` — both callers pass `false`); `breakpoints` + `paddings` (`src/components/layout/layout-scale.astro`).
-- [ ] Delete unused assets `src/assets/astro.svg` + `src/assets/background.svg` (grep confirms zero importers).
+- [x] Delete `src/services/data-store.service.js` (zero importers — grep `data-store` returns 0). (done: ce3f6e9)
+- [x] Remove the 13 dead callback props never passed by any caller: `add-button.onClicked`; `template-card.onProductClick/onAddToCart`; `product-detail.onAddToCart/onClose`; `combo-card.onAddToCart`; `promotion-card.onAddToCart/onProductClick`; `block-combos.addToCart`; `block-promotions.addToCart/productClick` (grep each prop name before/after). (done: 860595d)
+- [x] Remove zero-caller methods `withAll`, `header`, `withoutCache`, `getOr`, `clearCache`, `toString` (`src/services/api-client.js`). (done: a5ce694)
+- [x] Remove `getGalleryData`, `gallery`, `setUseApi`, `withLocalData` (`src/services/menu.service.js` — grep `setUseApi|withLocalData|getGalleryData` returns 0). (done: ff006de)
+- [x] Remove `computed`, `combineSubscriptions`, `hasSubscribers`, `reset` (`src/utils/reactive.js`). (done: 1f4cad8)
+- [x] Remove never-passed props: `id` + `sectionClass` (`src/components/blocks/menu-block.astro`); `autoSlide` + `autoSlideInterval` (`src/components/ui/slider.astro` — both callers pass `false`); `breakpoints` + `paddings` (`src/components/layout/layout-scale.astro`). (done: 98e4332)
+- [x] Delete unused assets `src/assets/astro.svg` + `src/assets/background.svg` (grep confirms zero importers). (done: c3366a5)
 
 Cierre: all greps return 0; `pnpm build` green.
 
@@ -70,10 +70,10 @@ Cierre: all greps return 0; `pnpm build` green.
 
 Objective: one owner per domain rule (no duplicated literals or parallel implementations).
 
-- [ ] Export a single WhatsApp link builder with country code in `src/utils/whatsapp.js`; replace every hardcoded `wa.me/51…` (`src/components/ui/whatsapp-button.astro`, `src/components/cart/checkout-form.astro`, `src/components/layout/footer.astro` ×2) and route `product-detail.astro` through it (today it opens without the country code).
-- [ ] Build the order message with the existing `OrderMessage` builder; delete the hand-rolled string and both duplicated `PAYMENT_LABELS` copies (`src/components/cart/checkout-form.astro` frontmatter + script; `src/utils/whatsapp.js` keeps its single copy).
-- [ ] Single source for the days array in `src/services/business-hours.service.js`; `footer.astro` and `restaurant-closed-modal.astro` consume it (grep shows 3 copies today).
-- [ ] Gate through `businessHoursService` instead of importing raw `isOpenAt` (`src/components/cart/checkout-form.astro`).
+- [x] Export a single WhatsApp link builder with country code in `src/utils/whatsapp.js`; replace every hardcoded `wa.me/51…` (`src/components/ui/whatsapp-button.astro`, `src/components/cart/checkout-form.astro`, `src/components/layout/footer.astro` ×2) and route `product-detail.astro` through it (today it opens without the country code). (done: ba18350, 4fda411, 8c03a1c)
+- [x] Build the order message with the existing `OrderMessage` builder; delete the hand-rolled string and both duplicated `PAYMENT_LABELS` copies (`src/components/cart/checkout-form.astro` frontmatter + script; `src/utils/whatsapp.js` keeps its single copy). (done: 4fda411 — script copy was actually `DELIVERY_LABELS`, also deleted)
+- [x] Single source for the days array in `src/services/business-hours.service.js`; `footer.astro` and `restaurant-closed-modal.astro` consume it (grep shows 3 copies today). (done: 8c03a1c — exports `WEEK_DAYS` + `weekDayKey()`)
+- [x] Gate through `businessHoursService` instead of importing raw `isOpenAt` (`src/components/cart/checkout-form.astro`). (done: 4fda411)
 
 Cierre: grep shows one `wa.me` builder call site pattern, one `PAYMENT_LABELS`, one days array; build green.
 
