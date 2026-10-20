@@ -2,8 +2,11 @@
 /**
  * Header — brand, address and share actions.
  *
- * Props: none beyond pass-through classes (the Angular component exposed no
- * outputs). Data is loaded from `restaurantService` at render time.
+ * Props:
+ * - `restaurant` — profile rendered here (name, address, coordinates); the
+ *                  page loads it once and passes it down (F5)
+ * - `class`      — pass-through host classes (the Angular component exposed
+ *                  no outputs)
  *
  * Client actions (no Angular outputs to mirror):
  * - `[data-copy-address]` — copies the address to the clipboard
@@ -18,19 +21,18 @@ import Map from '../icons/map.astro';
 import MapPin from '../icons/map-pin.astro';
 import Utensils from '../icons/utensils.astro';
 import ShareButton from '../ui/share-button.astro';
-import { restaurantService } from '../../services/restaurant.service.js';
+import type { RestaurantProfile } from '../../types/menu';
 
 interface Props {
   class?: string;
+  restaurant?: RestaurantProfile | null;
 }
 
-const { class: hostClass = '' } = Astro.props;
+const { class: hostClass = '', restaurant = null } = Astro.props;
 
-await restaurantService.load();
-
-const restaurantName = restaurantService.restaurant?.name ?? 'Mr Sushi';
-const address = restaurantService.restaurant?.address ?? '';
-const location = restaurantService.restaurant?.location;
+const restaurantName = restaurant?.name ?? 'Mr Sushi';
+const address = restaurant?.address ?? '';
+const location = restaurant?.location;
 const latitude = location?.lat ?? '';
 const longitude = location?.lng ?? '';
 ---

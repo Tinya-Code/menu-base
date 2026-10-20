@@ -3,7 +3,8 @@
  * ComboCard — circular combo image with price badge and quick add.
  *
  * Props:
- * - `combo`       — `{ id, name, description, price, url, cloudinary_id }`
+ * - `combo`    — `{ id, name, description, price, url, cloudinary_id }`
+ * - `canOrder` — whether the storefront accepts orders right now (page-loaded)
  *
  * Markup + `data-*` payload only: the page owns the click delegation and
  * announces `add-to-cart` for the `data-combo-card` root (`data-combo` is its
@@ -11,16 +12,14 @@
  */
 import AddButton from '../ui/add-button.astro';
 import { precio } from '../../utils/format.js';
-import { restaurantService } from '../../services/restaurant.service.js';
+import type { Combo } from '../../types/menu';
 
 interface Props {
-  combo: any;
+  combo: Combo;
+  canOrder?: boolean;
 }
 
-const { combo } = Astro.props;
-
-await restaurantService.load();
-const canOrder = restaurantService.orderConfig?.delivery_enabled ?? true;
+const { combo, canOrder = true } = Astro.props;
 ---
 
 <div

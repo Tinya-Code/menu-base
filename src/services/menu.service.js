@@ -52,13 +52,32 @@ function shapeDecorations(data = {}) {
 }
 
 /**
+ * Look up a price range by id using the tolerant string comparison the
+ * Angular components relied on (empty ids never match).
+ *
+ * Exported as a pure function (F5) so components resolve ranges from a
+ * `priceRanges` prop instead of querying the service; the `MenuService`
+ * method below is the same lookup over the memoised ranges.
+ *
+ * @param {import('../types/menu.js').PriceRange[]} priceRanges
+ * @param {string | number | null | undefined} priceRangeId
+ * @returns {import('../types/menu.js').PriceRange | null}
+ */
+export function findPriceRange(priceRanges, priceRangeId) {
+  if (priceRangeId === null || priceRangeId === undefined || priceRangeId === '') return null;
+
+  const rangeId = String(priceRangeId).trim();
+  return priceRanges.find((range) => String(range.id).trim() === rangeId) ?? null;
+}
+
+/**
  * MenuService — every menu related read, plus the normalisation the Angular
  * components used to do inline.
  *
  * Reads are async, but once `load()` has resolved the data is available
  * through plain sync getters (`blocks`, `combos`, `priceRanges`, …). That is
- * the static-rendering contract: call `await menuService.load()` in the
- * component frontmatter, then treat the result as ordinary data.
+ * the static-rendering contract: the PAGE calls `await menuService.load()`
+ * once and passes the result to components as props — components never fetch.
  *
  * ```js
  * const { blocks, combos, promotions } = await menuService.load();
@@ -381,18 +400,14 @@ export class MenuService {
   }
 
   /**
-   * Look up a price range by id using the tolerant string comparison the
-   * Angular components relied on.
+   * Look up a price range among the memoised ranges.
    * @param {string | number | null | undefined} priceRangeId
-   * @returns {any | null}
+   * @returns {import('../types/menu.js').PriceRange | null}
    */
   findPriceRange(priceRangeId) {
-    if (priceRangeId === null || priceRangeId === undefined || priceRangeId === '') return null;
-
-    const rangeId = String(priceRangeId).trim();
-    return this.#priceRanges.find((range) => String(range.id).trim() === rangeId) ?? null;
+    return findPriceRange(this.#priceRanges, priceRangeId);
   }
 }
 
-/** Shared instance used by the components. */
+/** Shared instance used by the page — the only orchestrator (F5). */
 export const menuService = new MenuService();

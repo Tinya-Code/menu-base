@@ -3,8 +3,12 @@
  * ProductDetail — modal with image, price-range options, quantity stepper and
  * the two order actions (cart / WhatsApp).
  *
- * Props:
- * - `product`       — product payload (required)
+ * Props (every value resolved by the page, F5):
+ * - `product`        — product payload (required)
+ * - `priceRanges`    — ranges used to resolve `price_range_id`
+ * - `maxQuantity`    — `order_config.max_order_quantity`
+ * - `canOrder`       — `order_config.delivery_enabled`
+ * - `whatsappPhone`  — `whatsapp_config.number`
  *
  * Announces its actions as bubbling CustomEvents: `add-to-cart` (the page is
  * the single owner of the cart mutation) and `close-product-detail`; the
@@ -19,23 +23,26 @@ import Plus from '../icons/plus.astro';
 import ShoppingBag from '../icons/shopping-bag.astro';
 import X from '../icons/x.astro';
 import { precio } from '../../utils/format.js';
-import { menuService } from '../../services/menu.service.js';
-import { restaurantService } from '../../services/restaurant.service.js';
+import { findPriceRange } from '../../services/menu.service.js';
+import type { MenuProduct, PriceRange, PriceRangeEntry } from '../../types/menu';
 
 interface Props {
-  product: any;
+  product: MenuProduct;
+  priceRanges?: PriceRange[];
+  maxQuantity?: number;
+  canOrder?: boolean;
+  whatsappPhone?: string;
 }
 
-const { product } = Astro.props;
+const {
+  product,
+  priceRanges = [],
+  maxQuantity = 99,
+  canOrder = true,
+  whatsappPhone = '',
+} = Astro.props;
 
-await restaurantService.load();
-await menuService.getPriceRanges();
-
-const maxQuantity = restaurantService.orderConfig?.max_order_quantity ?? 99;
-const canOrder = restaurantService.orderConfig?.delivery_enabled ?? true;
-const whatsappPhone = restaurantService.whatsappConfig?.number ?? '';
-
-const priceRange = menuService.findPriceRange(product?.price_range_id);
+const priceRange = findPriceRange(priceRanges, product?.price_range_id);
 
 /** The product expects a range but the data never arrived. */
 const isLoadingRange = !!product?.price_range_id && !priceRange;
@@ -150,7 +157,7 @@ const rootAttributes = {
                   Opciones disponibles
                 </span>
                 <div data-entry-grid class="grid grid-cols-1 gap-2">
-                  {priceRange?.entries?.map((entry: any, index: number) => (
+                  {priceRange?.entries?.map((entry: PriceRangeEntry, index: number) => (
                     <button
                       data-entry-index={String(index)}
                       data-entry={JSON.stringify(entry)}

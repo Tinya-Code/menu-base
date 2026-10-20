@@ -3,7 +3,9 @@
  * PromotionCard — discounted item with an expandable description.
  *
  * Props:
- * - `promotion`     — `{ id, name, description, price, discountedPrice, url, cloudinary_id }`
+ * - `promotion` — `{ id, name, description, price, discountedPrice, url,
+ *                   cloudinary_id }`
+ * - `canOrder`  — whether the storefront accepts orders right now (page-loaded)
  *
  * Markup + `data-*` payloads (`data-promotion`, `data-product`) plus the
  * "Ver más" toggle: the page owns the click delegation and announces
@@ -11,19 +13,17 @@
  */
 import AddButton from '../ui/add-button.astro';
 import { precio } from '../../utils/format.js';
-import { restaurantService } from '../../services/restaurant.service.js';
+import type { MenuProduct, Promotion } from '../../types/menu';
 
 interface Props {
-  promotion: any;
+  promotion: Promotion;
+  canOrder?: boolean;
 }
 
-const { promotion } = Astro.props;
-
-await restaurantService.load();
-const canOrder = restaurantService.orderConfig?.delivery_enabled ?? true;
+const { promotion, canOrder = true } = Astro.props;
 
 /** Angular `onCardClick()`: a Promotion shown through the product detail dialog. */
-const asProduct = {
+const asProduct: MenuProduct = {
   id: promotion?.id,
   name: promotion?.name,
   description: promotion?.description,

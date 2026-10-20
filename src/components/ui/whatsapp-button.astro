@@ -4,20 +4,24 @@
  *
  * Port of Angular `src/app/components/whatsapp-button/*`.
  *
- * The URL is resolved in frontmatter (`whatsapp_config.number` +
- * `message_template`), exactly like the Angular `computed()`s; only the
- * tooltip timing needs client code.
+ * Props (the page resolves them from `whatsapp_config`, F5):
+ * - `phone`   — number the link opens
+ * - `message` — prefilled message
+ *
+ * The URL is built in frontmatter, exactly like the Angular `computed()`s;
+ * only the tooltip timing needs client code.
  */
-import { restaurantService } from '../../services/restaurant.service.js';
 import { WhatsApp } from '../../utils/whatsapp.js';
 import Whatsapp from '../icons/whatsapp.astro';
 
-await restaurantService.load();
+interface Props {
+  phone?: string;
+  message?: string | null;
+}
 
-const config = restaurantService.whatsappConfig;
-const phone = config?.number ?? '';
-const message = config?.message_template ?? 'Hola, me gustaría información';
-const whatsappUrl = WhatsApp.link(phone, message);
+const { phone = '', message = null } = Astro.props;
+
+const whatsappUrl = WhatsApp.link(phone, message ?? 'Hola, me gustaría información');
 ---
 
 <div

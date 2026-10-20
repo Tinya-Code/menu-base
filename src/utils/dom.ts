@@ -3,10 +3,11 @@
  *
  * Cards, the product dialog, the layout scaler and the page all hand payloads
  * to client scripts through serialized attributes; every copy of this reader
- * collapsed into the two functions below (F4).
+ * collapsed into the functions below (F4/F5).
  *
  * Client only: nothing here runs during server rendering.
  */
+import type { BusinessHours, MenuProduct } from '../types/menu';
 
 /**
  * Parse a JSON attribute.
@@ -34,6 +35,21 @@ export function readJson<T>(element: Element | null, attribute: string, fallback
 }
 
 /** `readJson(element, 'data-product')` — the payload every card exposes. */
-export function readProduct(element: Element | null): any {
-  return readJson(element, 'data-product');
+export function readProduct(element: Element | null): MenuProduct | null {
+  return readJson<MenuProduct | null>(element, 'data-product', null);
+}
+
+/**
+ * `#business-hours-data` — the opening-hours payload the page embeds for the
+ * cart and checkout scripts; they must not fetch settings in the browser (F5).
+ *
+ * `null` when the schedule never arrived, which `isOpenAt()` treats as
+ * "restaurant open" — the same semantics the client-side fetch had.
+ */
+export function readBusinessHours(): BusinessHours | null {
+  return readJson<BusinessHours | null>(
+    document.getElementById('business-hours-data'),
+    'data-business-hours',
+    null,
+  );
 }

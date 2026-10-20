@@ -5,15 +5,17 @@
  * Port of Angular `src/app/components/category-nav/category-nav.component.ts`.
  *
  * Props:
- * - `categories` — `Array<{ category }>` (the `allCategories` shape used by
- *                  `Menu`): the component only reads `category.id` and
- *                  `category.name`.
+ * - `categories` — `Array<{ category }>` (the `allCategories` shape built by
+ *                  the page from `MenuBlock[]`): the component only reads
+ *                  `category.id` and `category.name`.
  *
  * The anchors keep their `#category-{id}` href so the nav still works without
  * JavaScript; the script only adds the 140 px scroll offset from Angular.
  */
+import type { MenuCategory } from '../../types/menu';
+
 interface Props {
-  categories?: any[];
+  categories?: Array<{ category: MenuCategory }>;
 }
 
 const { categories = [] } = Astro.props;

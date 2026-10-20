@@ -5,7 +5,9 @@
  *   2. has price range → prominent card with "Elegir cantidades"
  *
  * Props:
- * - `product`       — product payload (required)
+ * - `product`     — product payload (required)
+ * - `priceRanges` — ranges used to resolve `price_range_id` (page-loaded)
+ * - `canOrder`    — whether the storefront accepts orders right now
  *
  * Markup + `data-*` payload only: the page owns the click delegation and
  * announces `product-click` / `add-to-cart` for the `data-template-card`
@@ -15,29 +17,27 @@ import Plus from '../icons/plus.astro';
 import Star from '../icons/star.astro';
 import AddButton from '../ui/add-button.astro';
 import { precio } from '../../utils/format.js';
-import { menuService } from '../../services/menu.service.js';
-import { restaurantService } from '../../services/restaurant.service.js';
+import { findPriceRange } from '../../services/menu.service.js';
+import type { MenuProduct, PriceRange } from '../../types/menu';
 
 interface Props {
-  product: any;
+  product: MenuProduct;
+  priceRanges?: PriceRange[];
+  canOrder?: boolean;
 }
 
-const { product } = Astro.props;
+const { product, priceRanges = [], canOrder = true } = Astro.props;
 
-// ─── Static data: settings + price ranges ────────────────────────────────────
-await restaurantService.load();
-await menuService.getPriceRanges();
-
-const canOrder = restaurantService.orderConfig?.delivery_enabled ?? true;
-const hasPriceRange = !!product?.price_range_id;
-const matchedRange = menuService.findPriceRange(product?.price_range_id);
+// ─── Data resolved from the page-provided props ─────────────────────────────
+const hasPriceRange = !!product.price_range_id;
+const matchedRange = findPriceRange(priceRanges, product.price_range_id);
 
 /** Minimum price from the range, or the flat product price. */
 const startingPrice = (() => {
   if (matchedRange && Array.isArray(matchedRange.entries) && matchedRange.entries.length > 0) {
     const prices = matchedRange.entries
-      .map((entry: any) => Number(entry.price))
-      .filter((n: number) => !Number.isNaN(n) && n > 0);
+      .map((entry) => Number(entry.price))
+      .filter((n) => !Number.isNaN(n) && n > 0);
     return prices.length > 0 ? Math.min(...prices) : null;
   }
 

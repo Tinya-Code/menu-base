@@ -9,15 +9,22 @@
  * Visibility is driven by `cartService.isBusinessClosed` (the Angular input
  * `isOpen` came from the same signal), and "Entendido" / the backdrop dispatch
  * the Angular `close` output by calling `cartService.closeBusinessClosedModal()`.
+ *
+ * Props:
+ * - `businessHours` — weekly schedule the page loaded (F5); a missing day
+ *                     renders as "Cerrado"
  */
 import Clock from '../icons/clock.astro';
 import X from '../icons/x.astro';
 import { timeFormat } from '../../utils/format.js';
-import { businessHoursService, WEEK_DAYS } from '../../services/business-hours.service.js';
+import { WEEK_DAYS } from '../../services/business-hours.service.js';
+import type { BusinessHours } from '../../types/menu';
 
-await businessHoursService.load();
+interface Props {
+  businessHours?: BusinessHours;
+}
 
-const businessHours = businessHoursService.rawHours ?? {};
+const { businessHours = {} } = Astro.props;
 
 const hasHours = WEEK_DAYS.some((day) => businessHours[day.key]?.isOpen);
 ---

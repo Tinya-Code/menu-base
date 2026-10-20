@@ -6,24 +6,28 @@
  * step: on submit it validates the fields, persists the name/address and opens
  * WhatsApp with the very same message the Angular component built.
  *
- * Server-side it only renders the static shape (fields + payment methods come
- * from the settings payload); validation, persistence and the WhatsApp hand-off
- * happen in the script below.
+ * Server-side it only renders the static shape: the page resolves the settings
+ * and passes them as props (F5), while validation, persistence and the
+ * WhatsApp hand-off happen in the script below from `data-*` attributes.
  */
 import MessageCircle from '../icons/message-circle.astro';
 import Banknote from '../icons/banknote.astro';
 import CreditCard from '../icons/credit-card.astro';
 import Smartphone from '../icons/smartphone.astro';
-import { restaurantService } from '../../services/restaurant.service.js';
 import { OrderMessage } from '../../utils/whatsapp.js';
+import type { OrderConfig, WhatsappConfig } from '../../types/menu';
 
-await restaurantService.load();
+interface Props {
+  orderConfig?: OrderConfig | null;
+  whatsappConfig?: WhatsappConfig | null;
+}
 
-const orderConfig = restaurantService.orderConfig ?? {};
-const deliveryEnabled = orderConfig.delivery_enabled ?? true;
-const paymentMethods: string[] = orderConfig.payment_methods ?? [];
+const { orderConfig = null, whatsappConfig = null } = Astro.props;
 
-const PAYMENT_ICONS: Record<string, any> = {
+const deliveryEnabled = orderConfig?.delivery_enabled ?? true;
+const paymentMethods: string[] = orderConfig?.payment_methods ?? [];
+
+const PAYMENT_ICONS: Record<string, typeof CreditCard> = {
   cash: Banknote,
   efectivo: Banknote,
   card: CreditCard,
@@ -43,7 +47,14 @@ const fieldClass =
   'w-full font-body bg-gray-100 border border-primary/20 rounded-sm px-4 py-3 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-primary/40 focus:bg-secondary/50';
 ---
 
-<form data-checkout-form class="space-y-4 p-2" novalidate>
+<form
+  data-checkout-form
+  data-delivery-enabled={String(deliveryEnabled)}
+  data-whatsapp={whatsappConfig?.number ?? ''}
+  data-whatsapp-template={whatsappConfig?.message_template ?? ''}
+  class="space-y-4 p-2"
+  novalidate
+>
   <!-- Name -->
   <div class="flex flex-col gap-1">
     <label class="text-sm font-display text-secondary mb-1" for="checkout-name">Nombre Completo</label>
@@ -135,9 +146,9 @@ const fieldClass =
 
 <script>
   import { cartService } from '../../services/cart.service.js';
-  import { restaurantService } from '../../services/restaurant.service.js';
-  import { businessHoursService } from '../../services/business-hours.service.js';
+  import { isOpenAt } from '../../services/business-hours.service.js';
   import { OrderMessage } from '../../utils/whatsapp.js';
+  import { readBusinessHours } from '../../utils/dom';
   import { local } from '../../utils/local-storage.js';
 
   const STORAGE_KEYS = { NAME: 'user_name', ADDRESS: 'user_address' };
@@ -146,10 +157,10 @@ const fieldClass =
 
   const form = document.querySelector<HTMLFormElement>('[data-checkout-form]');
   if (form) {
-    // `whatsappConfig`, the delivery flag and the hours live in the settings
-    // payload: the message can only be built after it arrives (the request is
-    // memoised, so this is the same call the sidebar and the trigger make).
-    businessHoursService.load().then(() => init(form));
+    // Everything this form needs (`whatsappConfig`, the delivery flag and the
+    // hours) is page-rendered data: the form attributes plus
+    // `#business-hours-data` (F5), so there is nothing to await.
+    init(form);
   }
 
   function init(form: HTMLFormElement) {
@@ -166,7 +177,7 @@ const fieldClass =
     if (savedName && nameInput) nameInput.value = savedName;
     if (savedAddress && addressInput) addressInput.value = savedAddress;
 
-    const deliveryEnabled = restaurantService.orderConfig?.delivery_enabled ?? true;
+    const deliveryEnabled = form.dataset.deliveryEnabled === 'true';
 
     const selectedPayment = () =>
       form.querySelector<HTMLInputElement>('[data-payment-input]:checked')?.value ?? '';
@@ -216,12 +227,12 @@ const fieldClass =
 
       if (cartService.isEmpty) return;
 
-      if (!businessHoursService.isOpen()) {
+      if (!isOpenAt(readBusinessHours())) {
         cartService.showBusinessClosedModal();
         return;
       }
 
-      const phoneNumber = restaurantService.whatsappConfig?.number;
+      const phoneNumber = form.dataset.whatsapp;
       if (!phoneNumber) return;
 
       local.set(STORAGE_KEYS.NAME, name);
@@ -230,8 +241,7 @@ const fieldClass =
       const { subtotal, deliveryFee, total, items } = cartService.snapshot;
 
       new OrderMessage({
-        template:
-          restaurantService.whatsappConfig?.message_template || 'Hola, me gustaría ordenar:',
+        template: form.dataset.whatsappTemplate || 'Hola, me gustaría ordenar:',
         deliveryEnabled,
       })
         .withItems(items)

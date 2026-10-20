@@ -45,6 +45,26 @@ export class RestaurantService {
     return this.#ready;
   }
 
+  /**
+   * Seed the service with a payload the page already owns (F5).
+   *
+   * Components never call `load()`: the page loads once at build time and
+   * ships the resolved payload in `data-restaurant-info`; the page script
+   * replays it here so client code (the cart totals) reads the same values
+   * without a browser request. `load()` afterwards resolves with the seeded
+   * payload instead of fetching.
+   *
+   * @param {any} info — the exact payload `load()` resolves to
+   * @returns {this}
+   */
+  hydrate(info) {
+    if (info && typeof info === 'object') {
+      this.#info = info;
+      this.#ready = Promise.resolve(info);
+    }
+    return this;
+  }
+
   /** @returns {any} full payload */
   get info() {
     return this.#info;
@@ -81,5 +101,5 @@ export class RestaurantService {
   }
 }
 
-/** Shared instance used by the components. */
+/** Shared instance used by the page; the cart reads it after `hydrate()`. */
 export const restaurantService = new RestaurantService();

@@ -55,13 +55,15 @@ import { precio } from '../../utils/format.js';
 
 <script>
   import { cartService } from '../../services/cart.service.js';
-  import { businessHoursService } from '../../services/business-hours.service.js';
+  import { isOpenAt } from '../../services/business-hours.service.js';
   import { precio } from '../../utils/format.js';
+  import { readBusinessHours } from '../../utils/dom';
 
-  // The cart totals include the delivery fee, which lives in the settings
-  // payload: load it before the first paint (the request is memoised, so the
-  // other components share this single call).
-  businessHoursService.load().then(bootstrap);
+  // The cart totals include the delivery fee from the settings payload and the
+  // click checks the opening hours: the page ships both (the fee is seeded by
+  // the page script into `restaurantService`, the hours live in
+  // `#business-hours-data`), so the trigger paints synchronously (F5).
+  bootstrap();
 
   function bootstrap() {
     const root = document.querySelector<HTMLElement>('[data-cart-trigger]');
@@ -79,7 +81,7 @@ import { precio } from '../../utils/format.js';
     cartService.subscribe(render, { immediate: true });
 
     root.querySelector('[data-cart-trigger-button]')?.addEventListener('click', () => {
-      if (!businessHoursService.isOpen()) {
+      if (!isOpenAt(readBusinessHours())) {
         cartService.showBusinessClosedModal();
         return;
       }

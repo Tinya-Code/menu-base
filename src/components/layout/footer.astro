@@ -2,8 +2,14 @@
 /**
  * Footer — contact, hours, branding, social links and credits.
  *
- * Props: none (the Angular component exposed no outputs).
- * Data comes from `restaurantService` + `businessHoursService`.
+ * Props:
+ * - `restaurant`    — profile (name, phone) loaded by the page
+ * - `settings`      — settings payload (description + social links)
+ * - `businessHours` — weekly schedule; today's row renders from it
+ * - `class`         — pass-through host classes
+ *
+ * The page loads every value once and passes it down (F5); this component
+ * never fetches.
  */
 import ArrowUpRight from '../icons/arrow-up-right.astro';
 import Facebook from '../icons/facebook.astro';
@@ -11,30 +17,31 @@ import Instagram from '../icons/instagram.astro';
 import Phone from '../icons/phone.astro';
 import Utensils from '../icons/utensils.astro';
 import { timeFormat } from '../../utils/format.js';
-import { restaurantService } from '../../services/restaurant.service.js';
-import { businessHoursService, weekDayKey } from '../../services/business-hours.service.js';
+import { weekDayKey } from '../../services/business-hours.service.js';
 import { WhatsApp } from '../../utils/whatsapp.js';
+import type { BusinessHours, RestaurantProfile, RestaurantSettings, SocialMedia } from '../../types/menu';
 
 interface Props {
   class?: string;
+  restaurant?: RestaurantProfile | null;
+  settings?: RestaurantSettings | null;
+  businessHours?: BusinessHours;
 }
 
-const { class: hostClass = '' } = Astro.props;
+const {
+  class: hostClass = '',
+  restaurant = null,
+  settings = null,
+  businessHours = {},
+} = Astro.props;
 
-await restaurantService.load();
-await businessHoursService.load();
-
-const restaurantName = restaurantService.restaurant?.name ?? 'TU RESTAURANTE';
-const restaurantDescription = restaurantService.settings?.description ?? '';
-const restaurantPhone = restaurantService.restaurant?.phone ?? '';
-const socialMedia = restaurantService.socialMedia ?? {};
-const rawHours = businessHoursService.rawHours;
+const restaurantName = restaurant?.name ?? 'TU RESTAURANTE';
+const restaurantDescription = settings?.description ?? '';
+const restaurantPhone = restaurant?.phone ?? '';
+const socialMedia: Partial<SocialMedia> = settings?.business_config.social_media ?? {};
 
 /** Opening schedule for today (`null` when the schedule never arrived). */
-const todayHours = (() => {
-  if (!rawHours) return null;
-  return rawHours[weekDayKey()] ?? null;
-})();
+const todayHours = businessHours[weekDayKey()] ?? null;
 ---
 
 <footer

@@ -6,9 +6,15 @@
  *   category-nav → base-template → cart-trigger → whatsapp-button →
  *   sidebar-cart → product-detail (mounted hidden) → restaurant-closed-modal
  *
- * Data is loaded in frontmatter (the services memoise every request), so there
- * is no `forkJoin`, no `isLoading` signal and no 800 ms `hidden` artefact:
- * the page ships ready.
+ * Data (F5): this page is the single orchestrator. It loads every payload
+ * (menu, price ranges, restaurant settings + hours) in frontmatter and passes
+ * the resolved values to components as props — nothing under `src/components`
+ * fetches, neither at build time nor in the browser. The few values the client
+ * scripts still need (hours, settings, price ranges) ship as hidden JSON
+ * attributes rendered below and read back by the script.
+ *
+ * There is no `forkJoin`, no `isLoading` signal and no 800 ms `hidden`
+ * artefact: the page ships ready.
  *
  * The product dialog is static, so it is rendered once — hidden — and refilled
  * from the clicked card's `data-product` payload by the script below.
@@ -27,40 +33,90 @@ import ProductDetail from '../components/base-template/product-detail.astro';
 import RestaurantClosedModal from '../components/ui/restaurant-closed-modal.astro';
 
 import { menuService } from '../services/menu.service.js';
-import { businessHoursService } from '../services/business-hours.service.js';
+import { restaurantService } from '../services/restaurant.service.js';
+import type {
+  BusinessHours,
+  Combo,
+  Decorations,
+  MenuBlock,
+  MenuCategory,
+  MenuProduct,
+  OrderConfig,
+  PriceRange,
+  Promotion,
+  RestaurantInfo,
+  RestaurantProfile,
+  RestaurantSettings,
+  WhatsappConfig,
+} from '../types/menu';
+
+/** What the menu payload must resolve to before it reaches the components. */
+interface MenuPayload {
+  blocks: MenuBlock[];
+  combos: Combo[];
+  promotions: Promotion[];
+  decorations: Partial<Decorations>;
+}
 
 /** Same data Angular's `forkJoin` resolved, minus the artificial delay. */
-const { blocks = [], combos = [], promotions = [], decorations = {} } = await menuService
-  .load()
-  .catch((error) => {
-    console.error('[menu] could not load the menu payload.', error);
-    return { blocks: [], combos: [], promotions: [], decorations: {} };
-  });
+const menuPayload: MenuPayload = await menuService.load().catch((error) => {
+  console.error('[menu] could not load the menu payload.', error);
+  return { blocks: [], combos: [], promotions: [], decorations: {} };
+});
+const { blocks, combos, promotions, decorations } = menuPayload;
 
-await menuService.getPriceRanges().catch(() => {});
-await businessHoursService.load().catch(() => {});
+/** Price ranges and the restaurant payload — also loaded only here (F5). */
+await Promise.all([
+  menuService.getPriceRanges().catch(() => {}),
+  restaurantService.load().catch(() => {}),
+]);
+
+const priceRanges: PriceRange[] = menuService.priceRanges;
+const restaurantInfo: RestaurantInfo | null = restaurantService.info;
+const restaurant: RestaurantProfile | null = restaurantService.restaurant;
+const settings: RestaurantSettings | null = restaurantService.settings;
+const orderConfig: OrderConfig | null = restaurantService.orderConfig;
+const whatsappConfig: WhatsappConfig | null = restaurantService.whatsappConfig;
+
+/** Raw schedule; `undefined` when the settings payload never arrived. */
+const rawHours: BusinessHours | undefined = restaurantService.businessConfig?.business_hours;
+const businessHours: BusinessHours = rawHours ?? {};
+
+/** Ordering rules every card and dialog renders from. */
+const canOrder = orderConfig?.delivery_enabled ?? true;
+const maxOrderQuantity = orderConfig?.max_order_quantity ?? 99;
+const whatsappPhone = whatsappConfig?.number ?? '';
 
 /** `allCategories` from `Menu.ngOnInit` — `{ category }` wrappers. */
-const allCategories = blocks.flatMap((block: any) =>
-  (block.categories ?? []).map((category: any) => ({ category })),
+const allCategories: Array<{ category: MenuCategory }> = blocks.flatMap((block) =>
+  (block.categories ?? []).map((category) => ({ category })),
 );
 
 /** Every product, used to pick the dialog's template product. */
-const allProducts = blocks.flatMap((block: any) =>
-  (block.categories ?? []).flatMap((category: any) => category.products ?? []),
+const allProducts: MenuProduct[] = blocks.flatMap((block) =>
+  (block.categories ?? []).flatMap((category) => category.products ?? []),
 );
 
 /**
  * The dialog renders one product at build time; prefer one with a price range
  * so the options list markup exists client-side, then refill it on click.
  */
-const placeholderProduct =
-  allProducts.find((product: any) => product?.price_range_id) ?? allProducts[0] ?? {};
+const placeholderProduct: MenuProduct =
+  allProducts.find((product) => product?.price_range_id) ??
+  allProducts[0] ??
+  ({} as MenuProduct);
 
-const priceRanges = menuService.priceRanges ?? [];
-
-/** Client-side lookup for the price options (no extra request on click). */
+/** Serialized payloads the client scripts read back — all rendered below. */
 const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
+const restaurantInfoJson = JSON.stringify(restaurantInfo).replace(/</g, '\\u003c');
+
+/**
+ * The hours attribute is omitted entirely when the schedule never arrived:
+ * `readBusinessHours()` then returns `null`, which `isOpenAt()` treats as
+ * "open" — the same semantics the old failed client-side fetch had.
+ */
+const hoursJson =
+  rawHours === undefined ? null : JSON.stringify(rawHours).replace(/</g, '\\u003c');
 ---
 
 <Layout title="Carta">
@@ -72,29 +128,67 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
       combos={combos}
       promotions={promotions}
       decorations={decorations}
+      restaurant={restaurant}
+      settings={settings}
+      businessHours={businessHours}
+      canOrder={canOrder}
+      priceRanges={priceRanges}
     />
 
     <CartTrigger />
 
-    <WhatsAppButton />
+    <WhatsAppButton phone={whatsappPhone} message={whatsappConfig?.message_template ?? null} />
 
-    <SidebarCart />
+    <SidebarCart orderConfig={orderConfig} whatsappConfig={whatsappConfig} />
 
     <!-- Product detail: mounted hidden, revealed (and refilled) on click. -->
     <div data-product-detail-host hidden>
-      <ProductDetail product={placeholderProduct} />
+      <ProductDetail
+        product={placeholderProduct}
+        priceRanges={priceRanges}
+        maxQuantity={maxOrderQuantity}
+        canOrder={canOrder}
+        whatsappPhone={whatsappPhone}
+      />
     </div>
 
-    <RestaurantClosedModal />
+    <RestaurantClosedModal businessHours={businessHours} />
   </div>
 
   <div id="price-ranges-data" data-price-ranges={priceRangesJson} hidden></div>
+  <div id="restaurant-info-data" data-restaurant-info={restaurantInfoJson} hidden></div>
+  {
+    hoursJson !== null && (
+      <div id="business-hours-data" data-business-hours={hoursJson} hidden></div>
+    )
+  }
 
   <script>
     import { emit, on } from '../utils/events';
     import { readJson, readProduct } from '../utils/dom';
     import { precio } from '../utils/format.js';
     import { cartService } from '../services/cart.service.js';
+    import { restaurantService } from '../services/restaurant.service.js';
+    import { findPriceRange } from '../services/menu.service.js';
+    import type {
+      MenuProduct,
+      OrderableProduct,
+      PriceRange,
+      PriceRangeEntry,
+      RestaurantInfo,
+    } from '../types/menu';
+
+    // The settings payload ships with the page: replay it into the shared
+    // service so the cart totals read the values the build used. Every cart is
+    // still empty while the modules evaluate, so nothing visible renders
+    // before this line (F5).
+    restaurantService.hydrate(
+      readJson<RestaurantInfo | null>(
+        document.getElementById('restaurant-info-data'),
+        'data-restaurant-info',
+        null,
+      ),
+    );
 
     const ENTRY_BASE_CLASSES =
       'flex items-center justify-between p-2.5 rounded-xl md:rounded-2xl border-2 border-secondary/5 hover:border-accent/30 transition-all text-left group';
@@ -105,17 +199,14 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
     const host = document.querySelector<HTMLElement>('[data-product-detail-host]');
     const root = document.querySelector<HTMLElement>('[data-product-detail]');
 
-    const priceRanges: any[] = (() => {
-      const parsed = readJson(document.getElementById('price-ranges-data'), 'data-price-ranges');
+    const priceRanges: PriceRange[] = (() => {
+      const parsed = readJson<PriceRange[] | null>(
+        document.getElementById('price-ranges-data'),
+        'data-price-ranges',
+        null,
+      );
       return Array.isArray(parsed) ? parsed : [];
     })();
-
-    /** Same tolerant id comparison as `MenuService.findPriceRange`. */
-    const findPriceRange = (id: unknown) => {
-      if (id === null || id === undefined || id === '') return null;
-      const wanted = String(id).trim();
-      return priceRanges.find((range) => String(range.id).trim() === wanted) ?? null;
-    };
 
     const escapeHtml = (value: unknown) =>
       String(value ?? '')
@@ -125,12 +216,13 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
         .replace(/"/g, '&quot;');
 
     /** Rebuild the price options for the product that is about to open. */
-    const renderEntries = (root: HTMLElement, range: any) => {
+    const renderEntries = (root: HTMLElement, range: PriceRange | null) => {
       const list = root.querySelector<HTMLElement>('[data-entry-list]');
       const grid = root.querySelector<HTMLElement>('[data-entry-grid]');
       if (!list || !grid) return null;
 
-      const entries: any[] = Array.isArray(range?.entries) ? range.entries : [];
+      const candidate = range?.entries;
+      const entries: PriceRangeEntry[] = Array.isArray(candidate) ? candidate : [];
 
       list.hidden = entries.length === 0;
       list.setAttribute('data-selected-index', entries.length > 0 ? '0' : '');
@@ -162,10 +254,10 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
     };
 
     /** Paint the dialog with the product the user clicked. */
-    const fill = (product: any) => {
+    const fill = (product: MenuProduct) => {
       if (!root) return;
 
-      root.setAttribute('data-product', JSON.stringify(product ?? {}));
+      root.setAttribute('data-product', JSON.stringify(product));
 
       const name = root.querySelector<HTMLElement>('[data-detail-name]');
       if (name) name.textContent = product?.name ?? '';
@@ -188,7 +280,7 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
         dialog.classList.toggle('md:grid-cols-1', !hasImage);
       }
 
-      const range = findPriceRange(product?.price_range_id);
+      const range = findPriceRange(priceRanges, product?.price_range_id);
       const firstEntry = renderEntries(root, range);
 
       const price = root.querySelector<HTMLElement>('[data-current-price]');
@@ -287,15 +379,16 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
 
       const comboCard = target.closest('[data-combo-card]');
       if (comboCard) {
-        const combo = readJson(comboCard, 'data-combo');
+        const combo = readJson<OrderableProduct | null>(comboCard, 'data-combo', null);
         if (combo) emit('add-to-cart', { product: combo, quantity: 1, selectedEntry: undefined });
         return;
       }
 
       const promotionCard = target.closest('[data-promotion-card]');
       if (promotionCard) {
-        const promotion = readJson(promotionCard, 'data-promotion');
-        if (promotion) emit('add-to-cart', { product: promotion, quantity: 1, selectedEntry: undefined });
+        const promotion = readJson<OrderableProduct | null>(promotionCard, 'data-promotion', null);
+        if (promotion)
+          emit('add-to-cart', { product: promotion, quantity: 1, selectedEntry: undefined });
       }
     });
   </script>

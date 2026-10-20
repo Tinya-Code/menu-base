@@ -10,20 +10,26 @@
  * Client only: both helpers default to `document`, so import this module from
  * `<script>` blocks, never from server frontmatter.
  */
+import type { MenuProduct, OrderableProduct, PriceRangeEntry } from '../types/menu';
 
 /**
  * Payload map: event name → the exact `detail` shape the dispatchers send.
  *
- * The product payloads stay `any` until `src/types/menu.ts` (F5) exists;
- * widening them now would be a type change, and this refactor only moves code.
+ * Product payloads are typed from `src/types/menu.ts` (F5): a card dispatches
+ * its own `MenuProduct`, and the combo/promotion cards dispatch the raw
+ * resource object (the cart only reads `id`, `name` and `price`).
  */
 export interface EventMap {
   /** A card asks the page to open the product dialog for `product`. */
-  'product-click': { product: any };
+  'product-click': { product: MenuProduct };
   /** `ui/add-button.astro` announces a "＋" press; `event` is the click. */
   'add-button-click': { event: Event };
   /** Ask the page (the single owner) to add a line to the cart. */
-  'add-to-cart': { product: any; quantity?: number; selectedEntry?: any };
+  'add-to-cart': {
+    product: OrderableProduct;
+    quantity?: number;
+    selectedEntry?: PriceRangeEntry | null;
+  };
   /** The product dialog must close. */
   'close-product-detail': Record<string, never>;
 }

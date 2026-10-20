@@ -13,6 +13,7 @@
  * - `sectionAttrs`    — extra section attributes (e.g. `data-block-1`,
  *                       `data-maki-urls` for the client-side maki rail).
  * - `outerClass` / `cardsClass` / `categorySectionClass` — per-block grids
+ * - `canOrder` / `priceRanges` — card data the page resolves once (F5)
  *
  * Named slots:
  * - `decoration-left`  — grid cell(s) BEFORE the categories
@@ -22,19 +23,7 @@
  */
 import TemplateCard from '../cards/template-card.astro';
 import TemplateSectionTitle from '../ui/template-section-title.astro';
-
-/** One product; the cards consume it opaquely. */
-interface MenuProduct {
-  [key: string]: any;
-}
-
-/** One category rendered as a section inside the block. */
-interface MenuCategory {
-  id?: string | number;
-  name?: string;
-  description?: string | null;
-  products?: MenuProduct[];
-}
+import type { MenuCategory, PriceRange } from '../../types/menu';
 
 interface Props {
   categories?: MenuCategory[];
@@ -42,6 +31,8 @@ interface Props {
   outerClass?: string;
   cardsClass?: string;
   categorySectionClass?: string;
+  canOrder?: boolean;
+  priceRanges?: PriceRange[];
 }
 
 const {
@@ -50,6 +41,8 @@ const {
   outerClass = '',
   cardsClass = '',
   categorySectionClass = '',
+  canOrder = true,
+  priceRanges = [],
 } = Astro.props;
 
 /**
@@ -75,7 +68,7 @@ const hasDecorations =
 
             <div class={`grid ${cardsClass}`}>
               {(cat.products ?? []).map((product) => (
-                <TemplateCard product={product} />
+                <TemplateCard product={product} priceRanges={priceRanges} canOrder={canOrder} />
               ))}
             </div>
           </section>

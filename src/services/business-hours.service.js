@@ -123,5 +123,5 @@ export class BusinessHoursService {
   }
 }
 
-/** Shared instance used by the components. */
+/** Shared instance used by the page — the only orchestrator (F5). */
 export const businessHoursService = new BusinessHoursService();

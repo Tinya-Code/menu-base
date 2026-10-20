@@ -4,6 +4,7 @@
  *
  * Props:
  * - `combos`      — combos rendered inside the slider (required, defaults to `[]`)
+ * - `canOrder`    — forwarded to each card (page-loaded ordering flag)
  * - `title`       — section heading (default `'Combos'`)
  * - `description` — section sub-text (default `'Combos especiales para compartir'`)
  *
@@ -13,15 +14,18 @@
 import ComboCard from '../cards/combo-card.astro';
 import TemplateSectionTitle from '../ui/template-section-title.astro';
 import Slider from '../ui/slider.astro';
+import type { Combo } from '../../types/menu';
 
 interface Props {
-  combos?: any[];
+  combos?: Combo[];
+  canOrder?: boolean;
   title?: string;
   description?: string;
 }
 
 const {
   combos = [],
+  canOrder = true,
   title = 'Combos',
   description = 'Combos especiales para compartir',
 } = Astro.props;
@@ -34,7 +38,7 @@ const {
 
       <Slider showArrows={true}>
         {combos.map((combo) => (
-          <ComboCard combo={combo} />
+          <ComboCard combo={combo} canOrder={canOrder} />
         ))}
       </Slider>
     </section>

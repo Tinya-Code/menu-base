@@ -9,6 +9,10 @@
  * from `cartService`; `showCheckout` (Angular `signal`) is plain local state
  * inside that script. Nothing here needs a client framework.
  *
+ * Props (passed through to the checkout step, resolved by the page, F5):
+ * - `orderConfig`    — delivery flag + payment methods
+ * - `whatsappConfig` — number + message template
+ *
  * The Angular `theme-{templateId}` class carried a null input on this page, so
  * it is not ported.
  */
@@ -20,6 +24,14 @@ import ShoppingBag from '../icons/shopping-bag.astro';
 import Trash2 from '../icons/trash-2.astro';
 import X from '../icons/x.astro';
 import CheckoutForm from './checkout-form.astro';
+import type { OrderConfig, WhatsappConfig } from '../../types/menu';
+
+interface Props {
+  orderConfig?: OrderConfig | null;
+  whatsappConfig?: WhatsappConfig | null;
+}
+
+const { orderConfig = null, whatsappConfig = null } = Astro.props;
 ---
 
 <!-- Backdrop -->
@@ -92,7 +104,7 @@ import CheckoutForm from './checkout-form.astro';
 
     <!-- Checkout view -->
     <div data-checkout-view hidden>
-      <CheckoutForm />
+      <CheckoutForm orderConfig={orderConfig} whatsappConfig={whatsappConfig} />
     </div>
   </div>
 
@@ -184,12 +196,16 @@ import CheckoutForm from './checkout-form.astro';
 
 <script>
   import { cartService } from '../../services/cart.service.js';
-  import { businessHoursService } from '../../services/business-hours.service.js';
+  import { isOpenAt } from '../../services/business-hours.service.js';
   import { precio } from '../../utils/format.js';
+  import { readBusinessHours } from '../../utils/dom';
+  import type { CartLine } from '../../types/cart';
 
-  // Totals need the delivery fee from the settings payload; the request is
-  // memoised in the shared module, so this is the same call the trigger makes.
-  businessHoursService.load().then(bootstrap);
+  // The totals need the delivery fee from the settings payload and the closed
+  // check needs the opening hours: both are page-rendered data (the fee is
+  // seeded by the page script into `restaurantService`, the hours come from
+  // `#business-hours-data`), so the drawer boots synchronously (F5).
+  bootstrap();
 
   function bootstrap() {
     const drawer = document.querySelector<HTMLElement>('[data-cart-drawer]');
@@ -212,7 +228,7 @@ import CheckoutForm from './checkout-form.astro';
 
     let showCheckout = false;
 
-    const renderItems = (items: any[]) => {
+    const renderItems = (items: CartLine[]) => {
       list.replaceChildren();
 
       for (const item of items) {
@@ -281,7 +297,7 @@ import CheckoutForm from './checkout-form.astro';
       if (target.closest('[data-cart-clear]')) return void cartService.clear();
 
       if (target.closest('[data-cart-checkout]')) {
-        if (!businessHoursService.isOpen()) {
+        if (!isOpenAt(readBusinessHours())) {
           cartService.showBusinessClosedModal();
           return;
         }
