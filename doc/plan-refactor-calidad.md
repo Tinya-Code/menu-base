@@ -81,11 +81,11 @@ Cierre: grep shows one `wa.me` builder call site pattern, one `PAYMENT_LABELS`, 
 
 Objective: components collaborate only through typed CustomEvents, owned by one module; dispatchers have no hidden side effects.
 
-- [ ] Create `src/utils/events.ts`: typed event-name union + payload map + `emit()`/`on()` helpers; delete the 4 copied `emit()` helpers and the 3 duplicated `readJson`/`readProduct` helpers, migrating their callers (`src/pages/index.astro`, `template-card.astro`, `combo-card.astro`, `promotion-card.astro`, `product-detail.astro`).
-- [ ] Migrate every dispatcher to the module: `product-click`, `add-button-click`, `close-product-detail` (`template-card`, `combo-card`, `promotion-card`, `product-detail`, `add-button`).
-- [ ] Migrate every listener to `on(...)`: `index.astro` dialog refill, `product-detail` inner listeners, `sidebar-cart`, `restaurant-closed-modal`.
-- [ ] Define `add-to-cart` ownership: one listener in `src/pages/index.astro` calls `cartService.addItem({ product, quantity, selectedEntry })`; delete the 4 "default action" handlers inside dispatchers (dispatchers dispatch, never mutate state).
-- [ ] Document-level delegation: one listener set in `index.astro` replaces the per-card click scripts — `template-card.astro`, `combo-card.astro`, `promotion-card.astro` become markup + `data-*` attributes only (verify: product detail still opens, add-to-cart still adds).
+- [x] Create `src/utils/events.ts`: typed event-name union + payload map + `emit()`/`on()` helpers; delete the 4 copied `emit()` helpers and the 3 duplicated `readJson`/`readProduct` helpers, migrating their callers (`src/pages/index.astro`, `template-card.astro`, `combo-card.astro`, `promotion-card.astro`, `product-detail.astro`). (done: 27985cd)
+- [x] Migrate every dispatcher to the module: `product-click`, `add-button-click`, `close-product-detail` (`template-card`, `combo-card`, `promotion-card`, `product-detail`, `add-button`). (done: 27985cd)
+- [x] Migrate every listener to `on(...)`: `index.astro` dialog refill, `product-detail` inner listeners, `sidebar-cart`, `restaurant-closed-modal`. (done: 27985cd)
+- [x] Define `add-to-cart` ownership: one listener in `src/pages/index.astro` calls `cartService.addItem({ product, quantity, selectedEntry })`; delete the 4 "default action" handlers inside dispatchers (dispatchers dispatch, never mutate state). (done: 27985cd)
+- [x] Document-level delegation: one listener set in `index.astro` replaces the per-card click scripts — `template-card.astro`, `combo-card.astro`, `promotion-card.astro` become markup + `data-*` attributes only (verify: product detail still opens, add-to-cart still adds). (done: 27985cd)
 
 Cierre: grep `dispatchEvent` outside `src/utils/events.ts` returns only the module; per-card `<script>` blocks gone; manual smoke (open detail, add, close) works; build green.
 
