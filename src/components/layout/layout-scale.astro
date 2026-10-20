@@ -5,31 +5,27 @@
  * The wrapper keeps the scaled height in flow while the inner box keeps its
  * design width and is transformed with `scale()`.
  *
- * Props:
- * - `breakpoints` — width per breakpoint (default 256 / 768 / 1280 / 1280)
- * - `paddings`    — horizontal padding per breakpoint (default 0 everywhere)
+ * The canvas is fixed: breakpoint widths and paddings are constants, handed
+ * to the client script through the `data-*` attributes below.
  *
  * Client only: measurement, debounced re-layout, `ResizeObserver`,
  * `MutationObserver` and `window.resize` all live in the `<script>` below and
  * are scoped to `[data-layout-scale]` so several instances are safe.
  */
-interface Props {
-  breakpoints?: { mobile: number; tablet: number; desktop: number; wide: number };
-  paddings?: { mobile: number; tablet: number; desktop: number; wide: number };
-}
 
-const {
-  breakpoints = { mobile: 256, tablet: 768, desktop: 1280, wide: 1280 },
-  paddings = { mobile: 0, tablet: 0, desktop: 0, wide: 0 },
-} = Astro.props;
+/** Width per breakpoint (design canvas): mobile / tablet / desktop / wide. */
+const BREAKPOINTS = { mobile: 256, tablet: 768, desktop: 1280, wide: 1280 };
 
-const defaultWidth = breakpoints.desktop;
+/** Horizontal padding per breakpoint (none on any breakpoint). */
+const PADDINGS = { mobile: 0, tablet: 0, desktop: 0, wide: 0 };
+
+const defaultWidth = BREAKPOINTS.desktop;
 ---
 
 <div
   data-layout-scale
-  data-breakpoints={JSON.stringify(breakpoints)}
-  data-paddings={JSON.stringify(paddings)}
+  data-breakpoints={JSON.stringify(BREAKPOINTS)}
+  data-paddings={JSON.stringify(PADDINGS)}
   class="w-full overflow-hidden flex justify-center"
 >
   <div

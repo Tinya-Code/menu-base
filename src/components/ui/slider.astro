@@ -6,8 +6,6 @@
  *
  * Props:
  * - `showArrows`       — render the prev/next buttons (default `true`)
- * - `autoSlide`        — advance automatically (default `false`)
- * - `autoSlideInterval`— delay in ms between advances (default `5000`)
  *
  * Client behaviour (scroll by one full page, smooth) lives in the `<script>` below.
  */
@@ -16,14 +14,12 @@ import ChevronRight from '../icons/chevron-right.astro';
 
 interface Props {
   showArrows?: boolean;
-  autoSlide?: boolean;
-  autoSlideInterval?: number;
 }
 
-const { showArrows = true, autoSlide = false, autoSlideInterval = 5000 } = Astro.props;
+const { showArrows = true } = Astro.props;
 ---
 
-<div data-slider data-auto-slide={autoSlide ? 'true' : 'false'} data-interval={String(autoSlideInterval)} class="relative">
+<div data-slider class="relative">
   <div
     data-slider-track
     class="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
@@ -60,9 +56,6 @@ const { showArrows = true, autoSlide = false, autoSlideInterval = 5000 } = Astro
 </div>
 
 <script>
-  /** Auto-slide timers so page swaps can never leak one. */
-  const timers = new Set<ReturnType<typeof setInterval>>();
-
   function scrollByPage(track: HTMLElement, direction: 1 | -1) {
     track.scrollBy({ left: track.clientWidth * direction, behavior: 'smooth' });
   }
@@ -76,12 +69,6 @@ const { showArrows = true, autoSlide = false, autoSlideInterval = 5000 } = Astro
 
     slider.querySelector('[data-slider-prev]')?.addEventListener('click', () => scrollByPage(track, -1));
     slider.querySelector('[data-slider-next]')?.addEventListener('click', () => scrollByPage(track, 1));
-
-    if (slider.getAttribute('data-auto-slide') === 'true') {
-      const interval = Number(slider.getAttribute('data-interval') || 5000);
-      const timer = setInterval(() => scrollByPage(track, 1), interval);
-      timers.add(timer);
-    }
   }
 
   const initAll = () => {
@@ -90,10 +77,4 @@ const { showArrows = true, autoSlide = false, autoSlideInterval = 5000 } = Astro
 
   initAll();
   document.addEventListener('astro:page-load', initAll);
-
-  // Equivalent of Angular's ngOnDestroy.
-  document.addEventListener('astro:before-swap', () => {
-    timers.forEach((timer) => clearInterval(timer));
-    timers.clear();
-  });
 </script>
