@@ -7,7 +7,8 @@
  * - `title`       — section heading (default `'Combos'`)
  * - `description` — section sub-text (default `'Combos especiales para compartir'`)
  *
- * Combo cards dispatch their own bubbling `add-to-cart` CustomEvent.
+ * Combo cards expose a `data-combo` payload; the page dispatches the bubbling
+ * `add-to-cart` CustomEvent for them (see `src/pages/index.astro`).
  */
 import ComboCard from '../cards/combo-card.astro';
 import TemplateSectionTitle from '../ui/template-section-title.astro';

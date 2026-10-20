@@ -5,10 +5,9 @@
  * Props:
  * - `promotion`     — `{ id, name, description, price, discountedPrice, url, cloudinary_id }`
  *
- * Listens for `add-button-click` (emitted by `ui/add-button.astro`) and
- * announces `add-to-cart` / `product-click` as bubbling CustomEvents — the
- * latter carries the promotion already mapped to a Product (discounted price
- * as `price`).
+ * Markup + `data-*` payloads (`data-promotion`, `data-product`) plus the
+ * "Ver más" toggle: the page owns the click delegation and announces
+ * `product-click` / `add-to-cart` for the `data-promotion-card` root.
  */
 import AddButton from '../ui/add-button.astro';
 import { precio } from '../../utils/format.js';
@@ -80,25 +79,9 @@ const asProduct = {
 </div>
 
 <script>
-  import { cartService } from '../../services/cart.service.js';
-
-  /** Notify the page; returns false when a listener called `preventDefault()`. */
-  function emit(name: string, detail: Record<string, unknown>) {
-    const event = new CustomEvent(name, { detail, bubbles: true, cancelable: true });
-    return document.dispatchEvent(event);
-  }
-
-  function readJson(element: Element | null, attribute: string) {
-    const raw = element?.getAttribute(attribute);
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  }
-
   // "Ver más" → expand / collapse the description without opening the dialog.
+  // (The clamp itself is CSS-only work, not this phase's; the click wiring is
+  // the only script this card still owns — dispatch lives in the page.)
   document.addEventListener('click', (event) => {
     const target = event.target instanceof Element ? event.target : null;
     const toggle = target?.closest('[data-toggle-description]');
@@ -110,31 +93,5 @@ const asProduct = {
 
     const isClamped = description.classList.toggle('line-clamp-1');
     description.classList.toggle('line-clamp-none', !isClamped);
-  });
-
-  // Card body click → open the product detail with the discounted price.
-  document.addEventListener('click', (event) => {
-    const target = event.target instanceof Element ? event.target : null;
-    const card = target?.closest('[data-promotion-card]');
-    if (!card) return;
-    if (target?.closest('[data-add-button]')) return;
-    if (target?.closest('[data-toggle-description]')) return;
-
-    const product = readJson(card, 'data-product');
-    if (product) emit('product-click', { product });
-  });
-
-  // "＋" click → add the promotion straight to the cart.
-  document.addEventListener('add-button-click', (event) => {
-    const target = event.target instanceof Element ? event.target : null;
-    const card = target?.closest('[data-promotion-card]');
-    if (!card) return;
-
-    const promotion = readJson(card, 'data-promotion');
-    if (!promotion) return;
-
-    if (emit('add-to-cart', { product: promotion, quantity: 1, selectedEntry: undefined })) {
-      cartService.addItem(promotion, 1);
-    }
   });
 </script>

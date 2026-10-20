@@ -7,8 +7,9 @@
  * - `title`       — section heading (default `'Promociones'`)
  * - `description` — section sub-text (default `'Aprovecha nuestras ofertas especiales'`)
  *
- * Promotion cards dispatch their own bubbling `add-to-cart` and
- * `product-click` CustomEvents.
+ * Promotion cards expose `data-promotion` / `data-product` payloads; the page
+ * dispatches the bubbling `add-to-cart` and `product-click` CustomEvents for
+ * them (see `src/pages/index.astro`).
  */
 import PromotionCard from '../cards/promotion-card.astro';
 import TemplateSectionTitle from '../ui/template-section-title.astro';

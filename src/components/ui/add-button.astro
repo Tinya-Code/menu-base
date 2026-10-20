@@ -53,21 +53,17 @@ const classes = [
 </button>
 
 <script>
+  import { emit } from '../../utils/events';
+
   // Runs once per page: every `[data-add-button]` click is announced through
-  // the `add-button-click` bubbling CustomEvent. Cards listen for it and are
-  // the ones that decide what it means.
+  // the `add-button-click` bubbling CustomEvent. The page listens for it and is
+  // the one that decides what it means (open the dialog or add to the cart).
   document.addEventListener('click', (event) => {
     const target = event.target instanceof Element ? event.target : null;
     const button = target?.closest<HTMLButtonElement>('[data-add-button]');
     if (!button || button.disabled) return;
 
     event.stopPropagation();
-    button.dispatchEvent(
-      new CustomEvent('add-button-click', {
-        detail: { event },
-        bubbles: true,
-        cancelable: true,
-      }),
-    );
+    emit('add-button-click', { event }, button);
   });
 </script>

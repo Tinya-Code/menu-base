@@ -6,10 +6,9 @@
  * Props:
  * - `product`       — product payload (required)
  *
- * Announces its actions as bubbling CustomEvents: `add-to-cart`
- * (with the default cart action when nobody handles it) and
- * `close-product-detail`; the dialog always closes after adding, like the
- * Angular version.
+ * Announces its actions as bubbling CustomEvents: `add-to-cart` (the page is
+ * the single owner of the cart mutation) and `close-product-detail`; the
+ * dialog always closes after adding, like the Angular version.
  *
  * Client state (quantity, selected price entry) is handled locally in the
  * `<script>` below — it never touches the cart until the user adds the item.
@@ -266,33 +265,18 @@ const rootAttributes = {
 </div>
 
 <script>
-  import { cartService } from '../../services/cart.service.js';
+  import { emit } from '../../utils/events';
+  import { readJson } from '../../utils/dom';
   import { precio } from '../../utils/format.js';
   import { OrderMessage, WhatsApp } from '../../utils/whatsapp.js';
 
   const SELECTED_CLASSES = ['border-accent', 'bg-accent/5'];
 
-  /** Notify the page; returns false when a listener called `preventDefault()`. */
-  function emit(name: string, detail: Record<string, unknown> = {}) {
-    const event = new CustomEvent(name, { detail, bubbles: true, cancelable: true });
-    return document.dispatchEvent(event);
-  }
-
-  function readJson(element: Element | null, attribute: string) {
-    const raw = element?.getAttribute(attribute);
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  }
-
   /** Close the dialog (overlay + both close buttons). */
   document.addEventListener('click', (event) => {
     const target = event.target instanceof Element ? event.target : null;
     if (target?.closest('[data-close-overlay]')) {
-      emit('close-product-detail');
+      emit('close-product-detail', {});
     }
   });
 
@@ -347,7 +331,7 @@ const rootAttributes = {
     if (increase) increase.disabled = next >= max;
   });
 
-  /** Add to the cart, then close the dialog (same order as Angular). */
+  /** Announce the add; the page owns the cart mutation, we always close after. */
   document.addEventListener('click', (event) => {
     const target = event.target instanceof Element ? event.target : null;
     const button = target?.closest('[data-add-to-cart]');
@@ -370,11 +354,8 @@ const rootAttributes = {
         : null;
     const selectedEntry = readJson(selectedButton ?? null, 'data-entry') ?? undefined;
 
-    const detail = { product, quantity, selectedEntry };
-    if (emit('add-to-cart', detail)) {
-      cartService.addItem(product, quantity, selectedEntry);
-    }
-    emit('close-product-detail');
+    emit('add-to-cart', { product, quantity, selectedEntry });
+    emit('close-product-detail', {});
   });
 
   /** Single-product WhatsApp message (same wording as the Angular dialog). */

@@ -7,8 +7,9 @@
  * Props:
  * - `product`       — product payload (required)
  *
- * Listens for `add-button-click` (emitted by `ui/add-button.astro`) and
- * announces `product-click` / `add-to-cart` as bubbling CustomEvents.
+ * Markup + `data-*` payload only: the page owns the click delegation and
+ * announces `product-click` / `add-to-cart` for the `data-template-card`
+ * root (`data-product`, `data-has-range` are its client contract).
  */
 import Plus from '../icons/plus.astro';
 import Star from '../icons/star.astro';
@@ -136,55 +137,3 @@ const rootAttributes = {
     </div>
   )
 }
-<script>
-  import { cartService } from '../../services/cart.service.js';
-
-  /** Notify the page; returns false when a listener called `preventDefault()`. */
-  function emit(name: string, detail: Record<string, unknown>) {
-    const event = new CustomEvent(name, { detail, bubbles: true, cancelable: true });
-    return document.dispatchEvent(event);
-  }
-
-  function readProduct(element: Element | null) {
-    const raw = element?.getAttribute('data-product');
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  }
-
-  // Card body click → open the product detail.
-  document.addEventListener('click', (event) => {
-    const target = event.target instanceof Element ? event.target : null;
-    const card = target?.closest('[data-template-card]');
-    if (!card) return;
-    // The add button owns this click (see the listener below).
-    if (target?.closest('[data-add-button]')) return;
-
-    const product = readProduct(card);
-    if (product) emit('product-click', { product });
-  });
-
-  // "＋" click → add straight to the cart, or open the detail when the product
-  // needs a price range selection.
-  document.addEventListener('add-button-click', (event) => {
-    const target = event.target instanceof Element ? event.target : null;
-    const card = target?.closest('[data-template-card]');
-    if (!card) return;
-
-    const product = readProduct(card);
-    if (!product) return;
-
-    if (card.getAttribute('data-has-range') === 'true') {
-      emit('product-click', { product });
-      return;
-    }
-
-    const detail = { product, quantity: 1, selectedEntry: undefined };
-    if (emit('add-to-cart', detail)) {
-      cartService.addItem(product, 1);
-    }
-  });
-</script>

@@ -12,6 +12,10 @@
  *
  * The product dialog is static, so it is rendered once — hidden — and refilled
  * from the clicked card's `data-product` payload by the script below.
+ *
+ * The script is also the single owner of the component event contract
+ * (`src/utils/events.ts`): delegated card clicks, `add-to-cart` → cart, and
+ * the dialog open/close listeners.
  */
 import Layout from '../layouts/Layout.astro';
 import CategoryNav from '../components/ui/category-nav.astro';
@@ -87,7 +91,10 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
   <div id="price-ranges-data" data-price-ranges={priceRangesJson} hidden></div>
 
   <script>
+    import { emit, on } from '../utils/events';
+    import { readJson, readProduct } from '../utils/dom';
     import { precio } from '../utils/format.js';
+    import { cartService } from '../services/cart.service.js';
 
     const ENTRY_BASE_CLASSES =
       'flex items-center justify-between p-2.5 rounded-xl md:rounded-2xl border-2 border-secondary/5 hover:border-accent/30 transition-all text-left group';
@@ -99,13 +106,8 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
     const root = document.querySelector<HTMLElement>('[data-product-detail]');
 
     const priceRanges: any[] = (() => {
-      const raw = document.getElementById('price-ranges-data')?.getAttribute('data-price-ranges') ?? '[]';
-      try {
-        const parsed = JSON.parse(raw);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
+      const parsed = readJson(document.getElementById('price-ranges-data'), 'data-price-ranges');
+      return Array.isArray(parsed) ? parsed : [];
     })();
 
     /** Same tolerant id comparison as `MenuService.findPriceRange`. */
@@ -218,8 +220,12 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
       }
     };
 
-    document.addEventListener('product-click', (event) => {
-      const detail = (event as CustomEvent).detail as { product?: any } | undefined;
+    // ─── Event contract (see `src/utils/events.ts`) ─────────────────────────
+    // The page is the single owner of every cross-component collaboration:
+    // cards are pure markup, the add button only announces its press, and the
+    // product dialog only announces its actions.
+
+    on('product-click', (detail) => {
       const product = detail?.product;
       if (!host || !product) return;
 
@@ -228,10 +234,69 @@ const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
       document.documentElement.style.overflow = 'hidden';
     });
 
-    document.addEventListener('close-product-detail', () => {
+    on('close-product-detail', () => {
       if (!host) return;
       host.hidden = true;
       document.documentElement.style.overflow = '';
+    });
+
+    /**
+     * The one owner of `add-to-cart`: dispatchers never touch the cart
+     * themselves (they used to run `addItem` as the event's "default action"
+     * after `emit(...) === false` — a vetoed dispatch still skips the add).
+     */
+    on('add-to-cart', (detail, event) => {
+      if (event.defaultPrevented) return;
+      cartService.addItem(detail.product, detail.quantity, detail.selectedEntry);
+    });
+
+    // Card body click → `product-click` (delegation replaces the per-card
+    // scripts; combo cards never opened the dialog, so they stay inert).
+    document.addEventListener('click', (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      const card = target?.closest('[data-template-card], [data-promotion-card]');
+      if (!card) return;
+      // The add button owns this click (it announces `add-button-click`).
+      if (target?.closest('[data-add-button]')) return;
+      // "Ver más" toggles the clamp in place, it never opens the dialog.
+      if (target?.closest('[data-toggle-description]')) return;
+
+      const product = readProduct(card);
+      if (product) emit('product-click', { product });
+    });
+
+    // "＋" click → straight to the cart, or the dialog when the product needs
+    // a price-range selection (the old per-card `add-button-click` handlers).
+    on('add-button-click', (_detail, event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+
+      const templateCard = target.closest('[data-template-card]');
+      if (templateCard) {
+        const product = readProduct(templateCard);
+        if (!product) return;
+
+        if (templateCard.getAttribute('data-has-range') === 'true') {
+          emit('product-click', { product });
+          return;
+        }
+
+        emit('add-to-cart', { product, quantity: 1, selectedEntry: undefined });
+        return;
+      }
+
+      const comboCard = target.closest('[data-combo-card]');
+      if (comboCard) {
+        const combo = readJson(comboCard, 'data-combo');
+        if (combo) emit('add-to-cart', { product: combo, quantity: 1, selectedEntry: undefined });
+        return;
+      }
+
+      const promotionCard = target.closest('[data-promotion-card]');
+      if (promotionCard) {
+        const promotion = readJson(promotionCard, 'data-promotion');
+        if (promotion) emit('add-to-cart', { product: promotion, quantity: 1, selectedEntry: undefined });
+      }
     });
   </script>
 </Layout>

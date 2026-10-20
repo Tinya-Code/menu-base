@@ -38,19 +38,11 @@ const defaultWidth = BREAKPOINTS.desktop;
 </div>
 
 <script>
+  import { readJson } from '../../utils/dom';
+
   type Breakpoints = { mobile: number; tablet: number; desktop: number; wide: number };
 
   const DEBOUNCE_MS = 60;
-
-  function readJson<T>(element: Element | null, attribute: string, fallback: T): T {
-    const raw = element?.getAttribute(attribute);
-    if (!raw) return fallback;
-    try {
-      return JSON.parse(raw) as T;
-    } catch {
-      return fallback;
-    }
-  }
 
   function setup(wrapper: Element) {
     if (wrapper.hasAttribute('data-scale-ready')) return;

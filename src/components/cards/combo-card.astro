@@ -5,8 +5,9 @@
  * Props:
  * - `combo`       — `{ id, name, description, price, url, cloudinary_id }`
  *
- * Listens for `add-button-click` (emitted by `ui/add-button.astro`) and
- * announces `add-to-cart` as a bubbling CustomEvent.
+ * Markup + `data-*` payload only: the page owns the click delegation and
+ * announces `add-to-cart` for the `data-combo-card` root (`data-combo` is its
+ * client contract — a combo has never opened the product dialog).
  */
 import AddButton from '../ui/add-button.astro';
 import { precio } from '../../utils/format.js';
@@ -58,36 +59,3 @@ const canOrder = restaurantService.orderConfig?.delivery_enabled ?? true;
     </div>
   </div>
 </div>
-
-<script>
-  import { cartService } from '../../services/cart.service.js';
-
-  /** Notify the page; returns false when a listener called `preventDefault()`. */
-  function emit(name: string, detail: Record<string, unknown>) {
-    const event = new CustomEvent(name, { detail, bubbles: true, cancelable: true });
-    return document.dispatchEvent(event);
-  }
-
-  function readCombo(element: Element | null) {
-    const raw = element?.getAttribute('data-combo');
-    if (!raw) return null;
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return null;
-    }
-  }
-
-  document.addEventListener('add-button-click', (event) => {
-    const target = event.target instanceof Element ? event.target : null;
-    const card = target?.closest('[data-combo-card]');
-    if (!card) return;
-
-    const combo = readCombo(card);
-    if (!combo) return;
-
-    if (emit('add-to-cart', { product: combo, quantity: 1, selectedEntry: undefined })) {
-      cartService.addItem(combo, 1);
-    }
-  });
-</script>
