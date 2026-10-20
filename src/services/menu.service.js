@@ -77,7 +77,6 @@ export class MenuService {
     menu: 'menu',
     priceRanges: 'price-range',
     settings: 'settings',
-    gallery: 'gallery',
     combos: 'combos',
     promotions: 'promotions',
     templateImages: 'template-images',
@@ -88,7 +87,6 @@ export class MenuService {
     menu: 'menu',
     priceRanges: 'priceRanges',
     settings: 'restaurant',
-    gallery: 'gallery',
     combos: 'combos',
     promotions: 'promotions',
     templateImages: 'templateImages',
@@ -128,9 +126,6 @@ export class MenuService {
   /** @type {ReturnType<typeof shapeDecorations> | null} */
   #decorations = null;
 
-  /** @type {any[]} */
-  #gallery = [];
-
   /** @type {Promise<any> | undefined} */
   #priceRangesPromise;
 
@@ -141,26 +136,6 @@ export class MenuService {
     this.#client = client;
     this.#local = local;
     this.#useApi = useApi;
-  }
-
-  /**
-   * Force API or local JSON for every read.
-   * @param {boolean} value
-   * @returns {this}
-   */
-  setUseApi(value) {
-    this.#useApi = Boolean(value);
-    return this;
-  }
-
-  /**
-   * Merge extra local JSON after construction.
-   * @param {Record<string, any>} local
-   * @returns {this}
-   */
-  withLocalData(local) {
-    this.#local = { ...this.#local, ...local };
-    return this;
   }
 
   // ─── Resolution helpers ────────────────────────────────────────────────────
@@ -296,20 +271,6 @@ export class MenuService {
   }
 
   /**
-   * Gallery items; every entry gets an explicit `type`.
-   * @returns {Promise<{ data: any[] }>}
-   */
-  async getGalleryData() {
-    const response = await this.#resolve('gallery', { data: [] });
-
-    if (Array.isArray(response?.data)) {
-      response.data = response.data.map((item) => ({ ...item, type: item.type ?? 'image' }));
-    }
-
-    return response;
-  }
-
-  /**
    * Background + decorative images.
    * Local data wins when present; otherwise the endpoint is queried.
    * @returns {Promise<{ data: Record<string, any> }>}
@@ -417,11 +378,6 @@ export class MenuService {
   /** @returns {ReturnType<typeof shapeDecorations> | null} */
   get decorations() {
     return this.#decorations;
-  }
-
-  /** @returns {any[]} */
-  get gallery() {
-    return this.#gallery;
   }
 
   /**
