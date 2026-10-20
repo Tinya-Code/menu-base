@@ -11,8 +11,6 @@
  * - `customClass` — extra classes appended to the button (Angular `customClass`)
  * - `class`       — extra classes for the root (Angular projected host class)
  * - `disabled`    — disables the button
- * - `onClicked`   — Angular `output()` mirrored as a prop; the real transport is
- *                   the bubbling `add-button-click` CustomEvent dispatched on click
  *
  * Emits: `add-button-click` → detail `{ event }`
  */
@@ -23,7 +21,6 @@ interface Props {
   customClass?: string;
   class?: string;
   disabled?: boolean;
-  onClicked?: (event: Event) => void;
 }
 
 const { text = '', customClass = '', disabled = false, class: hostClass = '' } = Astro.props;

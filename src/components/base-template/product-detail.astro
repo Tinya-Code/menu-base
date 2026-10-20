@@ -5,12 +5,11 @@
  *
  * Props:
  * - `product`       — product payload (required)
- * - `onAddToCart`   — Angular `addToCart` output mirrored as a prop.
- *                     Real transport: the `add-to-cart` CustomEvent
- *                     (default action when nobody handles it: `cartService.addItem(...)`).
- *                     The dialog always closes afterwards, like the Angular version.
- * - `onClose`       — Angular `close` output mirrored as a prop.
- *                     Real transport: the `close-product-detail` CustomEvent.
+ *
+ * Announces its actions as bubbling CustomEvents: `add-to-cart`
+ * (with the default cart action when nobody handles it) and
+ * `close-product-detail`; the dialog always closes after adding, like the
+ * Angular version.
  *
  * Client state (quantity, selected price entry) is handled locally in the
  * `<script>` below — it never touches the cart until the user adds the item.
@@ -26,8 +25,6 @@ import { restaurantService } from '../../services/restaurant.service.js';
 
 interface Props {
   product: any;
-  onAddToCart?: (payload: { product: any; quantity: number; selectedEntry?: any }) => void;
-  onClose?: () => void;
 }
 
 const { product } = Astro.props;

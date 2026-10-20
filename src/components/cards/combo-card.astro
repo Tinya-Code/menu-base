@@ -4,11 +4,9 @@
  *
  * Props:
  * - `combo`       — `{ id, name, description, price, url, cloudinary_id }`
- * - `onAddToCart` — Angular `addToCart` output mirrored as a prop.
- *                   Real transport: the `add-to-cart` CustomEvent
- *                   (default action when nobody handles it: `cartService.addItem(combo, 1)`).
  *
- * Listens for `add-button-click` (emitted by `ui/add-button.astro`).
+ * Listens for `add-button-click` (emitted by `ui/add-button.astro`) and
+ * announces `add-to-cart` as a bubbling CustomEvent.
  */
 import AddButton from '../ui/add-button.astro';
 import { precio } from '../../utils/format.js';
@@ -16,7 +14,6 @@ import { restaurantService } from '../../services/restaurant.service.js';
 
 interface Props {
   combo: any;
-  onAddToCart?: (combo: any) => void;
 }
 
 const { combo } = Astro.props;

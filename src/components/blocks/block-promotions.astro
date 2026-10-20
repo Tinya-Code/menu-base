@@ -6,12 +6,9 @@
  * - `promotions`  — promotions rendered inside the slider (required, defaults to `[]`)
  * - `title`       — section heading (default `'Promociones'`)
  * - `description` — section sub-text (default `'Aprovecha nuestras ofertas especiales'`)
- * - `addToCart`   — Angular output mirrored as a prop.
- *                   Real transport: promotion cards dispatch their own bubbling
- *                   `add-to-cart` CustomEvent.
- * - `productClick`— Angular output mirrored as a prop.
- *                   Real transport: promotion cards dispatch their own bubbling
- *                   `product-click` CustomEvent.
+ *
+ * Promotion cards dispatch their own bubbling `add-to-cart` and
+ * `product-click` CustomEvents.
  */
 import PromotionCard from '../cards/promotion-card.astro';
 import TemplateSectionTitle from '../ui/template-section-title.astro';
@@ -21,8 +18,6 @@ interface Props {
   promotions?: any[];
   title?: string;
   description?: string;
-  addToCart?: (payload: { product: any }) => void;
-  productClick?: (payload: { product: any }) => void;
 }
 
 const {
@@ -37,7 +32,7 @@ const {
     <section class="relative py-12 px-8">
       <TemplateSectionTitle title={title} description={description} />
 
-      <Slider showArrows={true} autoSlide={false}>
+      <Slider showArrows={true}>
         {promotions.map((promotion) => (
           <PromotionCard promotion={promotion} />
         ))}

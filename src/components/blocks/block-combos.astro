@@ -6,9 +6,8 @@
  * - `combos`      — combos rendered inside the slider (required, defaults to `[]`)
  * - `title`       — section heading (default `'Combos'`)
  * - `description` — section sub-text (default `'Combos especiales para compartir'`)
- * - `addToCart`   — Angular output mirrored as a prop.
- *                   Real transport: combo cards dispatch their own bubbling
- *                   `add-to-cart` CustomEvent.
+ *
+ * Combo cards dispatch their own bubbling `add-to-cart` CustomEvent.
  */
 import ComboCard from '../cards/combo-card.astro';
 import TemplateSectionTitle from '../ui/template-section-title.astro';
@@ -18,7 +17,6 @@ interface Props {
   combos?: any[];
   title?: string;
   description?: string;
-  addToCart?: (payload: { product: any }) => void;
 }
 
 const {
@@ -33,7 +31,7 @@ const {
     <section class="relative py-12 px-8">
       <TemplateSectionTitle title={title} description={description} />
 
-      <Slider showArrows={true} autoSlide={false}>
+      <Slider showArrows={true}>
         {combos.map((combo) => (
           <ComboCard combo={combo} />
         ))}
