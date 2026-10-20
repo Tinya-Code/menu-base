@@ -22,9 +22,9 @@ import Minus from '../icons/minus.astro';
 import Plus from '../icons/plus.astro';
 import ShoppingBag from '../icons/shopping-bag.astro';
 import X from '../icons/x.astro';
-import { precio } from '../../utils/format.js';
-import { findPriceRange } from '../../services/menu.service.js';
-import type { MenuProduct, PriceRange, PriceRangeEntry } from '../../types/menu';
+import { precio } from '../utils/format.js';
+import { findPriceRange } from '../services/menu.service.js';
+import type { MenuProduct, PriceRange, PriceRangeEntry } from '../types/menu';
 
 interface Props {
   product: MenuProduct;
@@ -272,10 +272,10 @@ const rootAttributes = {
 </div>
 
 <script>
-  import { emit } from '../../utils/events';
-  import { readJson } from '../../utils/dom';
-  import { precio } from '../../utils/format.js';
-  import { OrderMessage, WhatsApp } from '../../utils/whatsapp.js';
+  import { emit } from '../utils/events';
+  import { readJson } from '../utils/dom';
+  import { precio } from '../utils/format.js';
+  import { OrderMessage, WhatsApp } from '../utils/whatsapp.js';
 
   const SELECTED_CLASSES = ['border-accent', 'bg-accent/5'];
 

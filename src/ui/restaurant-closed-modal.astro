@@ -16,9 +16,9 @@
  */
 import Clock from '../icons/clock.astro';
 import X from '../icons/x.astro';
-import { timeFormat } from '../../utils/format.js';
-import { WEEK_DAYS } from '../../services/business-hours.service.js';
-import type { BusinessHours } from '../../types/menu';
+import { timeFormat } from '../utils/format.js';
+import { WEEK_DAYS } from '../services/business-hours.service.js';
+import type { BusinessHours } from '../types/menu';
 
 interface Props {
   businessHours?: BusinessHours;
@@ -101,7 +101,7 @@ const hasHours = WEEK_DAYS.some((day) => businessHours[day.key]?.isOpen);
 </div>
 
 <script>
-  import { cartService } from '../../services/cart.service.js';
+  import { cartService } from '../services/cart.service.js';
 
   const root = document.querySelector<HTMLElement>('[data-restaurant-closed-modal]');
   if (root) {
