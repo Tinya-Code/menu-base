@@ -109,7 +109,7 @@ Objective: cut client bytes by moving what CSS already does out of scripts.
 - [x] `promotion-card.astro`: replace the JS "Ver más" line-clamp toggle with a CSS-only pattern. (done: ae7f2c1)
 - [x] `whatsapp-button.astro`: tooltip show/hide visuals to CSS (`group-hover` + transitions); JS keeps only the 3s/8s sequencing timers. (done: ae7f2c1)
 - [x] `parallax.ts`: CSS scroll-driven animation behind `@supports (animation-timeline: view())`; keep the rAF fallback for unsupported browsers. (done: ae7f2c1)
-- [ ] Record `dist/index.html` script bytes before this phase and after F7; paste both numbers in the F7 commit body. (baseline recorded: inline 4572 B / external 14676 B post-F5; inline 3742 B post-F6 — final measurement at F7)
+- [x] Record `dist/index.html` script bytes before this phase and after F7; paste both numbers in the F7 commit body. (baseline recorded: inline 4572 B / external 14676 B post-F5; inline 3742 B post-F6 — final measurement at F7) — final: inline 3742 B / external 14666 B; recorded in 2955ef2 body
 
 Cierre: each deleted script greps 0 in source; behavior preserved; numbers recorded.
 
@@ -131,11 +131,11 @@ src/
   services/  scripts/  utils/  types/  styles/
 ```
 
-- [ ] Create `src/menu/` and move `components/blocks/*`, `components/cards/*`, `ui/category-nav.astro`, `ui/template-section-title.astro`, `base-template/product-detail.astro`; fix every import; build green.
-- [ ] Create `src/commerce/` and move `components/cart/*`, `ui/add-button.astro`; fix imports; build green.
-- [ ] Move `base-template/base-template.astro` → `src/layout/menu-page.astro`; its content region becomes `<slot />` — move the promotions/combos/7-block composition into `src/pages/index.astro` (page assembles everything; BaseTemplate is a pure shell: header/scale/background/footer).
-- [ ] Remove empty dirs (`components/blocks`, `components/cards`, `components/base-template`, …) and update `AGENTS.md`/docs paths if referenced.
-- [ ] Final verification: `pnpm build` green, dist markers identical (block order, `data-block-1`, maki URLs), script-bytes comparison recorded (F6 task 5), folder tree matches the target above.
+- [x] Create `src/menu/` and move `components/blocks/*`, `components/cards/*`, `ui/category-nav.astro`, `ui/template-section-title.astro`, `base-template/product-detail.astro`; fix every import; build green. (done: 2955ef2)
+- [x] Create `src/commerce/` and move `components/cart/*`, `ui/add-button.astro`; fix imports; build green. (done: 2955ef2)
+- [x] Move `base-template/base-template.astro` → `src/layout/menu-page.astro`; its content region becomes `<slot />` — move the promotions/combos/7-block composition into `src/pages/index.astro` (page assembles everything; BaseTemplate is a pure shell: header/scale/background/footer). (done: 2955ef2)
+- [x] Remove empty dirs (`components/blocks`, `components/cards`, `components/base-template`, …) and update `AGENTS.md`/docs paths if referenced. (done: 2955ef2)
+- [x] Final verification: `pnpm build` green, dist markers identical (block order, `data-block-1`, maki URLs), script-bytes comparison recorded (F6 task 5), folder tree matches the target above. (done: 2955ef2)
 
 Cierre: tree matches target; build green; page byte-equivalent except intended JS/CSS changes.
 
