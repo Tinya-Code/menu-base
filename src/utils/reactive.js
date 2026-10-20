@@ -72,48 +72,4 @@ export class ReactiveValue {
       this.#listeners.delete(listener);
     };
   }
-
-  /**
-   * @returns {boolean}
-   */
-  hasSubscribers() {
-    return this.#listeners.size > 0;
-  }
-
-  /**
-   * Drop every subscriber (useful when tearing down a page).
-   * @returns {this}
-   */
-  reset() {
-    this.#listeners.clear();
-    return this;
-  }
-}
-
-/**
- * Derive a value from other reactive values. Reads are lazy: the value is
- * recomputed on every `get()`, so there is nothing to invalidate.
- *
- * @template T
- * @param {() => T} compute
- * @returns {{ get: () => T }}
- */
-export function computed(compute) {
-  return {
-    get: () => compute(),
-  };
-}
-
-/**
- * Bundle several subscriptions into one cancel handle.
- *
- * @param {...(() => void)} unsubscribers
- * @returns {() => void}
- */
-export function combineSubscriptions(...unsubscribers) {
-  return () => {
-    for (const dispose of unsubscribers) {
-      if (typeof dispose === 'function') dispose();
-    }
-  };
 }
