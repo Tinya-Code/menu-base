@@ -1,0 +1,43 @@
+---
+/**
+ * BlockCombos — slider of combo cards with its own section title.
+ *
+ * Props:
+ * - `combos`      — combos rendered inside the slider (required, defaults to `[]`)
+ * - `title`       — section heading (default `'Combos'`)
+ * - `description` — section sub-text (default `'Combos especiales para compartir'`)
+ * - `addToCart`   — Angular output mirrored as a prop.
+ *                   Real transport: combo cards dispatch their own bubbling
+ *                   `add-to-cart` CustomEvent.
+ */
+import ComboCard from '../cards/combo-card.astro';
+import TemplateSectionTitle from '../ui/template-section-title.astro';
+import Slider from '../ui/slider.astro';
+
+interface Props {
+  combos?: any[];
+  title?: string;
+  description?: string;
+  addToCart?: (payload: { product: any }) => void;
+}
+
+const {
+  combos = [],
+  title = 'Combos',
+  description = 'Combos especiales para compartir',
+} = Astro.props;
+---
+
+{
+  combos.length > 0 && (
+    <section class="relative py-12 px-8">
+      <TemplateSectionTitle title={title} description={description} />
+
+      <Slider showArrows={true} autoSlide={false}>
+        {combos.map((combo) => (
+          <ComboCard combo={combo} />
+        ))}
+      </Slider>
+    </section>
+  )
+}

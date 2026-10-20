@@ -1,0 +1,76 @@
+---
+/**
+ * AddButton — the small "＋" action button used by every card.
+ *
+ * It is presentational: the click is interpreted by the card that contains it
+ * (the card knows the product), so this file only renders the button and
+ * announces the click.
+ *
+ * Props:
+ * - `text`        — button label; empty by default (icon only)
+ * - `customClass` — extra classes appended to the button (Angular `customClass`)
+ * - `class`       — extra classes for the root (Angular projected host class)
+ * - `disabled`    — disables the button
+ * - `onClicked`   — Angular `output()` mirrored as a prop; the real transport is
+ *                   the bubbling `add-button-click` CustomEvent dispatched on click
+ *
+ * Emits: `add-button-click` → detail `{ event }`
+ */
+import Plus from '../icons/plus.astro';
+
+interface Props {
+  text?: string;
+  customClass?: string;
+  class?: string;
+  disabled?: boolean;
+  onClicked?: (event: Event) => void;
+}
+
+const { text = '', customClass = '', disabled = false, class: hostClass = '' } = Astro.props;
+
+const classes = [
+  'bg-accent',
+  'px-1',
+  'py-1',
+  'cursor-pointer',
+  'text-primary-text',
+  'text-2xl',
+  'uppercase',
+  'font-display',
+  'active:scale-95',
+  'transition-all',
+  'duration-300',
+  'rounded-sm',
+  'disabled:opacity-50',
+  'disabled:cursor-not-allowed',
+  customClass,
+  hostClass,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<button data-add-button type="button" disabled={disabled} class={classes}>
+  {text}
+  <Plus class="" />
+</button>
+
+<script>
+  // Runs once per page: every `[data-add-button]` click is announced through
+  // the `add-button-click` bubbling CustomEvent. Cards listen for it and are
+  // the ones that decide what it means.
+  document.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target?.closest<HTMLButtonElement>('[data-add-button]');
+    if (!button || button.disabled) return;
+
+    event.stopPropagation();
+    button.dispatchEvent(
+      new CustomEvent('add-button-click', {
+        detail: { event },
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+  });
+</script>

@@ -1,0 +1,109 @@
+---
+/**
+ * MenuBlock — generic skeleton for one menu section.
+ *
+ * Zero block-specific knowledge: grid classes, section attributes and
+ * decoration markup all arrive from the caller (props + NAMED SLOTS). The
+ * component owns only the shared skeleton (category sections + cards) and
+ * the client-side animation bootstrap.
+ *
+ * Props:
+ * - `id`              — rendered as the section `id` when provided.
+ * - `categories`      — categories rendered as sections; when empty the
+ *                       block renders NOTHING (rendering guard).
+ * - `sectionClass`    — section classes; overrides the derived default
+ *                       (`relative py-12 px-8`, plus `overflow-hidden` when
+ *                       the block carries decoration slots).
+ * - `sectionAttrs`    — extra section attributes (e.g. `data-block-1`,
+ *                       `data-maki-urls` for the client-side maki rail).
+ * - `outerClass` / `cardsClass` / `categorySectionClass` — per-block grids
+ *
+ * Named slots:
+ * - `decoration-left`  — grid cell(s) BEFORE the categories
+ * - `decoration-right` — grid cell(s) AFTER the categories
+ * - `extra`            — extra grid cell(s) after the decorations
+ * - default            — content at the end of the section
+ */
+import TemplateCard from '../cards/template-card.astro';
+import TemplateSectionTitle from '../ui/template-section-title.astro';
+
+/** One product; the cards consume it opaquely. */
+interface MenuProduct {
+  [key: string]: any;
+}
+
+/** One category rendered as a section inside the block. */
+interface MenuCategory {
+  id?: string | number;
+  name?: string;
+  description?: string | null;
+  products?: MenuProduct[];
+}
+
+interface Props {
+  id?: string;
+  categories?: MenuCategory[];
+  sectionClass?: string;
+  sectionAttrs?: Record<string, string>;
+  outerClass?: string;
+  cardsClass?: string;
+  categorySectionClass?: string;
+}
+
+const {
+  id,
+  categories = [],
+  sectionClass,
+  sectionAttrs = {},
+  outerClass = '',
+  cardsClass = '',
+  categorySectionClass = '',
+} = Astro.props;
+
+/**
+ * Section classes: blocks with decorations carried `overflow-hidden`, the
+ * plain ones did not. `sectionClass` overrides all.
+ */
+const hasDecorations =
+  Astro.slots.has('decoration-left') || Astro.slots.has('decoration-right');
+
+const resolvedSectionClass = sectionClass ?? `relative py-12 px-8${hasDecorations ? ' overflow-hidden' : ''}`;
+---
+
+{
+  categories.length > 0 && (
+    <section id={id} {...sectionAttrs} class={resolvedSectionClass}>
+      <div class={`grid ${outerClass}`}>
+        <slot name="decoration-left" />
+
+        {categories.map((cat) => (
+          <section id={`category-${cat.id}`} class={`flex flex-col ${categorySectionClass}`.trim()}>
+            <TemplateSectionTitle title={cat.name ?? ''} description={cat.description || ''} />
+
+            <div class={`grid ${cardsClass}`}>
+              {(cat.products ?? []).map((product) => (
+                <TemplateCard product={product} />
+              ))}
+            </div>
+          </section>
+        ))}
+
+        <slot name="decoration-right" />
+
+        <slot name="extra" />
+      </div>
+
+      <slot />
+    </section>
+  )
+}
+
+<script>
+  import { initAnimations } from '../../scripts/animations';
+
+  const initAll = () => initAnimations(document);
+
+  initAll();
+  // Covers Astro's client-side navigation as well as the initial render.
+  document.addEventListener('astro:page-load', initAll);
+</script>

@@ -1,0 +1,47 @@
+---
+/**
+ * BlockPromotions — slider of promotion cards with its own section title.
+ *
+ * Props:
+ * - `promotions`  — promotions rendered inside the slider (required, defaults to `[]`)
+ * - `title`       — section heading (default `'Promociones'`)
+ * - `description` — section sub-text (default `'Aprovecha nuestras ofertas especiales'`)
+ * - `addToCart`   — Angular output mirrored as a prop.
+ *                   Real transport: promotion cards dispatch their own bubbling
+ *                   `add-to-cart` CustomEvent.
+ * - `productClick`— Angular output mirrored as a prop.
+ *                   Real transport: promotion cards dispatch their own bubbling
+ *                   `product-click` CustomEvent.
+ */
+import PromotionCard from '../cards/promotion-card.astro';
+import TemplateSectionTitle from '../ui/template-section-title.astro';
+import Slider from '../ui/slider.astro';
+
+interface Props {
+  promotions?: any[];
+  title?: string;
+  description?: string;
+  addToCart?: (payload: { product: any }) => void;
+  productClick?: (payload: { product: any }) => void;
+}
+
+const {
+  promotions = [],
+  title = 'Promociones',
+  description = 'Aprovecha nuestras ofertas especiales',
+} = Astro.props;
+---
+
+{
+  promotions.length > 0 && (
+    <section class="relative py-12 px-8">
+      <TemplateSectionTitle title={title} description={description} />
+
+      <Slider showArrows={true} autoSlide={false}>
+        {promotions.map((promotion) => (
+          <PromotionCard promotion={promotion} />
+        ))}
+      </Slider>
+    </section>
+  )
+}

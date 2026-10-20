@@ -1,0 +1,157 @@
+---
+/**
+ * BaseTemplate — pure presentation shell: header, scaled content canvas,
+ * footer, plus the seven explicit block declarations (block-1 … block-7).
+ *
+ * Construction order mirrors Angular `src/app/base-template/index.ts`:
+ * header → layout-scale → background → promotions → combos → block-1 …
+ * block-7 → the "empty" state → footer. Each block is declared with its own
+ * grid props and decoration slots — no iteration, no layout config file,
+ * no service calls: the page supplies every prop already shaped.
+ *
+ * Props:
+ * - `blocks`        — raw blocks; every declaration picks its own block via
+ *                     the `cats('block-N')` helper and renders nothing when
+ *                     that block has no categories.
+ * - `combos`        — combo cards (default `[]`)
+ * - `promotions`    — promotion cards (default `[]`)
+ * - `decorations`   — the service-shaped decoration object
+ *                     (`MenuService.getDecorations()`); consumed here via
+ *                     `decorations.*` inside the decoration slots.
+ * - `postresImages` — block-7 illustration list; the PAGE computes it from
+ *                     the template payload.
+ */
+import Header from '../layout/header.astro';
+import Footer from '../layout/footer.astro';
+import LayoutScale from '../layout/layout-scale.astro';
+
+import MenuBlock from '../blocks/menu-block.astro';
+import BlockCombos from '../blocks/block-combos.astro';
+import BlockPromotions from '../blocks/block-promotions.astro';
+import IllustrationCell from '../blocks/illustration-cell.astro';
+
+interface Props {
+  blocks?: any[];
+  combos?: any[];
+  promotions?: any[];
+  decorations?: Record<string, any>;
+  postresImages?: { url?: string }[];
+}
+
+const {
+  blocks = [],
+  combos = [],
+  promotions = [],
+  decorations = {},
+  postresImages = [],
+} = Astro.props;
+
+/** Pick one block's categories by id (each declaration renders one block). */
+const cats = (id: string) => blocks.find((b) => b?.id === id)?.categories ?? [];
+
+const hasContent = blocks.length > 0 || combos.length > 0 || promotions.length > 0;
+---
+
+<Header />
+
+<LayoutScale>
+  <div style={`background-image: url(${decorations.background ?? '/images/bg.png'})`} class="bg-repeat relative mx-2">
+    <div class:list={['h-full w-auto mx-2', hasContent && 'py-12']}>
+      <BlockPromotions promotions={promotions} />
+
+      <BlockCombos combos={combos} />
+
+      <!-- block-1: maki rail + barco parallax -->
+      <MenuBlock
+        categories={cats('block-1')}
+        outerClass="grid-cols-4 md:grid-cols-12 gap-x-12 gap-y-16"
+        categorySectionClass="col-span-3 md:col-span-8"
+        cardsClass="grid-cols-2 md:grid-cols-3 gap-8"
+        sectionAttrs={{
+          'data-block-1': '',
+          'data-maki-urls': JSON.stringify(decorations.block1?.makis ?? []),
+        }}
+      >
+        <div
+          slot="decoration-left"
+          class="relative hidden md:block col-span-0 md:col-span-2 h-full"
+          data-maki-container
+        />
+        <div slot="decoration-right" class="relative md:block col-span-1 md:col-span-2 h-full">
+          <img
+            src={decorations.block1?.barco}
+            alt="Alitas Fondo"
+            class="absolute top-0 -right-28 md:-right-48 min-w-[300px] md:min-w-[400px] object-contain will-change-transform transition-transform duration-300 ease-out"
+            data-anim="parallax"
+            data-barco
+          />
+        </div>
+      </MenuBlock>
+
+      <!-- block-2: plain categories, single column → 2-up cards -->
+      <MenuBlock
+        categories={cats('block-2')}
+        outerClass="grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-16 items-start"
+        cardsClass="grid-cols-1 md:grid-cols-2"
+      />
+
+      <!-- block-3: full-width header row with the alitas decorations -->
+      <MenuBlock
+        categories={cats('block-3')}
+        outerClass="relative grid-cols-1 md:grid-cols-12 gap-x-12 gap-y-8 items-start"
+        categorySectionClass="col-span-12 md:col-span-8"
+        cardsClass="grid-cols-3 md:grid-cols-4 gap-6"
+      >
+        <div slot="decoration-left" class="justify-between flex col-span-12 h-60 md:col-span-12 md:h-0">
+          <img src={decorations.block3?.alitasFondo} alt="Alitas Fondo" class="h-full md:h-auto md:w-130 md:absolute top-10 -right-35" />
+          <img src={decorations.block3?.alitas2Fondo} alt="Alitas 2 Fondo" class="h-full md:h-auto md:w-130 md:absolute bottom-10 -right-35" />
+        </div>
+      </MenuBlock>
+
+      <!-- block-4: same layout as block-2 -->
+      <MenuBlock
+        categories={cats('block-4')}
+        outerClass="grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-16 items-start"
+        cardsClass="grid-cols-1 md:grid-cols-2"
+      />
+
+      <!-- block-5: 2-up cards from mobile -->
+      <MenuBlock
+        categories={cats('block-5')}
+        outerClass="grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-16 items-start"
+        cardsClass="grid-cols-2 md:grid-cols-2"
+      />
+
+      <!-- block-6: cocktail column decoration on the left -->
+      <MenuBlock
+        categories={cats('block-6')}
+        outerClass="grid-cols-5 md:grid-cols-12 md:gap-12 items-start"
+        categorySectionClass="w-full col-span-4 md:col-span-8"
+        cardsClass="grid-cols-2 md:grid-cols-2"
+      >
+        <div slot="decoration-left" class="w-full relative h-full col-span-1 flex justify-center items-center md:col-span-4">
+          <img src={decorations.block6?.coctelesVertical} alt class="absolute md:static -left-70 min-w-[500px] md:min-w-[450px] h-auto" />
+        </div>
+      </MenuBlock>
+
+      <!-- block-7: dessert illustration cell -->
+      <MenuBlock
+        categories={cats('block-7')}
+        outerClass="grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 items-start"
+        cardsClass="grid-cols-2 md:grid-cols-1"
+      >
+        <IllustrationCell slot="extra" images={postresImages} label="Postres" />
+      </MenuBlock>
+    </div>
+    {
+      !hasContent && (
+        <div class="flex flex-col items-center justify-center py-20 text-white italic font-medium">
+          <p class="text-xl">Estamos actualizando nuestra carta...</p>
+          <p class="text-sm mt-2">Danos un momento para prepararte lo mejor.</p>
+        </div>
+      )
+    }
+  </div>
+</LayoutScale>
+
+<Footer class="mt-20 block" />

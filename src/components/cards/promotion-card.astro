@@ -1,0 +1,145 @@
+---
+/**
+ * PromotionCard — discounted item with an expandable description.
+ *
+ * Props:
+ * - `promotion`     — `{ id, name, description, price, discountedPrice, url, cloudinary_id }`
+ * - `onAddToCart`   — Angular `addToCart` output mirrored as a prop.
+ *                     Real transport: the `add-to-cart` CustomEvent
+ *                     (default action when nobody handles it: `cartService.addItem(promotion, 1)`).
+ * - `onProductClick`— Angular `productClick` output mirrored as a prop.
+ *                     Real transport: the `product-click` CustomEvent, carrying the
+ *                     promotion already mapped to a Product (discounted price as `price`).
+ *
+ * Listens for `add-button-click` (emitted by `ui/add-button.astro`).
+ */
+import AddButton from '../ui/add-button.astro';
+import { precio } from '../../utils/format.js';
+import { restaurantService } from '../../services/restaurant.service.js';
+
+interface Props {
+  promotion: any;
+  onAddToCart?: (promotion: any) => void;
+  onProductClick?: (product: any) => void;
+}
+
+const { promotion } = Astro.props;
+
+await restaurantService.load();
+const canOrder = restaurantService.orderConfig?.delivery_enabled ?? true;
+
+/** Angular `onCardClick()`: a Promotion shown through the product detail dialog. */
+const asProduct = {
+  id: promotion?.id,
+  name: promotion?.name,
+  description: promotion?.description,
+  price: promotion?.discountedPrice,
+  image_url: promotion?.url,
+  qty_label: null,
+  price_range_id: null,
+  category_id: 'promotion',
+  cloudinary_id: promotion?.cloudinary_id,
+  is_hidden: false,
+};
+---
+
+<div
+  data-promotion-card
+  data-promotion={JSON.stringify(promotion ?? {})}
+  data-product={JSON.stringify(asProduct)}
+  class="group relative space-y-4 items-center w-120 min-h-50 border border-transparent hover:border-accent rounded-sm p-4 flex flex-col cursor-pointer"
+>
+  <div class="w-full col-span-1 h-auto grid grid-cols-2 gap-8 items-start justify-between">
+    <div class="bg-secondary relative rounded-full w-50 h-50">
+      <img src={promotion.url} alt={promotion.name} title={promotion.name} class="h-50 w-50 duration-300" />
+      {
+        canOrder && (
+          <AddButton class="absolute bottom-0 -right-3" />
+        )
+      }
+    </div>
+
+    <div class="flex flex-col items-start max-w-50 gap-4">
+      <h3 class="text-4xl font-display text-white">{promotion.name}</h3>
+
+      <div class="flex w-full items-start mx-auto flex-col relative">
+        <span class="text-lg font-display text-primary-text/50 line-through">
+          {precio(promotion.price)}
+        </span>
+        <span class="text-3xl py-1 px-3 rounded-sm bg-primary font-display text-white">
+          {precio(promotion.discountedPrice)}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col items-start px-4">
+    <p data-promotion-description class="line-clamp-1 text-lg text-white/80">
+      {promotion.description}
+    </p>
+
+    <button data-toggle-description type="button" class="text-white bg-primary px-3 py-1 rounded-sm">
+      Ver más
+    </button>
+  </div>
+</div>
+
+<script>
+  import { cartService } from '../../services/cart.service.js';
+
+  /** Notify the page; returns false when a listener called `preventDefault()`. */
+  function emit(name: string, detail: Record<string, unknown>) {
+    const event = new CustomEvent(name, { detail, bubbles: true, cancelable: true });
+    return document.dispatchEvent(event);
+  }
+
+  function readJson(element: Element | null, attribute: string) {
+    const raw = element?.getAttribute(attribute);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  // "Ver más" → expand / collapse the description without opening the dialog.
+  document.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const toggle = target?.closest('[data-toggle-description]');
+    if (!toggle) return;
+
+    event.stopPropagation();
+    const description = toggle.parentElement?.querySelector('[data-promotion-description]');
+    if (!description) return;
+
+    const isClamped = description.classList.toggle('line-clamp-1');
+    description.classList.toggle('line-clamp-none', !isClamped);
+  });
+
+  // Card body click → open the product detail with the discounted price.
+  document.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const card = target?.closest('[data-promotion-card]');
+    if (!card) return;
+    if (target?.closest('[data-add-button]')) return;
+    if (target?.closest('[data-toggle-description]')) return;
+
+    const product = readJson(card, 'data-product');
+    if (product) emit('product-click', { product });
+  });
+
+  // "＋" click → add the promotion straight to the cart.
+  document.addEventListener('add-button-click', (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const card = target?.closest('[data-promotion-card]');
+    if (!card) return;
+
+    const promotion = readJson(card, 'data-promotion');
+    if (!promotion) return;
+
+    if (emit('add-to-cart', { product: promotion, quantity: 1, selectedEntry: undefined })) {
+      cartService.addItem(promotion, 1);
+    }
+  });
+</script>

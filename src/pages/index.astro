@@ -1,11 +1,237 @@
 ---
-import Welcome from '../components/Welcome.astro';
+/**
+ * Menu page — the Astro port of Angular `src/app/page/menu`.
+ *
+ * Render order follows COMPONENT-ORDER.md §1.2:
+ *   category-nav → base-template → cart-trigger → whatsapp-button →
+ *   sidebar-cart → product-detail (mounted hidden) → restaurant-closed-modal
+ *
+ * Data is loaded in frontmatter (the services memoise every request), so there
+ * is no `forkJoin`, no `isLoading` signal and no 800 ms `hidden` artefact:
+ * the page ships ready.
+ *
+ * The product dialog is static, so it is rendered once — hidden — and refilled
+ * from the clicked card's `data-product` payload by the script below.
+ */
 import Layout from '../layouts/Layout.astro';
+import CategoryNav from '../components/ui/category-nav.astro';
+import BaseTemplate from '../components/base-template/base-template.astro';
+import CartTrigger from '../components/cart/cart-trigger.astro';
+import WhatsAppButton from '../components/ui/whatsapp-button.astro';
+import SidebarCart from '../components/cart/sidebar-cart.astro';
+import ProductDetail from '../components/base-template/product-detail.astro';
+import RestaurantClosedModal from '../components/ui/restaurant-closed-modal.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import { menuService } from '../services/menu.service.js';
+import { businessHoursService } from '../services/business-hours.service.js';
+
+/** Same data Angular's `forkJoin` resolved, minus the artificial delay. */
+const { blocks = [], combos = [], promotions = [], decorations = {} } = await menuService
+  .load()
+  .catch((error) => {
+    console.error('[menu] could not load the menu payload.', error);
+    return { blocks: [], combos: [], promotions: [], decorations: {} };
+  });
+
+await menuService.getPriceRanges().catch(() => {});
+await businessHoursService.load().catch(() => {});
+
+/** `allCategories` from `Menu.ngOnInit` — `{ category }` wrappers. */
+const allCategories = blocks.flatMap((block: any) =>
+  (block.categories ?? []).map((category: any) => ({ category })),
+);
+
+/** Every product, used to pick the dialog's template product. */
+const allProducts = blocks.flatMap((block: any) =>
+  (block.categories ?? []).flatMap((category: any) => category.products ?? []),
+);
+
+/**
+ * The dialog renders one product at build time; prefer one with a price range
+ * so the options list markup exists client-side, then refill it on click.
+ */
+const placeholderProduct =
+  allProducts.find((product: any) => product?.price_range_id) ?? allProducts[0] ?? {};
+
+const priceRanges = menuService.priceRanges ?? [];
+
+/** Client-side lookup for the price options (no extra request on click). */
+const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Carta">
+  <div data-menu-page>
+    <CategoryNav categories={allCategories} />
+
+    <BaseTemplate
+      blocks={blocks}
+      combos={combos}
+      promotions={promotions}
+      decorations={decorations}
+    />
+
+    <CartTrigger />
+
+    <WhatsAppButton />
+
+    <SidebarCart />
+
+    <!-- Product detail: mounted hidden, revealed (and refilled) on click. -->
+    <div data-product-detail-host hidden>
+      <ProductDetail product={placeholderProduct} />
+    </div>
+
+    <RestaurantClosedModal />
+  </div>
+
+  <div id="price-ranges-data" data-price-ranges={priceRangesJson} hidden></div>
+
+  <script>
+    import { precio } from '../utils/format.js';
+
+    const ENTRY_BASE_CLASSES =
+      'flex items-center justify-between p-2.5 rounded-xl md:rounded-2xl border-2 border-secondary/5 hover:border-accent/30 transition-all text-left group';
+    const ENTRY_SELECTED_CLASSES = ['border-accent', 'bg-accent/5'];
+    const FALLBACK_DESCRIPTION =
+      'Un clásico preparado con los secretos mejor guardados de nuestra cocina.';
+
+    const host = document.querySelector<HTMLElement>('[data-product-detail-host]');
+    const root = document.querySelector<HTMLElement>('[data-product-detail]');
+
+    const priceRanges: any[] = (() => {
+      const raw = document.getElementById('price-ranges-data')?.getAttribute('data-price-ranges') ?? '[]';
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    })();
+
+    /** Same tolerant id comparison as `MenuService.findPriceRange`. */
+    const findPriceRange = (id: unknown) => {
+      if (id === null || id === undefined || id === '') return null;
+      const wanted = String(id).trim();
+      return priceRanges.find((range) => String(range.id).trim() === wanted) ?? null;
+    };
+
+    const escapeHtml = (value: unknown) =>
+      String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+
+    /** Rebuild the price options for the product that is about to open. */
+    const renderEntries = (root: HTMLElement, range: any) => {
+      const list = root.querySelector<HTMLElement>('[data-entry-list]');
+      const grid = root.querySelector<HTMLElement>('[data-entry-grid]');
+      if (!list || !grid) return null;
+
+      const entries: any[] = Array.isArray(range?.entries) ? range.entries : [];
+
+      list.hidden = entries.length === 0;
+      list.setAttribute('data-selected-index', entries.length > 0 ? '0' : '');
+      grid.innerHTML = entries
+        .map(
+          (entry, index) => `
+            <button
+              data-entry-index="${index}"
+              data-entry='${JSON.stringify(entry).replace(/'/g, '&#39;')}'
+              type="button"
+              class="${ENTRY_BASE_CLASSES}${index === 0 ? ' border-accent bg-accent/5' : ''}"
+            >
+              <div class="flex flex-col">
+                <span class="font-display text-sm md:text-lg text-secondary group-hover:text-accent transition-colors">
+                  ${escapeHtml(entry.qty)} Unidades
+                </span>
+                ${
+                  entry.bonus
+                    ? `<span class="text-[9px] md:text-[10px] font-bold text-accent-muted">${escapeHtml(entry.bonus)}</span>`
+                    : ''
+                }
+              </div>
+              <span class="font-display text-base md:text-xl text-secondary">${precio(Number(entry.price))}</span>
+            </button>`,
+        )
+        .join('');
+
+      return entries.length > 0 ? entries[0] : null;
+    };
+
+    /** Paint the dialog with the product the user clicked. */
+    const fill = (product: any) => {
+      if (!root) return;
+
+      root.setAttribute('data-product', JSON.stringify(product ?? {}));
+
+      const name = root.querySelector<HTMLElement>('[data-detail-name]');
+      if (name) name.textContent = product?.name ?? '';
+
+      const description = root.querySelector<HTMLElement>('[data-detail-description]');
+      if (description) description.textContent = product?.description || FALLBACK_DESCRIPTION;
+
+      const imageSection = root.querySelector<HTMLElement>('[data-detail-image-section]');
+      const image = root.querySelector<HTMLImageElement>('[data-detail-image]');
+      const dialog = root.querySelector<HTMLElement>('[data-detail-dialog]');
+      const hasImage = Boolean(product?.image_url);
+
+      if (imageSection) imageSection.hidden = !hasImage;
+      if (image) {
+        image.src = product?.image_url ?? '';
+        image.alt = product?.name ?? '';
+      }
+      if (dialog) {
+        dialog.classList.toggle('md:grid-cols-2', hasImage);
+        dialog.classList.toggle('md:grid-cols-1', !hasImage);
+      }
+
+      const range = findPriceRange(product?.price_range_id);
+      const firstEntry = renderEntries(root, range);
+
+      const price = root.querySelector<HTMLElement>('[data-current-price]');
+      if (price) {
+        const value = firstEntry
+          ? Number(firstEntry.price)
+          : product?.price === null || product?.price === undefined || product?.price === ''
+            ? 0
+            : Number(product.price);
+        price.textContent = Number.isNaN(value) ? '' : precio(value);
+      }
+
+      const label = root.querySelector<HTMLElement>('[data-entry-label]');
+      if (label) {
+        label.hidden = !firstEntry;
+        label.textContent = firstEntry ? `${firstEntry.qty} Unids.` : '';
+      }
+
+      // Reset the stepper to 1 (the Angular dialog mounts fresh each time).
+      const stepper = root.querySelector<HTMLElement>('[data-quantity]');
+      if (stepper) {
+        stepper.setAttribute('data-qty-value', '1');
+        const qtyLabel = stepper.querySelector<HTMLElement>('[data-qty-label]');
+        if (qtyLabel) qtyLabel.textContent = '1';
+        const dec = stepper.querySelector<HTMLButtonElement>('[data-qty-dec]');
+        const inc = stepper.querySelector<HTMLButtonElement>('[data-qty-inc]');
+        if (dec) dec.disabled = true;
+        if (inc) inc.disabled = false;
+      }
+    };
+
+    document.addEventListener('product-click', (event) => {
+      const detail = (event as CustomEvent).detail as { product?: any } | undefined;
+      const product = detail?.product;
+      if (!host || !product) return;
+
+      fill(product);
+      host.hidden = false;
+      document.documentElement.style.overflow = 'hidden';
+    });
+
+    document.addEventListener('close-product-detail', () => {
+      if (!host) return;
+      host.hidden = true;
+      document.documentElement.style.overflow = '';
+    });
+  </script>
 </Layout>
