@@ -93,11 +93,11 @@ Cierre: grep `dispatchEvent` outside `src/utils/events.ts` returns only the modu
 
 Objective: SRP — pages orchestrate data, components render what they're given.
 
-- [ ] Create `src/types/menu.ts` (`MenuProduct`, `MenuCategory`, `MenuBlock`, `Combo`, `Promotion`, `PriceRange`, `RestaurantInfo`, `Decorations`) and replace the `any` props in `base-template.astro`, `menu-block.astro`, `index.astro` with these types.
-- [ ] Layout consumers: remove frontmatter `await restaurantService.load()` from `header.astro`, `footer.astro`, `whatsapp-button.astro`; `index.astro` loads once and passes props.
-- [ ] Card consumers: same removal in `template-card.astro`, `combo-card.astro`, `promotion-card.astro` (price-range + can-order data arrives as props from the page).
-- [ ] Modal/checkout consumers: same removal in `product-detail.astro`, `restaurant-closed-modal.astro`, `checkout-form.astro`.
-- [ ] Client-side hours: `sidebar-cart.astro` and `cart-trigger.astro` scripts read a page-provided `data-business-hours` attribute instead of calling `businessHoursService.load()` in the browser.
+- [x] Create `src/types/menu.ts` (`MenuProduct`, `MenuCategory`, `MenuBlock`, `Combo`, `Promotion`, `PriceRange`, `RestaurantInfo`, `Decorations`) and replace the `any` props in `base-template.astro`, `menu-block.astro`, `index.astro` with these types. (done: b15602d)
+- [x] Layout consumers: remove frontmatter `await restaurantService.load()` from `header.astro`, `footer.astro`, `whatsapp-button.astro`; `index.astro` loads once and passes props. (done: b15602d)
+- [x] Card consumers: same removal in `template-card.astro`, `combo-card.astro`, `promotion-card.astro` (price-range + can-order data arrives as props from the page). (done: b15602d)
+- [x] Modal/checkout consumers: same removal in `product-detail.astro`, `restaurant-closed-modal.astro`, `checkout-form.astro`. (done: b15602d)
+- [x] Client-side hours: `sidebar-cart.astro` and `cart-trigger.astro` scripts read a page-provided `data-business-hours` attribute instead of calling `businessHoursService.load()` in the browser. (done: b15602d)
 
 Cierre: grep `restaurantService.load()` inside `src/components/` returns 0; grep `businessHoursService.load()` inside component scripts returns 0; build green.
 
