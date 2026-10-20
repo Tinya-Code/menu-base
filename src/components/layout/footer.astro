@@ -12,7 +12,8 @@ import Phone from '../icons/phone.astro';
 import Utensils from '../icons/utensils.astro';
 import { timeFormat } from '../../utils/format.js';
 import { restaurantService } from '../../services/restaurant.service.js';
-import { businessHoursService } from '../../services/business-hours.service.js';
+import { businessHoursService, weekDayKey } from '../../services/business-hours.service.js';
+import { WhatsApp } from '../../utils/whatsapp.js';
 
 interface Props {
   class?: string;
@@ -32,8 +33,7 @@ const rawHours = businessHoursService.rawHours;
 /** Opening schedule for today (`null` when the schedule never arrived). */
 const todayHours = (() => {
   if (!rawHours) return null;
-  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  return rawHours[days[new Date().getDay()]] ?? null;
+  return rawHours[weekDayKey()] ?? null;
 })();
 ---
 
@@ -134,7 +134,7 @@ const todayHours = (() => {
     <!-- Developer Signature -->
     <div class="w-full flex flex-col sm:flex-row justify-between items-center gap-6 mt-12 border-t border-white/10 pt-8">
       <div class="flex items-center gap-4 group">
-        <a href="https://wa.me/51924932128" target="_blank" class="relative">
+        <a href={WhatsApp.link('51924932128')} target="_blank" class="relative">
           <div class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 group-hover:opacity-70 transition duration-500"></div>
           <img
             src="/images/gato.jpg"
@@ -145,7 +145,7 @@ const todayHours = (() => {
         <div class="flex flex-col">
           <span class="text-white/40 text-[10px] uppercase tracking-[0.2em] font-bold mb-0.5">Diseño & Desarrollo</span>
           <a
-            href="https://wa.me/51924932128"
+            href={WhatsApp.link('51924932128')}
             target="_blank"
             class="text-white/90 font-display tracking-wide hover:text-white transition-colors flex items-center gap-1.5"
           >

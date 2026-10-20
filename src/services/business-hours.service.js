@@ -1,6 +1,33 @@
 import { restaurantService } from './restaurant.service.js';
 
 /**
+ * The canonical week — Monday first, with the Spanish labels the storefront
+ * renders. Single source for every days listing (footer, closed modal) and
+ * for `isOpenAt()`.
+ * @type {Array<{ key: string, label: string }>}
+ */
+export const WEEK_DAYS = [
+  { key: 'monday', label: 'Lunes' },
+  { key: 'tuesday', label: 'Martes' },
+  { key: 'wednesday', label: 'Miércoles' },
+  { key: 'thursday', label: 'Jueves' },
+  { key: 'friday', label: 'Viernes' },
+  { key: 'saturday', label: 'Sábado' },
+  { key: 'sunday', label: 'Domingo' },
+];
+
+/**
+ * Weekday key for a date: `Date.getDay()` runs Sunday = 0, `WEEK_DAYS`
+ * runs Monday first.
+ *
+ * @param {Date} [date]
+ * @returns {string}
+ */
+export function weekDayKey(date = new Date()) {
+  return WEEK_DAYS[(date.getDay() + 6) % 7].key;
+}
+
+/**
  * Pure "is the restaurant open at this exact moment?" check against a raw
  * `business_hours` payload.
  *
@@ -17,8 +44,7 @@ import { restaurantService } from './restaurant.service.js';
 export function isOpenAt(businessHours, now = new Date()) {
   if (!businessHours) return true;
 
-  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-  const schedule = businessHours[days[now.getDay()]];
+  const schedule = businessHours[weekDayKey(now)];
 
   if (!schedule || !schedule.isOpen) return false;
 
