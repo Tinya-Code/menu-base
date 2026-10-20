@@ -105,11 +105,11 @@ Cierre: grep `restaurantService.load()` inside `src/components/` returns 0; grep
 
 Objective: cut client bytes by moving what CSS already does out of scripts.
 
-- [ ] `category-nav.astro`: delete the ~23-line scroll script; replace the 140px offset with `scroll-margin-top` on category sections (smooth scrolling already set globally).
-- [ ] `promotion-card.astro`: replace the JS "Ver más" line-clamp toggle with a CSS-only pattern.
-- [ ] `whatsapp-button.astro`: tooltip show/hide visuals to CSS (`group-hover` + transitions); JS keeps only the 3s/8s sequencing timers.
-- [ ] `parallax.ts`: CSS scroll-driven animation behind `@supports (animation-timeline: view())`; keep the rAF fallback for unsupported browsers.
-- [ ] Record `dist/index.html` script bytes before this phase and after F7; paste both numbers in the F7 commit body.
+- [x] `category-nav.astro`: delete the ~23-line scroll script; replace the 140px offset with `scroll-margin-top` on category sections (smooth scrolling already set globally). (done: ae7f2c1)
+- [x] `promotion-card.astro`: replace the JS "Ver más" line-clamp toggle with a CSS-only pattern. (done: ae7f2c1)
+- [x] `whatsapp-button.astro`: tooltip show/hide visuals to CSS (`group-hover` + transitions); JS keeps only the 3s/8s sequencing timers. (done: ae7f2c1)
+- [x] `parallax.ts`: CSS scroll-driven animation behind `@supports (animation-timeline: view())`; keep the rAF fallback for unsupported browsers. (done: ae7f2c1)
+- [ ] Record `dist/index.html` script bytes before this phase and after F7; paste both numbers in the F7 commit body. (baseline recorded: inline 4572 B / external 14676 B post-F5; inline 3742 B post-F6 — final measurement at F7)
 
 Cierre: each deleted script greps 0 in source; behavior preserved; numbers recorded.
 
