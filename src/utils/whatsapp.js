@@ -6,6 +6,13 @@
  */
 export class WhatsApp {
   /**
+   * Storefront country code: `wa.me` expects the international number with
+   * no `+`, so this is the one place the prefix lives.
+   * @type {string}
+   */
+  static COUNTRY_CODE = '51';
+
+  /**
    * Strip everything that is not a digit from a phone number.
    * @param {string | number} phone
    * @returns {string}
@@ -20,11 +27,12 @@ export class WhatsApp {
    * @param {string} phone        Number as stored in the settings.
    * @param {string} message      Plain text; it is URL encoded automatically.
    * @param {{ countryCode?: string }} [options]
-   *        `countryCode` is prefixed only when the number does not already
-   *        start with it (keeps already-qualified numbers untouched).
+   *        Defaults to `COUNTRY_CODE` (`51`); the prefix is applied only when
+   *        the number does not already start with it (keeps already-qualified
+   *        numbers untouched).
    * @returns {string}
    */
-  static link(phone, message, { countryCode = '' } = {}) {
+  static link(phone, message, { countryCode = WhatsApp.COUNTRY_CODE } = {}) {
     let digits = WhatsApp.digits(phone);
 
     if (countryCode && !digits.startsWith(countryCode)) {
@@ -46,7 +54,7 @@ export class WhatsApp {
    * @param {{ countryCode?: string, target?: string }} [options]
    * @returns {string} the generated URL
    */
-  static open(phone, message, { countryCode = '', target = '_blank' } = {}) {
+  static open(phone, message, { countryCode = WhatsApp.COUNTRY_CODE, target = '_blank' } = {}) {
     const url = WhatsApp.link(phone, message, { countryCode });
 
     if (url && typeof window !== 'undefined') {
@@ -70,14 +78,20 @@ export class WhatsApp {
  *   .withCustomer({ name, address, paymentMethod })
  *   .build();
  *
- * WhatsApp.open(phone, message, { countryCode: '51' });
+ * WhatsApp.open(phone, message); // country code applied by the builder
  * ```
  */
 export class OrderMessage {
-  /** Payment method → label shown in the message. */
+  /**
+   * Payment method → label shown in the message and the checkout UI.
+   * Covers the four canonical ids plus the raw ids the API actually sends
+   * (`efectivo`, `tarjeta`), so neither surface ever ships a lowercase word.
+   */
   static PAYMENT_LABELS = {
     cash: 'Efectivo',
+    efectivo: 'Efectivo',
     card: 'Tarjeta',
+    tarjeta: 'Tarjeta',
     yape: 'Yape',
     plin: 'Plin',
   };

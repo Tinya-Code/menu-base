@@ -9,6 +9,7 @@
  * tooltip timing needs client code.
  */
 import { restaurantService } from '../../services/restaurant.service.js';
+import { WhatsApp } from '../../utils/whatsapp.js';
 import Whatsapp from '../icons/whatsapp.astro';
 
 await restaurantService.load();
@@ -16,7 +17,7 @@ await restaurantService.load();
 const config = restaurantService.whatsappConfig;
 const phone = config?.number ?? '';
 const message = config?.message_template ?? 'Hola, me gustaría información';
-const whatsappUrl = `https://wa.me/51${phone}?text=${encodeURIComponent(message)}`;
+const whatsappUrl = WhatsApp.link(phone, message);
 ---
 
 <div
