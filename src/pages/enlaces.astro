@@ -1,0 +1,234 @@
+---
+/**
+ * Links page (`src/pages/enlaces.astro`, route `/enlaces`).
+ *
+ * Linktree-style page aggregating every contact and social destination.
+ * Intentionally hidden from the main site nav.
+ */
+import Layout from '../storefront/layout/Layout.astro';
+import SiteHeader from '../storefront/layout/site-header.astro';
+import Footer from '../storefront/layout/footer.astro';
+import ArrowUpRight from '../storefront/icons/arrow-up-right.astro';
+import Facebook from '../storefront/icons/facebook.astro';
+import Instagram from '../storefront/icons/instagram.astro';
+import MapPin from '../storefront/icons/map-pin.astro';
+import Phone from '../storefront/icons/phone.astro';
+import TikTok from '../storefront/icons/tiktok.astro';
+import Utensils from '../storefront/icons/utensils.astro';
+import WhatsAppIcon from '../storefront/icons/whatsapp.astro';
+
+import { loadStorefront } from '../storefront/services/index.js';
+import { WhatsApp } from '../storefront/utils/whatsapp.js';
+
+const {
+  restaurant,
+  settings,
+  businessHours,
+  decorations,
+} = await loadStorefront();
+
+const restaurantName = restaurant?.name ?? settings?.name ?? 'Mr Nikkei';
+const tagline = settings?.seo?.description ?? 'Sushi artesanal en Lima. Delivery a domicilio, combos y promociones.';
+const logoUrl = settings?.logo_url ?? null;
+const footerBg = decorations?.footer_bg ?? settings?.footer_bg ?? null;
+
+const whatsappNumber = settings?.whatsapp?.number ?? restaurant?.phone ?? '';
+const whatsappUrl = whatsappNumber ? WhatsApp.link(whatsappNumber) : null;
+const instagramUrl = settings?.social_media?.instagram ?? null;
+const facebookUrl = settings?.social_media?.facebook ?? null;
+const tiktokUrl = settings?.social_media?.tiktok ?? null;
+const googleMapsUrl = settings?.google_maps ?? null;
+const phone = settings?.phone ?? restaurant?.phone ?? '';
+const address = restaurant?.address ?? settings?.address ?? '';
+---
+
+<Layout title="Enlaces" seo={settings?.seo}>
+  <div class="min-h-screen flex flex-col bg-secondary text-primary-text font-body selection:bg-primary selection:text-white">
+    <SiteHeader restaurant={restaurant} settings={settings} />
+
+    <main class="flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-20 relative overflow-hidden">
+      <!-- Ambient Glow -->
+      <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+        <div class="w-96 h-96 bg-primary/10 blur-[130px] rounded-full"></div>
+      </div>
+
+      <div class="relative z-10 w-full max-w-md mx-auto flex flex-col items-center text-center">
+        <!-- Brand Profile Card -->
+        <div class="w-24 h-24 bg-gradient-to-br from-primary to-primary/80 rounded-3xl flex items-center justify-center shadow-[0_15px_35px_rgba(220,38,38,0.3)] mb-5 overflow-hidden border-2 border-white/10">
+          {logoUrl ? (
+            <img src={logoUrl} alt={restaurantName} class="w-full h-full object-cover" />
+          ) : (
+            <Utensils class="w-12 h-12 text-white" />
+          )}
+        </div>
+
+        <h1 class="text-3xl sm:text-4xl font-display text-white tracking-tight leading-none mb-2">
+          {restaurantName}<span class="text-primary">.</span>
+        </h1>
+
+        <p class="text-xs sm:text-sm text-primary-text/70 max-w-xs mb-8 leading-relaxed">
+          {tagline}
+        </p>
+
+        <!-- Stacked Destination Buttons -->
+        <div class="w-full space-y-3.5">
+          <!-- WhatsApp Order (Primary highlight) -->
+          {whatsappUrl && (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-link-whatsapp
+              class="group relative flex items-center justify-between p-4 bg-emerald-600/90 hover:bg-emerald-600 text-white rounded-2xl border border-emerald-500/30 shadow-[0_10px_25px_rgba(16,185,129,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white">
+                  <WhatsAppIcon class="w-5 h-5 fill-current" />
+                </div>
+                <div class="text-left">
+                  <div class="text-sm font-bold leading-tight">Pedir por WhatsApp</div>
+                  <div class="text-xs text-white/80">Atención y pedidos inmediatos</div>
+                </div>
+              </div>
+              <ArrowUpRight class="w-5 h-5 text-white/70 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
+
+          <!-- Menú Digital -->
+          <a
+            href="/menu"
+            data-link-menu
+            class="group relative flex items-center justify-between p-4 bg-surface/5 hover:bg-surface/10 text-white rounded-2xl border border-white/10 hover:border-primary/40 shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+          >
+            <div class="flex items-center gap-3.5">
+              <div class="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors">
+                <Utensils class="w-5 h-5" />
+              </div>
+              <div class="text-left">
+                <div class="text-sm font-bold leading-tight">Ver Menú Completo</div>
+                <div class="text-xs text-primary-text/60">Makis, combos y promociones</div>
+              </div>
+            </div>
+            <ArrowUpRight class="w-5 h-5 text-primary-text/40 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </a>
+
+          <!-- Instagram -->
+          {instagramUrl && (
+            <a
+              href={instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-link-instagram
+              class="group relative flex items-center justify-between p-4 bg-surface/5 hover:bg-surface/10 text-white rounded-2xl border border-white/10 hover:border-primary/40 shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-pink-500/10 border border-pink-500/20 text-pink-400 flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-colors">
+                  <Instagram class="w-5 h-5" />
+                </div>
+                <div class="text-left">
+                  <div class="text-sm font-bold leading-tight">Instagram</div>
+                  <div class="text-xs text-primary-text/60">Fotos, novedades y promos</div>
+                </div>
+              </div>
+              <ArrowUpRight class="w-5 h-5 text-primary-text/40 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
+
+          <!-- Facebook -->
+          {facebookUrl && (
+            <a
+              href={facebookUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-link-facebook
+              class="group relative flex items-center justify-between p-4 bg-surface/5 hover:bg-surface/10 text-white rounded-2xl border border-white/10 hover:border-primary/40 shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                  <Facebook class="w-5 h-5" />
+                </div>
+                <div class="text-left">
+                  <div class="text-sm font-bold leading-tight">Facebook</div>
+                  <div class="text-xs text-primary-text/60">Comunidad y promociones</div>
+                </div>
+              </div>
+              <ArrowUpRight class="w-5 h-5 text-primary-text/40 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
+
+          <!-- TikTok (conditional render) -->
+          {tiktokUrl && (
+            <a
+              href={tiktokUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-link-tiktok
+              class="group relative flex items-center justify-between p-4 bg-surface/5 hover:bg-surface/10 text-white rounded-2xl border border-white/10 hover:border-primary/40 shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:bg-cyan-500 group-hover:text-white transition-colors">
+                  <TikTok class="w-5 h-5" />
+                </div>
+                <div class="text-left">
+                  <div class="text-sm font-bold leading-tight">TikTok</div>
+                  <div class="text-xs text-primary-text/60">Videos y detrás de escena</div>
+                </div>
+              </div>
+              <ArrowUpRight class="w-5 h-5 text-primary-text/40 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
+
+          <!-- Google Maps -->
+          {googleMapsUrl && (
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-link-maps
+              class="group relative flex items-center justify-between p-4 bg-surface/5 hover:bg-surface/10 text-white rounded-2xl border border-white/10 hover:border-primary/40 shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                  <MapPin class="w-5 h-5" />
+                </div>
+                <div class="text-left">
+                  <div class="text-sm font-bold leading-tight">Cómo llegar (Google Maps)</div>
+                  <div class="text-xs text-primary-text/60 line-clamp-1">{address || 'Ver ubicación en mapa'}</div>
+                </div>
+              </div>
+              <ArrowUpRight class="w-5 h-5 text-primary-text/40 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
+
+          <!-- Phone (tel:) -->
+          {phone && (
+            <a
+              href={`tel:${phone}`}
+              data-link-phone
+              class="group relative flex items-center justify-between p-4 bg-surface/5 hover:bg-surface/10 text-white rounded-2xl border border-white/10 hover:border-primary/40 shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 text-white flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-colors">
+                  <Phone class="w-5 h-5" />
+                </div>
+                <div class="text-left">
+                  <div class="text-sm font-bold leading-tight">Llamar por teléfono</div>
+                  <div class="text-xs text-primary-text/60">{phone}</div>
+                </div>
+              </div>
+              <ArrowUpRight class="w-5 h-5 text-primary-text/40 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          )}
+        </div>
+      </div>
+    </main>
+
+    <Footer
+      restaurant={restaurant}
+      settings={settings}
+      businessHours={businessHours}
+      footerBg={footerBg}
+      class="mt-16 block"
+    />
+  </div>
+</Layout>
