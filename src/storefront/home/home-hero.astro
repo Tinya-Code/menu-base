@@ -31,6 +31,7 @@ const showWhatsapp = block?.cta_whatsapp
 const menuHref = block?._resolved_menu_href ?? "/menu";
 const menuLabel = block?.cta_menu?.label ?? "Ver menú completo";
 const showMenu = block?.cta_menu ? block.cta_menu.enabled !== false : true;
+const showBadge = block?.show_hours_badge ?? true;
 ---
 
 <section
@@ -49,6 +50,50 @@ const showMenu = block?.cta_menu ? block.cta_menu.enabled !== false : true;
     >
       {tagline}
     </p>
+
+    {
+      showBadge && isOpen !== null && (
+        <div
+          id="hero-hours-badge"
+          data-state={isOpen ? "open" : "closed"}
+          class="inline-flex items-center px-4 py-2 rounded-full border border-white/10 bg-white/5 text-xs font-bold tracking-wider uppercase"
+        >
+          {/* Both states are pre-rendered; the client script flips [hidden]
+              so no Tailwind display utility ever fights the hidden attribute. */}
+          <span data-part="open" hidden={isOpen !== true}>
+            <span class="inline-flex items-center gap-2.5 text-emerald-300">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              </span>
+              Abierto
+              {openLabel && (
+                <span
+                  data-hours="open"
+                  class="text-primary-text/60 font-medium normal-case tracking-normal"
+                >
+                  {openLabel}
+                </span>
+              )}
+            </span>
+          </span>
+          <span data-part="closed" hidden={isOpen !== false}>
+            <span class="inline-flex items-center gap-2.5 text-red-300">
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-red-400" />
+              Cerrado
+              {openLabel && (
+                <span
+                  data-hours="closed"
+                  class="text-primary-text/60 font-medium normal-case tracking-normal"
+                >
+                  {openLabel}
+                </span>
+              )}
+            </span>
+          </span>
+        </div>
+      )
+    }
 
     <!-- Dual CTA -->
     <div class="flex flex-col sm:flex-row gap-3 justify-center pt-2">
@@ -81,3 +126,40 @@ const showMenu = block?.cta_menu ? block.cta_menu.enabled !== false : true;
     </div>
   </div>
 </section>
+
+<script>
+  import { readBusinessHours } from "../utils/dom";
+  import { isOpenAt, weekDayKey } from "../services/business-hours.service.js";
+
+  // Static build: the badge ships with the build-time state. Recompute it
+  // against the visitor's clock on load and every minute (closing time
+  // passes while the tab stays open).
+  const badge = document.getElementById("hero-hours-badge");
+  const hours = readBusinessHours();
+
+  if (badge && hours) {
+    const openPart = badge.querySelector('[data-part="open"]');
+    const closedPart = badge.querySelector('[data-part="closed"]');
+    const openHours = badge.querySelector('[data-hours="open"]');
+    const closedHours = badge.querySelector('[data-hours="closed"]');
+
+    const refresh = () => {
+      const now = new Date();
+      const open = isOpenAt(hours, now);
+      const today = hours[weekDayKey(now)];
+      const label =
+        today?.isOpen && today.open && today.close
+          ? `${today.open} – ${today.close}`
+          : "";
+
+      if (openPart instanceof HTMLElement) openPart.hidden = !open;
+      if (closedPart instanceof HTMLElement) closedPart.hidden = open;
+      if (openHours) openHours.textContent = label;
+      if (closedHours) closedHours.textContent = label;
+      badge.dataset.state = open ? "open" : "closed";
+    };
+
+    refresh();
+    window.setInterval(refresh, 60_000);
+  }
+</script>

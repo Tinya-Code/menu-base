@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
+import { isOpenAt } from '../src/storefront/services/business-hours.service.js';
 
 const CHROME_PATH = '/Users/alejandro/Library/Caches/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-mac-arm64/chrome-headless-shell';
 const BASE_URL = process.env.PREVIEW_URL || 'http://localhost:4322';
@@ -124,6 +125,20 @@ async function runSmoke() {
     })).result.value;
     console.log('  [PASS] Footer present:', footerPresent);
     assert.ok(footerPresent);
+
+    // 5. Hero hours badge: payload embedded + state matches the visitor's clock
+    const hoursPayloadPresent = (await client.send('Runtime.evaluate', {
+      expression: '!!document.querySelector(\'#business-hours-data[data-business-hours]\')',
+    })).result.value;
+    console.log('  [PASS] business-hours payload embedded:', hoursPayloadPresent);
+    assert.ok(hoursPayloadPresent, 'Missing #business-hours-data embed on /');
+
+    const badgeState = (await client.send('Runtime.evaluate', {
+      expression: 'document.querySelector("#hero-hours-badge")?.dataset.state ?? null',
+    })).result.value;
+    const expectedOpen = isOpenAt(settingsFixture.business_hours, new Date());
+    console.log('  [PASS] Hero badge state:', badgeState, '(expected:', expectedOpen ? 'open' : 'closed', ')');
+    assert.equal(badgeState, expectedOpen ? 'open' : 'closed');
 
     console.log('=== Checking /menu ===');
     await navigateAndWait(`${BASE_URL}/menu`);

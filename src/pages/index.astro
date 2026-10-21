@@ -35,6 +35,7 @@ import { WhatsApp } from '../storefront/utils/whatsapp.js';
 const {
   restaurant,
   settings,
+  rawHours,
   businessHours,
   decorations,
   blocks: menuBlocks,
@@ -49,7 +50,9 @@ const restaurantName = meta.title || restaurant?.name || settings?.seo?.site_nam
 const tagline = meta.tagline || settings?.seo?.description || 'Sushi artesanal en Lima. Delivery a domicilio, combos y promociones.';
 const siteTitle = settings?.seo?.title ?? `${restaurantName} — Sushi y delivery en Lima`;
 
-// Open/closed state
+// Initial open/closed state — computed at build time and corrected on the
+// client against the visitor's clock (home-hero re-reads the embedded
+// #business-hours-data payload below).
 const now = new Date();
 const todayKey = weekDayKey(now);
 const todayHours = businessHours?.[todayKey];
@@ -57,6 +60,14 @@ const isOpen = todayHours ? isOpenAt(todayHours, now) : null;
 const openLabel = todayHours?.open && todayHours?.close
   ? `${todayHours.open} – ${todayHours.close}`
   : null;
+
+/**
+ * Same escaping as menu.astro: the attribute is omitted entirely when the
+ * schedule never arrived, and `<` is escaped so the JSON cannot break out
+ * of the attribute.
+ */
+const hoursJson =
+  rawHours === undefined ? null : JSON.stringify(rawHours).replace(/</g, '\\u003c');
 
 // WhatsApp link
 const whatsappNumber = settings?.whatsapp?.number ?? restaurant?.phone ?? '';
@@ -145,4 +156,10 @@ const whatsappUrl = whatsappNumber ? WhatsApp.link(whatsappNumber, whatsappMsg) 
 
     <FlyerModal flyers={flyers} />
   </div>
+
+  {
+    hoursJson !== null && (
+      <div id="business-hours-data" data-business-hours={hoursJson} hidden />
+    )
+  }
 </Layout>
