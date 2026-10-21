@@ -67,7 +67,25 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
 
       <!-- Categories with Media -->
       <div class="space-y-16">
-        {galleryCategories.map((category) => (
+        {galleryCategories.map((category) => {
+          // A category holding video/embed items renders in WIDE columns — the
+          // Pinterest move: media cards get ~2× the width of image cards and the
+          // 9:16 embed becomes a full-height hero. Image-only categories keep
+          // the dense 4-column masonry.
+          const hasRichMedia = category.items.some(
+            (i) =>
+              i.type === 'video' ||
+              i.type === 'embed' ||
+              Boolean(i.embed_html) ||
+              (!i.type &&
+                Boolean(
+                  i.url?.endsWith('.mp4') ||
+                    i.url?.endsWith('.webm') ||
+                    /youtube|youtu\.be|tiktok|facebook/.test(i.url ?? ''),
+                )),
+          );
+
+          return (
           <section class="space-y-8" data-gallery-category={category.name}>
             <div class="border-b border-white/10 pb-4 flex items-baseline justify-between">
               <h2 class="text-3xl sm:text-4xl font-display text-white tracking-tight flex items-center gap-3">
@@ -78,24 +96,44 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
               </h2>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Masonry: CSS multi-columns, column-major flow. Cards keep their
+                 natural height and the columns absorb the mix — no uniform row
+                 heights. mb handles vertical spacing (row-gap does not apply to
+                 multicol); break-inside-avoid keeps each card in one column.
+                 Media categories switch to wide columns so video/embed cards
+                 dominate; image-only categories keep the dense 4-col grid. -->
+            <div class={hasRichMedia ? 'columns-1 sm:columns-2 gap-6' : 'columns-2 md:columns-3 lg:columns-4 gap-6'}>
               {category.items.map((item) => {
                 const embedUrl = resolveEmbedUrl(item);
                 const isVideo = item.type === 'video' || (!item.type && Boolean(item.url?.endsWith('.mp4') || item.url?.endsWith('.webm')));
                 const isEmbed = item.type === 'embed' || Boolean(item.embed_html) || (!item.type && Boolean(item.url?.includes('youtube') || item.url?.includes('youtu.be') || item.url?.includes('tiktok') || item.url?.includes('facebook')));
                 const isAspect916 = item.aspect_ratio === '9/16' || Boolean(item.url?.includes('shorts') || item.url?.includes('tiktok'));
 
+                // Size caps for media cards. The wide 2-col section gives
+                // media prominence, but unbounded cards blow up on desktop
+                // (604px column → 9:16 embed renders 1074px tall) and on
+                // mobile (full width → 636px tall). Landscape media caps at
+                // 460px wide (~259px tall); portrait 9:16 gets a tighter cap
+                // so its true ratio yields bounded height (~444px mobile /
+                // ~533px desktop) — still clearly the tallest card, no longer
+                // page-dominating.
+                const mediaCard = isAspect916
+                  ? ' max-w-[250px] md:max-w-[300px] mx-auto'
+                  : isVideo || isEmbed
+                    ? ' max-w-[460px] mx-auto'
+                    : '';
+
                 return (
                   <article
-                    class={`group bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-2 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.15)] cursor-pointer ${
-                      isAspect916 ? 'sm:col-span-1 md:row-span-2' : ''
-                    }`}
+                    class={`group relative mb-6 break-inside-avoid bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-2 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.15)] hover:z-10 cursor-pointer${mediaCard}`}
                     data-gallery-item={item.id}
                     data-gallery-data={JSON.stringify(item)}
                   >
-                    <!-- Media Container -->
+                    <!-- Media Container. Images flow at NATURAL height (that is
+                         what makes the masonry vary); videos/embeds keep a fixed
+                         16:9 or 9:16 frame. -->
                     <div class={`relative w-full rounded-2xl bg-secondary/80 overflow-hidden ${
-                      isAspect916 ? 'aspect-[9/16]' : (isVideo || isEmbed ? 'aspect-video' : 'aspect-square flex items-center justify-center p-4')
+                      isAspect916 ? 'aspect-[9/16]' : (isVideo || isEmbed ? 'aspect-video' : 'flex items-center justify-center p-4')
                     }`}>
                       {item.embed_html ? (
                         <div class="w-full h-full flex items-center justify-center [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:border-0" set:html={item.embed_html} />
@@ -122,7 +160,7 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
                           src={item.url}
                           alt={item.alt || item.title}
                           loading="lazy"
-                          class="w-full h-full object-contain transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-500 ease-out drop-shadow-xl"
+                          class="w-full h-auto transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-500 ease-out drop-shadow-xl"
                         />
                       ) : null}
                     </div>
@@ -132,7 +170,8 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
               })}
             </div>
           </section>
-        ))}
+          );
+        })}
       </div>
     </main>
 
