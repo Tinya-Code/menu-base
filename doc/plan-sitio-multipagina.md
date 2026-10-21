@@ -46,9 +46,9 @@ Cierre: build green; `/menu` serves the full storefront with the 11-check smoke 
 
 Objetivo: finish the landing content so it is the navigation hub of the site (the only entry to enlaces).
 
-- [ ] Add the CTA section to the landing (src/pages/index.astro: three link cards — Ver menú → `/menu`, Galería → `/galeria`, Enlaces → `/enlaces` — styled with existing tokens, footer reused below).
-- [ ] Set the landing SEO title (src/pages/index.astro: pass the site-level title through the Layout title prop so the landing keeps the canonical `Mr Nikkei6.9 — Sushi y delivery en Lima` head; `/menu` keeps the same default).
-- [ ] Extend the CDP smoke for the landing (smoke script: landing renders 3 CTA hrefs, SiteHeader logo resolves to `/`, title assertion passes, 0 console problems).
+- [x] Add the CTA section to the landing (src/pages/index.astro: three link cards — Ver menú → `/menu`, Galería → `/galeria`, Enlaces → `/enlaces` — styled with existing tokens, footer reused below) — `c54218f`.
+- [x] Set the landing SEO title (src/pages/index.astro: pass the site-level title through the Layout title prop so the landing keeps the canonical `Mr Nikkei6.9 — Sushi y delivery en Lima` head; `/menu` keeps the same default) — `b9a7011`.
+- [x] Extend the CDP smoke for the landing (smoke script: landing renders 3 CTA hrefs, SiteHeader logo resolves to `/`, title assertion passes, 0 console problems) — `086f119`.
 
 Cierre: landing shows hero + 3 CTAs + footer; smoke green.
 
