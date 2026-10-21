@@ -67,9 +67,9 @@ Cierre: `/galeria` renders all menu product photos grouped by category; smoke gr
 
 Objetivo: linktree-style page aggregating every contact/social destination; hidden from the site nav by design.
 
-- [ ] Create the links page (src/pages/enlaces.astro: Layout + SiteHeader + stacked link buttons — WhatsApp order via `WhatsApp.link(settings.whatsapp.number)`, Instagram, Facebook, TikTok rendered only when `settings.social_media` provides the URL, Google Maps from `settings.google_maps`, phone `tel:` — using existing icons from `src/storefront/icons/` + Footer).
-- [ ] Set the enlaces SEO title (src/pages/enlaces.astro: `title="Enlaces"` through the Layout title prop).
-- [ ] Extend the CDP smoke for enlaces (script: every populated social link resolves to the settings URL, the TikTok button is absent while the fixture value is null, SiteHeader contains exactly two nav links — Menú and Galería — on this page, landing CTA reaches `/enlaces`, 0 console problems).
+- [x] Create the links page (src/pages/enlaces.astro: Layout + SiteHeader + stacked link buttons — WhatsApp order via `WhatsApp.link(settings.whatsapp.number)`, Instagram, Facebook, TikTok rendered only when `settings.social_media` provides the URL, Google Maps from `settings.google_maps`, phone `tel:` — using existing icons from `src/storefront/icons/` + Footer) — `ba9b54e`.
+- [x] Set the enlaces SEO title (src/pages/enlaces.astro: `title="Enlaces"` through the Layout title prop) — `ba9b54e`.
+- [x] Extend the CDP smoke for enlaces (script: every populated social link resolves to the settings URL, the TikTok button is absent while the fixture value is null, SiteHeader contains exactly two nav links — Menú and Galería — on this page, landing CTA reaches `/enlaces`, 0 console problems) — `6f7a181`.
 
 Cierre: `/enlaces` lists every live destination from settings; confirmed absent from the header nav; smoke green.
 
