@@ -25,7 +25,7 @@ const { title, seo = null } = Astro.props;
 
 /** Document title: explicitly passed title composes with seo.title_template; otherwise seo.title or default. */
 const documentTitle = seo
-	? (title
+	? (title && title !== seo.title
 		? (seo.title_template ? seo.title_template.replace('%s', title) : title)
 		: (seo.title || (seo.title_template ? seo.title_template.replace('%s', seo.site_name) : seo.site_name)))
 	: (title || 'Mr Nikkei');
