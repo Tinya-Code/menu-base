@@ -6,6 +6,8 @@ import { isOpenAt } from '../src/storefront/services/business-hours.service.js';
 const CHROME_PATH = '/Users/alejandro/Library/Caches/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-mac-arm64/chrome-headless-shell';
 const BASE_URL = process.env.PREVIEW_URL || 'http://localhost:4322';
 const settingsFixture = JSON.parse(readFileSync('src/data/api/settings.json', 'utf8')).data;
+// Data-pinned expectations — APP zone: this JSON is yours to edit, smoke.mjs is not.
+const expectations = JSON.parse(readFileSync('scripts/smoke-data.json', 'utf8'));
 
 class CDPClient {
   constructor(wsUrl) {
@@ -100,7 +102,7 @@ async function runSmoke() {
     // 1. Landing Title assertion
     const landingTitle = (await client.send('Runtime.evaluate', { expression: 'document.title' })).result.value;
     console.log('  [PASS] Landing title:', landingTitle);
-    assert.equal(landingTitle, 'Mr Nikkei6.9 — Sushi y delivery en Lima');
+    assert.equal(landingTitle, settingsFixture.seo.title);
 
     // 2. SiteHeader Logo resolves to /
     const headerLogoHref = (await client.send('Runtime.evaluate', {
@@ -117,7 +119,7 @@ async function runSmoke() {
     assert.ok(ctaHrefs.includes('/menu'), 'Missing /menu CTA');
     assert.ok(ctaHrefs.includes('/galeria'), 'Missing /galeria CTA');
     assert.ok(ctaHrefs.includes('/enlaces'), 'Missing /enlaces CTA');
-    assert.equal(ctaHrefs.length, 3, 'Expected exactly 3 CTA cards in main section');
+    assert.equal(ctaHrefs.length, expectations.landingCtaCards, `Expected exactly ${expectations.landingCtaCards} CTA cards in main section`);
 
     // 4. Footer present
     const footerPresent = (await client.send('Runtime.evaluate', {
@@ -187,7 +189,7 @@ async function runSmoke() {
       expression: 'document.querySelector("[data-product-detail-host]:not([hidden]) [data-entry-label]")?.textContent?.trim() ?? null',
     })).result.value;
     console.log('  [PASS] Sticky-bar entry label:', entryLabelText);
-    assert.equal(entryLabelText, '12 Unidades');
+    assert.equal(entryLabelText, expectations.productEntryLabel);
 
     console.log('=== Checking /galeria ===');
     await navigateAndWait(`${BASE_URL}/galeria`);
@@ -195,7 +197,7 @@ async function runSmoke() {
     // 10. Gallery title assertion
     const galeriaTitle = (await client.send('Runtime.evaluate', { expression: 'document.title' })).result.value;
     console.log('  [PASS] Gallery title:', galeriaTitle);
-    assert.equal(galeriaTitle, 'Galería | Mr Nikkei6.9');
+    assert.equal(galeriaTitle, settingsFixture.seo.title_template.replace('%s', 'Galería'));
 
     // 11. Nav shows Galería active and Menú inactive
     const galeriaNavActive = JSON.parse((await client.send('Runtime.evaluate', {
@@ -213,14 +215,17 @@ async function runSmoke() {
     })).result.value);
     console.log('  [PASS] Category headings:', categoryHeadings);
     assert.ok(categoryHeadings.length > 0, 'Expected at least one category heading');
-    assert.ok(categoryHeadings.includes('Rolls'));
+    assert.ok(
+      expectations.galleryHeadingsInclude.every((h) => categoryHeadings.includes(h)),
+      `Expected category heading(s): ${expectations.galleryHeadingsInclude.join(', ')}`
+    );
 
-    // 13. Grid renders expected item count (at least 21 items) and contains video and iframe embeds
+    // 13. Grid renders the expected item count (scripts/smoke-data.json) plus video and iframe embeds
     const galleryItemsCount = (await client.send('Runtime.evaluate', {
       expression: 'document.querySelectorAll("[data-gallery-item]").length',
     })).result.value;
     console.log('  [PASS] Gallery items count:', galleryItemsCount);
-    assert.ok(galleryItemsCount >= 21, `Expected at least 21 gallery items, found ${galleryItemsCount}`);
+    assert.ok(galleryItemsCount >= expectations.galleryMinItems, `Expected at least ${expectations.galleryMinItems} gallery items, found ${galleryItemsCount}`);
 
     const hasVideo = (await client.send('Runtime.evaluate', {
       expression: 'document.querySelectorAll("video").length > 0',
@@ -264,7 +269,7 @@ async function runSmoke() {
     // 16. Enlaces title assertion
     const enlacesTitle = (await client.send('Runtime.evaluate', { expression: 'document.title' })).result.value;
     console.log('  [PASS] Enlaces title:', enlacesTitle);
-    assert.equal(enlacesTitle, 'Enlaces | Mr Nikkei6.9');
+    assert.equal(enlacesTitle, settingsFixture.seo.title_template.replace('%s', 'Enlaces'));
 
     // 17. SiteHeader on /enlaces contains exactly two nav links (Menú, Galería) and neither is active
     const enlacesNavLinks = JSON.parse((await client.send('Runtime.evaluate', {
@@ -295,12 +300,13 @@ async function runSmoke() {
     console.log('  [PASS] Google Maps href resolves to settings:', mapsHref === settingsFixture.google_maps);
     assert.equal(mapsHref, settingsFixture.google_maps);
 
-    // 19. TikTok button is absent while fixture value is null
+    // 19. TikTok button presence matches the fixture value
     const tiktokPresent = (await client.send('Runtime.evaluate', {
       expression: '!!document.querySelector(\'[data-block-link="social-tiktok"]\')',
     })).result.value;
-    console.log('  [PASS] TikTok button absent when null:', !tiktokPresent);
-    assert.equal(tiktokPresent, false);
+    const tiktokExpected = Boolean(settingsFixture.social_media.tiktok);
+    console.log('  [PASS] TikTok button matches fixture:', tiktokPresent === tiktokExpected);
+    assert.equal(tiktokPresent, tiktokExpected);
 
     // 20. Landing CTA reaches /enlaces
     await navigateAndWait(`${BASE_URL}/`);

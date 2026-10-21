@@ -14,16 +14,50 @@ shows comes from the fixture objects in `src/data/api/`.
 
 ## What to copy
 
-| Path | Role |
-| --- | --- |
-| `src/storefront/` | The whole domain — the portable core: `services/` (data access + fallbacks), `types/` (contracts), `menu/` (blocks, cards, product detail), `commerce/` (cart), `layout/`, `ui/` (modals), `home/`, `enlaces/`, `icons/`, `scripts/`, `styles/`, `utils/` |
-| `src/pages/` | The four routes: `index.astro` (landing), `menu.astro`, `galeria.astro`, `enlaces.astro` |
-| `src/data/api/` | Fixture objects — copy as placeholders, then replace with your declared data |
-| `public/` | Static assets (logos, images, favicon) |
-| `astro.config.mjs`, `package.json`, `tsconfig.json`, `pnpm-lock.yaml` | Tooling — Astro, Tailwind v4 via `@tailwindcss/vite`, sitemap integration |
-| `scripts/smoke.mjs` | End-to-end smoke over CDP (headless Chrome), no test framework needed |
+Every path belongs to an update zone (next section): **Core** = template-managed,
+**App** = yours forever, **Composition** = shared — conflicts only where you edit.
+
+| Path | Role | Zone |
+| --- | --- | --- |
+| `src/storefront/` | The whole domain — the portable core: `services/` (data access + fallbacks), `types/` (contracts), `menu/` (blocks, cards, product detail), `commerce/` (cart), `layout/`, `ui/` (modals), `home/`, `enlaces/`, `icons/`, `scripts/`, `styles/`, `utils/` | Core |
+| `src/pages/` | The four routes: `index.astro` (landing), `menu.astro`, `galeria.astro`, `enlaces.astro` | Composition |
+| `src/data/api/` | Fixture objects — copy as placeholders, then replace with your declared data | App |
+| `src/styles/tokens.css` | Brand: fonts (`@font-face`) + Tailwind v4 `@theme` tokens | App |
+| `public/` | Static assets (logos, images, favicon) | App |
+| `astro.config.mjs`, `package.json`, `tsconfig.json`, `pnpm-lock.yaml`, `.gitattributes` | Tooling — Astro, Tailwind v4 via `@tailwindcss/vite`, sitemap integration, update-zone rules | Core |
+| `scripts/smoke.mjs` | End-to-end smoke over CDP (headless Chrome), no test framework needed | Core |
+| `scripts/smoke-data.json` | Smoke expectations pinned to your data (CTA count, headings, min items, labels) | App |
 
 Not portable by design: `doc/` (project history), `.env*` (local), `dist/` (build output).
+
+## Update zones
+
+A template is only updatable where the owner did NOT edit — the same reason
+`node_modules` exists. Each copied file belongs to exactly one zone:
+
+| Zone | Paths | Rule |
+| --- | --- | --- |
+| **Core** | `src/storefront/`, `src/pages/`, `scripts/smoke.mjs`, tooling | Don't edit — extend through the seams instead: design slots in `menu.astro`, fixtures, tokens. Template updates apply cleanly here. |
+| **App** | `src/data/api/*.json`, `src/styles/tokens.css`, `public/`, `scripts/smoke-data.json` | Yours forever. `.gitattributes` marks these `merge=ours`, so an update merge never overwrites your data, brand, or assets. |
+| **Composition** | The parts of `src/pages/*.astro` / `menu.astro` you customize | Conflicts appear only where you edited; resolve by hand (keep yours or take the template's). |
+
+Applying an update (the scaffolder will wire the `upstream` remote and the copied
+version for you):
+
+```bash
+git fetch upstream && git merge upstream/vX.Y.Z
+```
+
+- Untouched core files merge clean.
+- App files are protected by `merge=ours` — your data and brand win.
+- Conflicts are confined to composition files you actually edited.
+
+Releases stay small and frequent with a CHANGELOG; breaking changes ship with a
+migration note in this guide — small merges are what keep updates practical.
+
+Rule of thumb: **edit the fixture/token, not the component.** If a change truly
+needs a core edit, that file leaves the update channel from then on — a decision,
+not a failure.
 
 ## Objects to declare
 
@@ -89,8 +123,9 @@ Required for a working site:
 - **Data mode** (`PUBLIC_DATA_MODE` env): unset/anything → LOCAL (reads the fixtures — default,
   zero network). `=api` → live Google Apps Script endpoint with a v1→v2 adapter (temporary;
   see `doc/proposal-api-v2.md` for the target contract).
-- **Brand tokens**: colors and fonts live in `src/storefront/styles/global.css` (Tailwind v4
-  `@theme`). Change tokens there — never hardcode colors in components.
+- **Brand tokens**: fonts and colors live in `src/styles/tokens.css` (app zone —
+  `@font-face` + Tailwind v4 `@theme`, imported by `src/storefront/styles/global.css`).
+  Change brand there — never hardcode colors in components.
 - **Design slots**: per-block card designs are wired in `src/pages/menu.astro` — the port point
   documented in `doc/menu-cards.md`.
 
@@ -155,10 +190,11 @@ schemas ARE the executable v2 contract (`doc/proposal-api-v2.md`):
 2. `node scripts/smoke.mjs` — drives headless Chrome over CDP against the preview server
    (`pnpm preview`, default `localhost:4322`). Checks: menu card/dialog counts, cart flows,
    gallery items/modal, landing CTA, footer links.
-3. **Gotcha — data-pinned assertions**: a few smoke checks snapshot *this* repo's fixtures
-   (gallery `>= 21` items, a category heading `Rolls`, exactly 3 landing CTA cards). After
-   declaring your own data, update those expectations in `scripts/smoke.mjs` — they are data
-   snapshots, not invariants. Menu checks are count-free (`> 0`), so they port as-is.
+3. **Gotcha — data-pinned expectations**: a few smoke checks snapshot *this* repo's data
+   (gallery min items, category headings, landing CTA count, product entry label). They live
+   in `scripts/smoke-data.json` (app zone) — after declaring your own data, update that file.
+   Titles, business hours, and social links derive from `settings.json` automatically. Menu
+   checks are count-free (`> 0`), so they port as-is.
 4. Manual browser pass at 1440px and 390px.
 
 ## Page references
