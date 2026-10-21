@@ -165,7 +165,47 @@ async function runSmoke() {
     console.log('  [PASS] Card click opens dialog:', dialogOpened);
     assert.ok(dialogOpened);
 
-    // 10. Check 0 console problems
+    console.log('=== Checking /galeria ===');
+    await navigateAndWait(`${BASE_URL}/galeria`);
+
+    // 10. Gallery title assertion
+    const galeriaTitle = (await client.send('Runtime.evaluate', { expression: 'document.title' })).result.value;
+    console.log('  [PASS] Gallery title:', galeriaTitle);
+    assert.equal(galeriaTitle, 'Galería | Mr Nikkei6.9');
+
+    // 11. Nav shows Galería active and Menú inactive
+    const galeriaNavActive = JSON.parse((await client.send('Runtime.evaluate', {
+      expression: 'JSON.stringify(Array.from(document.querySelectorAll("header nav a")).map(a => ({ text: a.innerText.trim(), active: a.className.includes("border-primary") })))',
+    })).result.value);
+    console.log('  [PASS] Gallery nav active state:', galeriaNavActive);
+    assert.deepEqual(galeriaNavActive, [
+      { text: 'MENÚ', active: false },
+      { text: 'GALERÍA', active: true },
+    ]);
+
+    // 12. Category heading exists
+    const categoryHeadings = JSON.parse((await client.send('Runtime.evaluate', {
+      expression: 'JSON.stringify(Array.from(document.querySelectorAll("[data-gallery-category] h2 span:first-child")).map(h => h.innerText.trim()))',
+    })).result.value);
+    console.log('  [PASS] Category headings:', categoryHeadings);
+    assert.ok(categoryHeadings.length > 0, 'Expected at least one category heading');
+    assert.ok(categoryHeadings.includes('Rolls'));
+
+    // 13. Grid renders expected image count (21 items)
+    const galleryItemsCount = (await client.send('Runtime.evaluate', {
+      expression: 'document.querySelectorAll("[data-gallery-item]").length',
+    })).result.value;
+    console.log('  [PASS] Gallery image items count:', galleryItemsCount);
+    assert.equal(galleryItemsCount, 21, 'Expected 21 gallery items with photos');
+
+    // 14. Footer present on /galeria
+    const galeriaFooterPresent = (await client.send('Runtime.evaluate', {
+      expression: '!!document.querySelector("footer")',
+    })).result.value;
+    console.log('  [PASS] Gallery footer present:', galeriaFooterPresent);
+    assert.ok(galeriaFooterPresent);
+
+    // 15. Check 0 console problems
     console.log('  Console problems count:', consoleProblems.length);
     if (consoleProblems.length > 0) {
       console.warn('  Problems found:', consoleProblems);
