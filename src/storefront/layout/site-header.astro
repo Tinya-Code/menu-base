@@ -1,0 +1,72 @@
+---
+/**
+ * SiteHeader — minimal top navigation for landing, galeria and enlaces.
+ *
+ * Props:
+ * - `restaurant` — profile (name) for logo alt and brand text
+ * - `settings`   — settings (logo_url)
+ * - `class`      — pass-through host classes
+ */
+import Utensils from '../icons/utensils.astro';
+import type { RestaurantProfile, RestaurantSettings } from '../types/menu';
+
+interface Props {
+  class?: string;
+  restaurant?: RestaurantProfile | null;
+  settings?: RestaurantSettings | null;
+}
+
+const {
+  class: hostClass = '',
+  restaurant = null,
+  settings = null,
+} = Astro.props;
+
+const restaurantName = restaurant?.name ?? 'Mr Nikkei';
+const logoUrl = settings?.logo_url ?? null;
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isMenuActive = currentPath === '/menu';
+const isGaleriaActive = currentPath === '/galeria';
+---
+
+<!-- Site Header -->
+<header class={`bg-secondary text-primary-text border-b border-white/10 py-4 px-6 ${hostClass}`}>
+  <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-center gap-6 sm:gap-10">
+    <a href="/" class="flex items-center gap-3 group" aria-label="Inicio">
+      <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-md overflow-hidden transition-transform duration-300 group-hover:scale-105">
+        {logoUrl ? (
+          <img src={logoUrl} alt={restaurantName} class="w-full h-full object-cover" />
+        ) : (
+          <Utensils class="w-6 h-6 text-white" />
+        )}
+      </div>
+      <span class="text-xl font-display text-white tracking-tight">
+        {restaurantName}<span class="text-primary">.</span>
+      </span>
+    </a>
+
+    <nav class="flex items-center gap-6 text-sm font-bold uppercase tracking-wider" aria-label="Navegación principal">
+      <a
+        href="/menu"
+        class={`transition-colors py-1 border-b-2 ${
+          isMenuActive
+            ? 'text-primary border-primary'
+            : 'text-primary-text/80 hover:text-white border-transparent'
+        }`}
+      >
+        Menú
+      </a>
+      <a
+        href="/galeria"
+        class={`transition-colors py-1 border-b-2 ${
+          isGaleriaActive
+            ? 'text-primary border-primary'
+            : 'text-primary-text/80 hover:text-white border-transparent'
+        }`}
+      >
+        Galería
+      </a>
+    </nav>
+  </div>
+</header>
