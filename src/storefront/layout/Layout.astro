@@ -21,12 +21,14 @@ interface Props {
 	seo?: SiteSeo | null;
 }
 
-const { title = 'Mr Nikkei', seo = null } = Astro.props;
+const { title, seo = null } = Astro.props;
 
-/** Document title: `seo.title`, else the template with the site/page name. */
+/** Document title: explicitly passed title composes with seo.title_template; otherwise seo.title or default. */
 const documentTitle = seo
-	? seo.title || seo.title_template.replace('%s', title || seo.site_name)
-	: title;
+	? (title
+		? (seo.title_template ? seo.title_template.replace('%s', title) : title)
+		: (seo.title || (seo.title_template ? seo.title_template.replace('%s', seo.site_name) : seo.site_name)))
+	: (title || 'Mr Nikkei');
 
 const description = seo?.description ?? '';
 const keywords = Array.isArray(seo?.keywords) ? seo.keywords : [];
