@@ -31,7 +31,7 @@ export function weekDayKey(date = new Date()) {
  * `business_hours` payload.
  *
  * Kept free of the service so the browser bundle can reuse it (the sidebar and
- * the checkout need it client-side, where `restaurantService` is only loaded
+ * the checkout need it client-side, where the restaurant data is only loaded
  * on demand).
  *
  * A schedule that never arrived counts as open, exactly like Angular.

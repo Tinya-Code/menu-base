@@ -14,5 +14,3 @@ export function initAnimations(root: ParentNode = document): void {
   initMakiRail(root);
   initParallax(root);
 }
-
-export { initMakiRail, initParallax };

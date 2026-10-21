@@ -1,5 +1,5 @@
 /**
- * format — pure ports of the Angular pipes (`precio`, `fecha`, `timeFormat`).
+ * format — pure ports of the Angular pipes (`precio`, `timeFormat`).
  *
  * All formatters are locale-locked to `es-PE`, exactly like the original pipes,
  * and return an empty string for nullish or unparseable input.
@@ -27,57 +27,6 @@ export function precio(value) {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(num);
-}
-
-/** Supported `fecha()` format aliases. */
-export const FECHA_FORMATS = ['short', 'medium', 'long', 'full', 'dateTime'];
-
-/**
- * @param {'short' | 'medium' | 'long' | 'full' | 'dateTime'} format
- * @returns {Intl.DateTimeFormatOptions}
- */
-function fechaOptions(format) {
-  switch (format) {
-    case 'short':
-      return { year: '2-digit', month: '2-digit', day: '2-digit' };
-    case 'long':
-      return { year: 'numeric', month: 'long', day: 'numeric' };
-    case 'full':
-      return { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    case 'dateTime':
-      return {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      };
-    case 'medium':
-    default:
-      return { year: 'numeric', month: 'short', day: 'numeric' };
-  }
-}
-
-/**
- * Human readable date.
- *
- * ```js
- * fecha('2026-10-10')                    // "10 oct 2026"
- * fecha('2026-10-10', 'dateTime')        // "10/10/2026, 03:15 p. m."
- * ```
- *
- * @param {Date | string | number | null | undefined} value
- * @param {'short' | 'medium' | 'long' | 'full' | 'dateTime'} [format]
- * @returns {string}
- */
-export function fecha(value, format = 'medium') {
-  if (value === null || value === undefined || value === '') return '';
-
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
-
-  return new Intl.DateTimeFormat('es-PE', fechaOptions(format)).format(date);
 }
 
 /**

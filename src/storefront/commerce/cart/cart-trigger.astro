@@ -61,8 +61,8 @@ import { precio } from '../../utils/format.js';
 
   // The cart totals include the delivery fee from the settings payload and the
   // click checks the opening hours: the page ships both (the fee is seeded by
-  // the page script into `restaurantService`, the hours live in
-  // `#business-hours-data`), so the trigger paints synchronously (F5).
+  // the page script, the hours live in `#business-hours-data`), so the
+  // trigger paints synchronously (F5).
   bootstrap();
 
   function bootstrap() {
