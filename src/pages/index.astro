@@ -23,10 +23,11 @@ const {
 
 const restaurantName = restaurant?.name ?? settings?.seo?.site_name ?? 'Mr Nikkei';
 const tagline = settings?.seo?.description ?? 'Sushi artesanal en Lima. Delivery a domicilio, combos y promociones.';
+const siteTitle = settings?.seo?.title ?? 'Mr Nikkei6.9 — Sushi y delivery en Lima';
 const footerBg = decorations?.footer_bg ?? settings?.footer_bg ?? null;
 ---
 
-<Layout seo={settings?.seo}>
+<Layout title={siteTitle} seo={settings?.seo}>
   <div class="min-h-screen flex flex-col bg-secondary text-primary-text font-body selection:bg-primary selection:text-white">
     <SiteHeader restaurant={restaurant} settings={settings} />
 
