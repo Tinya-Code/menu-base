@@ -8,6 +8,10 @@
 import Layout from '../storefront/layout/Layout.astro';
 import SiteHeader from '../storefront/layout/site-header.astro';
 import Footer from '../storefront/layout/footer.astro';
+import ArrowRight from '../storefront/icons/arrow-right.astro';
+import Images from '../storefront/icons/images.astro';
+import Share2 from '../storefront/icons/share-2.astro';
+import Utensils from '../storefront/icons/utensils.astro';
 import { loadStorefront } from '../storefront/services/index.js';
 
 const {
@@ -26,30 +30,78 @@ const footerBg = decorations?.footer_bg ?? settings?.footer_bg ?? null;
   <div class="min-h-screen flex flex-col bg-secondary text-primary-text font-body selection:bg-primary selection:text-white">
     <SiteHeader restaurant={restaurant} settings={settings} />
 
-    <main class="flex-1 flex flex-col items-center justify-center text-center px-6 py-20 relative overflow-hidden">
+    <main class="flex-1 flex flex-col items-center justify-center text-center px-6 py-16 sm:py-24 relative overflow-hidden">
       <!-- Ambient Glow -->
       <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
         <div class="w-96 h-96 bg-primary/15 blur-[120px] rounded-full"></div>
       </div>
 
-      <div class="relative z-10 max-w-3xl mx-auto space-y-8">
-        <h1 class="text-6xl md:text-8xl font-display text-white leading-none tracking-tighter">
-          {restaurantName}<span class="text-primary">.</span>
-        </h1>
+      <div class="relative z-10 max-w-4xl mx-auto space-y-10">
+        <!-- Hero Section -->
+        <div class="space-y-6">
+          <h1 class="text-6xl md:text-8xl font-display text-white leading-none tracking-tighter">
+            {restaurantName}<span class="text-primary">.</span>
+          </h1>
 
-        <p class="text-lg md:text-2xl text-primary-text/80 font-normal max-w-xl mx-auto leading-relaxed">
-          {tagline}
-        </p>
+          <p class="text-lg md:text-2xl text-primary-text/80 font-normal max-w-xl mx-auto leading-relaxed">
+            {tagline}
+          </p>
+        </div>
 
-        <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
+        <!-- CTA Cards Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 text-left">
+          <!-- Ver Menú -->
           <a
             href="/menu"
-            class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-primary text-white font-bold text-base md:text-lg rounded-2xl shadow-[0_10px_30px_rgba(220,38,38,0.35)] hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            class="group relative bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.2)] cursor-pointer"
           >
-            <span>Ver Menú</span>
-            <svg class="w-5 h-5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
+            <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+              <Utensils class="w-8 h-8" />
+            </div>
+            <h2 class="text-2xl font-display text-white mb-2">Ver menú</h2>
+            <p class="text-sm text-primary-text/70 leading-relaxed flex-1">
+              Explorá nuestra carta completa de makis, combos especiales y promociones.
+            </p>
+            <div class="mt-6 flex items-center gap-2 text-primary font-bold text-sm tracking-wider uppercase">
+              <span>Explorar carta</span>
+              <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </div>
+          </a>
+
+          <!-- Galería -->
+          <a
+            href="/galeria"
+            class="group relative bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.2)] cursor-pointer"
+          >
+            <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+              <Images class="w-8 h-8" />
+            </div>
+            <h2 class="text-2xl font-display text-white mb-2">Galería</h2>
+            <p class="text-sm text-primary-text/70 leading-relaxed flex-1">
+              Descubrí cada plato y la presentación artesanal de nuestras variedades.
+            </p>
+            <div class="mt-6 flex items-center gap-2 text-primary font-bold text-sm tracking-wider uppercase">
+              <span>Ver fotos</span>
+              <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </div>
+          </a>
+
+          <!-- Enlaces -->
+          <a
+            href="/enlaces"
+            class="group relative bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.2)] cursor-pointer"
+          >
+            <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
+              <Share2 class="w-8 h-8" />
+            </div>
+            <h2 class="text-2xl font-display text-white mb-2">Enlaces</h2>
+            <p class="text-sm text-primary-text/70 leading-relaxed flex-1">
+              Pedidos por WhatsApp, redes sociales, horarios y ubicación en mapa.
+            </p>
+            <div class="mt-6 flex items-center gap-2 text-primary font-bold text-sm tracking-wider uppercase">
+              <span>Contactar</span>
+              <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
+            </div>
           </a>
         </div>
       </div>
