@@ -20,6 +20,12 @@
  * scripts still need (hours, settings) ship as hidden JSON attributes
  * rendered below and read back by the script.
  *
+ * DESIGN WIRING: every block declares its per-item `card` slot as a
+ * function child rendering the block's Template*Card router — this page is
+ * the template's port point: swap a router (or pass state slots into it)
+ * per block to change that block's design without touching the components.
+ * block-6 demos the state-slot override pattern.
+ *
  * There is no `forkJoin`, no `isLoading` signal and no 800 ms `hidden`
  * artefact: the page ships ready.
  *
@@ -37,6 +43,9 @@ import MenuBlock from '../storefront/menu/blocks/menu-block.astro';
 import BlockCombos from '../storefront/menu/blocks/block-combos.astro';
 import BlockPromotions from '../storefront/menu/blocks/block-promotions.astro';
 import IllustrationCell from '../storefront/menu/blocks/illustration-cell.astro';
+import TemplateCard from '../storefront/menu/cards/template-card.astro';
+import TemplateComboCard from '../storefront/menu/cards/combo/template-combo-card.astro';
+import TemplatePromotionCard from '../storefront/menu/cards/promotion/template-promotion-card.astro';
 import CartTrigger from '../storefront/commerce/cart/cart-trigger.astro';
 import WhatsAppButton from '../storefront/ui/whatsapp-button.astro';
 import SidebarCart from '../storefront/commerce/cart/sidebar-cart.astro';
@@ -115,9 +124,28 @@ const hoursJson =
       footerBg={decorations.footer_background ?? settings?.footer_bg}
     >
       <div class:list={['h-full w-auto mx-2', hasContent && 'py-12']}>
-        <BlockPromotions promotions={promotions} canOrder={canOrder} />
+        <!--
+          DESIGN WIRING (template port point): every block declares its
+          per-item `card` slot as a function child that renders the block's
+          Template*Card router. To customize a domain, swap the router (or
+          pass state slots into it) inside the matching `<fragment slot="card">`
+          — e.g. block-6 below shows the state-slot override pattern.
+        -->
+        <BlockPromotions promotions={promotions} canOrder={canOrder}>
+          <fragment slot="card">
+            {(promotion, canOrder) => (
+              <TemplatePromotionCard promotion={promotion} canOrder={canOrder} />
+            )}
+          </fragment>
+        </BlockPromotions>
 
-        <BlockCombos combos={combos} canOrder={canOrder} />
+        <BlockCombos combos={combos} canOrder={canOrder}>
+          <fragment slot="card">
+            {(combo, canOrder) => (
+              <TemplateComboCard combo={combo} canOrder={canOrder} />
+            )}
+          </fragment>
+        </BlockCombos>
 
         <!-- block-1: maki rail + barco parallax -->
         <MenuBlock
@@ -128,7 +156,13 @@ const hoursJson =
           categorySectionClass="col-span-3 md:col-span-8"
           cardsClass="grid-cols-2 md:grid-cols-3 gap-8"
           sectionAttrs={{ 'data-block-1': '' }}
-        />
+        >
+          <fragment slot="card">
+            {(product, canOrder) => (
+              <TemplateCard product={product} canOrder={canOrder} />
+            )}
+          </fragment>
+        </MenuBlock>
 
         <!-- block-2: plain categories, single column → 2-up cards -->
         <MenuBlock
@@ -136,7 +170,13 @@ const hoursJson =
           canOrder={canOrder}
           outerClass="grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-16 items-start"
           cardsClass="grid-cols-1 md:grid-cols-2"
-        />
+        >
+          <fragment slot="card">
+            {(product, canOrder) => (
+              <TemplateCard product={product} canOrder={canOrder} />
+            )}
+          </fragment>
+        </MenuBlock>
 
         <!-- block-3: full-width header row with the alitas decorations -->
         <MenuBlock
@@ -146,7 +186,13 @@ const hoursJson =
           outerClass="relative grid-cols-1 md:grid-cols-12 gap-x-12 gap-y-8 items-start"
           categorySectionClass="col-span-12 md:col-span-8"
           cardsClass="grid-cols-3 md:grid-cols-4 gap-6"
-        />
+        >
+          <fragment slot="card">
+            {(product, canOrder) => (
+              <TemplateCard product={product} canOrder={canOrder} />
+            )}
+          </fragment>
+        </MenuBlock>
 
         <!-- block-4: same layout as block-2 -->
         <MenuBlock
@@ -154,7 +200,13 @@ const hoursJson =
           canOrder={canOrder}
           outerClass="grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-16 items-start"
           cardsClass="grid-cols-1 md:grid-cols-2"
-        />
+        >
+          <fragment slot="card">
+            {(product, canOrder) => (
+              <TemplateCard product={product} canOrder={canOrder} />
+            )}
+          </fragment>
+        </MenuBlock>
 
         <!-- block-5: 2-up cards from mobile -->
         <MenuBlock
@@ -162,9 +214,22 @@ const hoursJson =
           canOrder={canOrder}
           outerClass="grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-16 items-start"
           cardsClass="grid-cols-2 md:grid-cols-2"
-        />
+        >
+          <fragment slot="card">
+            {(product, canOrder) => (
+              <TemplateCard product={product} canOrder={canOrder} />
+            )}
+          </fragment>
+        </MenuBlock>
 
-        <!-- block-6: cocktail column decoration on the left -->
+        <!-- block-6: cocktail column decoration on the left.
+             This block DEMOS the state-slot override mechanism: the
+             `range-with-image` slot is wired with the default router as
+             placeholder — swap it for your design component, e.g.:
+               <fragment slot="range-with-image">
+                 {(product, canOrder) => <MyPizzaCard product={product} canOrder={canOrder} />}
+               </fragment>
+             Slots: flat-with-image | flat-no-image | range-with-image | range-no-image -->
         <MenuBlock
           categories={cats('block-6')}
           decorations={decorations.blocks?.['block-6']}
@@ -172,7 +237,19 @@ const hoursJson =
           outerClass="grid-cols-5 md:grid-cols-12 md:gap-12 items-start"
           categorySectionClass="w-full col-span-4 md:col-span-8"
           cardsClass="grid-cols-2 md:grid-cols-2"
-        />
+        >
+          <fragment slot="card">
+            {(product, canOrder) => (
+              <TemplateCard product={product} canOrder={canOrder}>
+                <fragment slot="range-with-image">
+                  {(product, canOrder) => (
+                    <TemplateCard product={product} canOrder={canOrder} />
+                  )}
+                </fragment>
+              </TemplateCard>
+            )}
+          </fragment>
+        </MenuBlock>
 
         <!-- block-7: dessert illustration cell -->
         <MenuBlock
@@ -181,6 +258,11 @@ const hoursJson =
           outerClass="grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 items-start"
           cardsClass="grid-cols-2 md:grid-cols-1"
         >
+          <fragment slot="card">
+            {(product, canOrder) => (
+              <TemplateCard product={product} canOrder={canOrder} />
+            )}
+          </fragment>
           <IllustrationCell slot="extra" images={postresImages} label="Postres" />
         </MenuBlock>
       </div>
