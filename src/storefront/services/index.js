@@ -1,40 +1,18 @@
 /**
  * Storefront Services — single entry point for all storefront data and logic.
  */
-import {
-  loadMenu,
-  getMenu,
-  getCombos,
-  getPromotions,
-  getDecorations,
-  getFlyers,
-  getGallery,
-  getGalleryCategories,
-} from './menu.service.js';
-import {
-  getRestaurantData,
-  getGoogleReviewLink,
-  restaurantService,
-} from './restaurant.service.js';
-import { cartService } from './cart.service.js';
-import { isOpenAt, weekDayKey, WEEK_DAYS } from './business-hours.service.js';
+import { loadMenu, getFlyers, getGallery, getGalleryCategories } from './menu.service.js';
+import { getRestaurantData } from './restaurant.service.js';
+import { isOpenAt, weekDayKey } from './business-hours.service.js';
+import { getEnlaces } from './enlaces.service.js';
+import { getLanding } from './landing.service.js';
 
 export {
-  loadMenu,
-  getMenu,
-  getCombos,
-  getPromotions,
-  getDecorations,
-  getFlyers,
-  getGallery,
   getGalleryCategories,
-  getRestaurantData,
-  getGoogleReviewLink,
-  restaurantService,
-  cartService,
   isOpenAt,
   weekDayKey,
-  WEEK_DAYS,
+  getEnlaces,
+  getLanding,
 };
 
 /**

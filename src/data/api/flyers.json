@@ -1,6 +1,6 @@
 {
   "enabled": true,
-  "delay_seconds": 20,
+  "delay_seconds": 3,
   "show_once_per_session": true,
   "items": [
     {

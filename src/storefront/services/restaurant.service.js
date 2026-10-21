@@ -1,4 +1,4 @@
-import { menuService } from './menu.service.js';
+import { getRestaurantInfo } from './menu.service.js';
 
 /**
  * Fetch and shape the restaurant profile and settings for build time.
@@ -11,7 +11,7 @@ import { menuService } from './menu.service.js';
  * }>}
  */
 export async function getRestaurantData() {
-  const info = await menuService.getRestaurantInfo().catch((error) => {
+  const info = await getRestaurantInfo().catch((error) => {
     console.warn('[RestaurantService] could not load restaurant info.', error);
     return null;
   });
@@ -39,18 +39,3 @@ export async function getRestaurantData() {
     googleMapsUrl: settings?.google_maps ?? null,
   };
 }
-
-/**
- * Get Google Maps / Reviews link from restaurant settings.
- * @returns {Promise<string | null>}
- */
-export async function getGoogleReviewLink() {
-  const { settings } = await getRestaurantData();
-  return settings?.google_maps ?? null;
-}
-
-/** Legacy singleton proxy for backward compatibility. */
-export const restaurantService = {
-  load: getRestaurantData,
-  getReviewLink: getGoogleReviewLink,
-};

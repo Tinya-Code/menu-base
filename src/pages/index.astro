@@ -2,118 +2,147 @@
 /**
  * Landing page (`src/pages/index.astro`, route `/`).
  *
- * Minimal landing with hero, primary CTA to `/menu`, SiteHeader, and Footer.
- * Data resolved server-side via `loadStorefront()`.
+ * Fully driven by `src/data/api/landing.json` via `getLanding()`,
+ * in the same declarative, polymorphic block architecture as `src/pages/enlaces.astro`.
+ *
+ * Supported block types in landing.json:
+ *   - "hero"         — Hero header with open badge and dual CTAs
+ *   - "promotions"   — Special deals / combos strip
+ *   - "recommended"  — Horizontal scroll of recommended dishes
+ *   - "media"        — Heterogeneous grid of banners / flyers / videos
+ *   - "banner"       — Standalone banner
+ *   - "flyer"        — Standalone flyer
+ *   - "video"        — Standalone video embed
+ *   - "nav-cards"    — Navigation cards (Menú, Galería, Contacto)
+ *
+ * Data is loaded server-side and passed as props — no client fetching.
  */
 import Layout from '../storefront/layout/Layout.astro';
 import SiteHeader from '../storefront/layout/site-header.astro';
 import Footer from '../storefront/layout/footer.astro';
-import ArrowRight from '../storefront/icons/arrow-right.astro';
-import Images from '../storefront/icons/images.astro';
-import Share2 from '../storefront/icons/share-2.astro';
-import Utensils from '../storefront/icons/utensils.astro';
-import { loadStorefront } from '../storefront/services/index.js';
+import FlyerModal from '../storefront/ui/flyer-modal.astro';
+
+import HomeHero from '../storefront/home/home-hero.astro';
+import HomePromotions from '../storefront/home/home-promotions.astro';
+import HomeRecommended from '../storefront/home/home-recommended.astro';
+import HomeMedia from '../storefront/home/home-media.astro';
+import HomeNavCards from '../storefront/home/home-nav-cards.astro';
+import WhatsAppIcon from '../storefront/icons/whatsapp.astro';
+
+import { loadStorefront, getLanding, isOpenAt, weekDayKey } from '../storefront/services/index.js';
+import { WhatsApp } from '../storefront/utils/whatsapp.js';
 
 const {
   restaurant,
   settings,
   businessHours,
   decorations,
+  blocks: menuBlocks,
+  promotions,
+  flyers,
 } = await loadStorefront();
 
-const restaurantName = restaurant?.name ?? settings?.seo?.site_name ?? 'Mr Nikkei';
-const tagline = settings?.seo?.description ?? 'Sushi artesanal en Lima. Delivery a domicilio, combos y promociones.';
-const siteTitle = settings?.seo?.title ?? 'Mr Nikkei6.9 — Sushi y delivery en Lima';
-const footerBg = decorations?.footer_bg ?? settings?.footer_bg ?? null;
+// Load declarative blocks configuration from landing.json
+const { meta, blocks } = await getLanding(settings, promotions, menuBlocks);
+
+const restaurantName = meta.title || restaurant?.name || settings?.seo?.site_name || 'Mr Nikkei';
+const tagline = meta.tagline || settings?.seo?.description || 'Sushi artesanal en Lima. Delivery a domicilio, combos y promociones.';
+const siteTitle = settings?.seo?.title ?? `${restaurantName} — Sushi y delivery en Lima`;
+
+// Open/closed state
+const now = new Date();
+const todayKey = weekDayKey(now);
+const todayHours = businessHours?.[todayKey];
+const isOpen = todayHours ? isOpenAt(todayHours, now) : null;
+const openLabel = todayHours?.open && todayHours?.close
+  ? `${todayHours.open} – ${todayHours.close}`
+  : null;
+
+// WhatsApp link
+const whatsappNumber = settings?.whatsapp?.number ?? restaurant?.phone ?? '';
+const whatsappMsg = settings?.whatsapp?.message_template ?? 'Hola, quiero hacer un pedido 🍱';
+const whatsappUrl = whatsappNumber ? WhatsApp.link(whatsappNumber, whatsappMsg) : null;
 ---
 
 <Layout title={siteTitle} seo={settings?.seo}>
   <div class="min-h-screen flex flex-col bg-secondary text-primary-text font-body selection:bg-primary selection:text-white">
     <SiteHeader restaurant={restaurant} settings={settings} />
 
-    <main class="flex-1 flex flex-col items-center justify-center text-center px-6 py-16 sm:py-24 relative overflow-hidden">
-      <!-- Ambient Glow -->
-      <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
-        <div class="w-96 h-96 bg-primary/15 blur-[120px] rounded-full"></div>
-      </div>
-
-      <div class="relative z-10 max-w-4xl mx-auto space-y-10">
-        <!-- Hero Section -->
-        <div class="space-y-6">
-          <h1 class="text-6xl md:text-8xl font-display text-white leading-none tracking-tighter">
-            {restaurantName}<span class="text-primary">.</span>
-          </h1>
-
-          <p class="text-lg md:text-2xl text-primary-text/80 font-normal max-w-xl mx-auto leading-relaxed">
-            {tagline}
-          </p>
-        </div>
-
-        <!-- CTA Cards Section -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 text-left">
-          <!-- Ver Menú -->
-          <a
-            href="/menu"
-            class="group relative bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.2)] cursor-pointer"
-          >
-            <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-              <Utensils class="w-8 h-8" />
-            </div>
-            <h2 class="text-2xl font-display text-white mb-2">Ver menú</h2>
-            <p class="text-sm text-primary-text/70 leading-relaxed flex-1">
-              Explorá nuestra carta completa de makis, combos especiales y promociones.
-            </p>
-            <div class="mt-6 flex items-center gap-2 text-primary font-bold text-sm tracking-wider uppercase">
-              <span>Explorar carta</span>
-              <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </div>
-          </a>
-
-          <!-- Galería -->
-          <a
-            href="/galeria"
-            class="group relative bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.2)] cursor-pointer"
-          >
-            <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-              <Images class="w-8 h-8" />
-            </div>
-            <h2 class="text-2xl font-display text-white mb-2">Galería</h2>
-            <p class="text-sm text-primary-text/70 leading-relaxed flex-1">
-              Descubrí cada plato y la presentación artesanal de nuestras variedades.
-            </p>
-            <div class="mt-6 flex items-center gap-2 text-primary font-bold text-sm tracking-wider uppercase">
-              <span>Ver fotos</span>
-              <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </div>
-          </a>
-
-          <!-- Enlaces -->
-          <a
-            href="/enlaces"
-            class="group relative bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.2)] cursor-pointer"
-          >
-            <div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 text-primary flex items-center justify-center mb-5 group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-              <Share2 class="w-8 h-8" />
-            </div>
-            <h2 class="text-2xl font-display text-white mb-2">Enlaces</h2>
-            <p class="text-sm text-primary-text/70 leading-relaxed flex-1">
-              Pedidos por WhatsApp, redes sociales, horarios y ubicación en mapa.
-            </p>
-            <div class="mt-6 flex items-center gap-2 text-primary font-bold text-sm tracking-wider uppercase">
-              <span>Contactar</span>
-              <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </div>
-          </a>
-        </div>
-      </div>
+    <main class="flex-1 flex flex-col">
+      {blocks.map((block) => {
+        switch (block.type) {
+          case 'hero':
+            return (
+              <HomeHero
+                block={block}
+                restaurantName={restaurantName}
+                tagline={tagline}
+                isOpen={isOpen}
+                openLabel={openLabel}
+                whatsappUrl={whatsappUrl}
+              />
+            );
+          case 'promotions':
+            return (
+              <HomePromotions
+                block={block}
+                promotions={promotions}
+                whatsappUrl={whatsappUrl}
+              />
+            );
+          case 'recommended':
+            return (
+              <HomeRecommended
+                block={block}
+              />
+            );
+          case 'media':
+            return (
+              <HomeMedia
+                block={block}
+              />
+            );
+          case 'banner':
+          case 'flyer':
+          case 'video':
+            return (
+              <HomeMedia
+                items={[block]}
+              />
+            );
+          case 'nav-cards':
+            return (
+              <HomeNavCards
+                block={block}
+              />
+            );
+          default:
+            return null;
+        }
+      })}
     </main>
+
+    <!-- Floating WhatsApp button -->
+    {whatsappUrl && (
+      <a
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Pedir por WhatsApp"
+        id="fab-whatsapp"
+        class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-[0_8px_24px_rgba(16,185,129,0.4)] hover:shadow-[0_12px_32px_rgba(16,185,129,0.55)] hover:scale-110 active:scale-95 transition-all duration-200"
+      >
+        <WhatsAppIcon class="w-7 h-7" />
+      </a>
+    )}
 
     <Footer
       restaurant={restaurant}
       settings={settings}
       businessHours={businessHours}
-      footerBg={footerBg}
-      class="block"
+      footerBg={decorations?.footer_bg}
     />
+
+    <FlyerModal flyers={flyers} />
   </div>
 </Layout>

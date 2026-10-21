@@ -103,14 +103,14 @@ async function runSmoke() {
 
     // 2. SiteHeader Logo resolves to /
     const headerLogoHref = (await client.send('Runtime.evaluate', {
-      expression: 'document.querySelector("header a")?.getAttribute("href")',
+      expression: 'document.querySelector(\'header a[aria-label="Inicio"]\')?.getAttribute("href")',
     })).result.value;
     console.log('  [PASS] SiteHeader logo href:', headerLogoHref);
     assert.equal(headerLogoHref, '/');
 
-    // 3. Landing renders 3 CTA hrefs (/menu, /galeria, /enlaces)
+    // 3. Nav cards block renders 3 CTA hrefs (/menu, /galeria, /enlaces)
     const ctaHrefs = JSON.parse((await client.send('Runtime.evaluate', {
-      expression: 'JSON.stringify(Array.from(document.querySelectorAll("main a[href]")).map(a => a.getAttribute("href")))',
+      expression: 'JSON.stringify(Array.from(document.querySelectorAll("#home-navigation a[href]")).map(a => a.getAttribute("href")))',
     })).result.value);
     console.log('  [PASS] Landing CTA hrefs:', ctaHrefs);
     assert.ok(ctaHrefs.includes('/menu'), 'Missing /menu CTA');
@@ -131,7 +131,7 @@ async function runSmoke() {
     // 5. Menu title assertion
     const menuTitle = (await client.send('Runtime.evaluate', { expression: 'document.title' })).result.value;
     console.log('  [PASS] Menu title:', menuTitle);
-    assert.equal(menuTitle, 'Mr Nikkei6.9 — Sushi y delivery en Lima');
+    assert.equal(menuTitle, settingsFixture.seo.title_template.replace('%s', 'Menú'));
 
     // 6. Menu header logo resolves to /
     const menuLogoHref = (await client.send('Runtime.evaluate', {
@@ -256,26 +256,26 @@ async function runSmoke() {
 
     // 18. Social links resolve to settings URLs
     const instagramHref = (await client.send('Runtime.evaluate', {
-      expression: 'document.querySelector("[data-link-instagram]")?.getAttribute("href")',
+      expression: 'document.querySelector(\'[data-block-link="social-instagram"]\')?.getAttribute("href")',
     })).result.value;
     console.log('  [PASS] Instagram href resolves to settings:', instagramHref === settingsFixture.social_media.instagram);
     assert.equal(instagramHref, settingsFixture.social_media.instagram);
 
     const facebookHref = (await client.send('Runtime.evaluate', {
-      expression: 'document.querySelector("[data-link-facebook]")?.getAttribute("href")',
+      expression: 'document.querySelector(\'[data-block-link="social-facebook"]\')?.getAttribute("href")',
     })).result.value;
     console.log('  [PASS] Facebook href resolves to settings:', facebookHref === settingsFixture.social_media.facebook);
     assert.equal(facebookHref, settingsFixture.social_media.facebook);
 
     const mapsHref = (await client.send('Runtime.evaluate', {
-      expression: 'document.querySelector("[data-link-maps]")?.getAttribute("href")',
+      expression: 'document.querySelector(\'[data-block-link="maps-link"]\')?.getAttribute("href")',
     })).result.value;
     console.log('  [PASS] Google Maps href resolves to settings:', mapsHref === settingsFixture.google_maps);
     assert.equal(mapsHref, settingsFixture.google_maps);
 
     // 19. TikTok button is absent while fixture value is null
     const tiktokPresent = (await client.send('Runtime.evaluate', {
-      expression: '!!document.querySelector("[data-link-tiktok]")',
+      expression: '!!document.querySelector(\'[data-block-link="social-tiktok"]\')',
     })).result.value;
     console.log('  [PASS] TikTok button absent when null:', !tiktokPresent);
     assert.equal(tiktokPresent, false);

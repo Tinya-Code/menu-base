@@ -22,7 +22,6 @@ const {
 } = await loadStorefront();
 
 const galleryCategories: GalleryCategory[] = await getGalleryCategories(blocks);
-const footerBg = decorations?.footer_bg ?? settings?.footer_bg ?? null;
 
 /** Converts common video platform URLs (YouTube, TikTok, Facebook) to embed URLs. */
 function resolveEmbedUrl(item: GalleryItem): string | null {
@@ -55,14 +54,14 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
   <div class="min-h-screen flex flex-col bg-secondary text-primary-text font-body selection:bg-primary selection:text-white">
     <SiteHeader restaurant={restaurant} settings={settings} />
 
-    <main class="flex-1 px-6 py-12 sm:py-20 max-w-7xl mx-auto w-full">
+    <main class="flex-1 px-6 py-16 sm:py-20 max-w-7xl mx-auto w-full">
       <!-- Page Header -->
       <header class="text-center max-w-3xl mx-auto mb-16 space-y-4">
         <h1 class="text-5xl sm:text-7xl font-display text-white leading-none tracking-tight">
-          Nuestra Galería<span class="text-primary">.</span>
+          Nuestra Galería
         </h1>
         <p class="text-base sm:text-xl text-primary-text/75 font-normal">
-          Conocé el arte, la frescura y la experiencia detrás de cada una de nuestras preparaciones nikkei.
+          Conocé el arte, la frescura y la experiencia detrás de cada una de nuestras preparaciones.
         </p>
       </header>
 
@@ -88,14 +87,14 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
 
                 return (
                   <article
-                    class={`group bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-5 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.15)] cursor-pointer ${
+                    class={`group bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-2 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.15)] cursor-pointer ${
                       isAspect916 ? 'sm:col-span-1 md:row-span-2' : ''
                     }`}
                     data-gallery-item={item.id}
                     data-gallery-data={JSON.stringify(item)}
                   >
                     <!-- Media Container -->
-                    <div class={`relative w-full rounded-2xl bg-secondary/80 overflow-hidden mb-4 ${
+                    <div class={`relative w-full rounded-2xl bg-secondary/80 overflow-hidden ${
                       isAspect916 ? 'aspect-[9/16]' : (isVideo || isEmbed ? 'aspect-video' : 'aspect-square flex items-center justify-center p-4')
                     }`}>
                       {item.embed_html ? (
@@ -128,15 +127,6 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
                       ) : null}
                     </div>
 
-                    <h3 class="text-xl sm:text-2xl font-display text-white leading-snug group-hover:text-primary transition-colors">
-                      {item.title}
-                    </h3>
-
-                    {item.description && (
-                      <p class="text-xs sm:text-sm text-primary-text/60 mt-2 line-clamp-2 leading-relaxed">
-                        {item.description}
-                      </p>
-                    )}
                   </article>
                 );
               })}
@@ -150,7 +140,7 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
       restaurant={restaurant}
       settings={settings}
       businessHours={businessHours}
-      footerBg={footerBg}
+      footerBg={decorations?.footer_bg}
       class="mt-20 block"
     />
 

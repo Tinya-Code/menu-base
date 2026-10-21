@@ -17,6 +17,7 @@
  * spacing of that column changes.
  */
 import ArrowUpRight from "../icons/arrow-up-right.astro";
+import DeveloperSignature from "./developer-signature.astro";
 import Facebook from "../icons/facebook.astro";
 import Instagram from "../icons/instagram.astro";
 import TikTok from "../icons/tiktok.astro";
@@ -25,7 +26,6 @@ import Star from "../icons/star.astro";
 import Utensils from "../icons/utensils.astro";
 import { timeFormat } from "../utils/format.js";
 import { weekDayKey } from "../services/business-hours.service.js";
-import { WhatsApp } from "../utils/whatsapp.js";
 import type {
   BusinessHours,
   RestaurantProfile,
@@ -202,38 +202,6 @@ const todayHours = businessHours[weekDayKey()] ?? null;
     </div>
 
     <!-- Developer Signature -->
-    <div
-      class="w-full flex flex-col sm:flex-row justify-between items-center gap-6 pt-8"
-    >
-      <div class="flex items-center gap-4 group">
-        <a href={WhatsApp.link("51924932128")} target="_blank" class="relative">
-          <div
-            class="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-full blur opacity-20 group-hover:opacity-70 transition duration-500"
-          >
-          </div>
-          <img
-            src="/images/gato.jpg"
-            alt="Pedro Alejandro"
-            class="relative w-11 h-11 rounded-full object-cover grayscale group-hover:grayscale-0 ring-2 ring-white/10 group-hover:ring-primary transition-all duration-500 cursor-pointer"
-          />
-        </a>
-        <div class="flex flex-col">
-          <span
-            class="text-white/40 text-[10px] uppercase tracking-[0.2em] font-bold mb-0.5"
-            >Diseño & Desarrollo</span
-          >
-          <a
-            href={WhatsApp.link("51924932128")}
-            target="_blank"
-            class="text-white/90 font-display tracking-wide hover:text-white transition-colors flex items-center gap-1.5"
-          >
-            Pedro Alejandro
-            <ArrowUpRight
-              class="w-3.5 h-3.5 text-primary opacity-0 -translate-y-1 translate-x-1 group-hover:opacity-100 group-hover:translate-y-0 group-hover:translate-x-0 transition-all duration-300"
-            />
-          </a>
-        </div>
-      </div>
-    </div>
+    <DeveloperSignature />
   </div>
 </footer>

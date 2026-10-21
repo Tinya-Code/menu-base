@@ -33,7 +33,10 @@ const documentTitle = seo
 const description = seo?.description ?? '';
 const keywords = Array.isArray(seo?.keywords) ? seo.keywords : [];
 const canonical = seo?.canonical_url ?? '';
-const twitterCard = seo?.twitter_card ?? '';
+const twitterCard = seo?.twitter_card ?? 'summary_large_image';
+const siteName = seo?.site_name ?? 'MR NIKKEI6.9';
+const locale = seo?.locale ?? 'es_PE';
+const ogImage = seo?.og_image || 'https://res.cloudinary.com/dopud1hkc/image/upload/v1778948345/promo_cffb90df-8bdd-4e74-8191-e8da455ec5d0.png';
 
 /** JSON-LD `@graph`: Organization (site) + whatever the API ships. */
 const jsonLd = seo
@@ -42,7 +45,7 @@ const jsonLd = seo
 			'@graph': [
 				{
 					'@type': 'Organization',
-					name: seo.site_name,
+					name: siteName,
 					...(canonical ? { url: canonical } : {}),
 				},
 				seo.json_ld,
@@ -52,22 +55,33 @@ const jsonLd = seo
 ---
 
 <!doctype html>
-<html lang={seo?.locale?.split('_')[0] ?? 'es'}>
+<html lang={locale.split('_')[0] ?? 'es'}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
+		<meta name="robots" content="index, follow" />
 		<title>{documentTitle}</title>
 		{description && <meta name="description" content={description} />}
 		{keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
 		{canonical && <link rel="canonical" href={canonical} />}
-		{description && <meta property="og:description" content={description} />}
-		<meta property="og:title" content={documentTitle} />
+
+		<!-- Open Graph / Facebook / WhatsApp -->
 		<meta property="og:type" content="website" />
-		{seo?.og_image && <meta property="og:image" content={seo.og_image} />}
-		{twitterCard && <meta name="twitter:card" content={twitterCard} />}
+		<meta property="og:site_name" content={siteName} />
+		<meta property="og:title" content={documentTitle} />
+		{description && <meta property="og:description" content={description} />}
+		<meta property="og:locale" content={locale} />
+		{ogImage && <meta property="og:image" content={ogImage} />}
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content={twitterCard} />
+		<meta name="twitter:title" content={documentTitle} />
+		{description && <meta name="twitter:description" content={description} />}
+		{ogImage && <meta name="twitter:image" content={ogImage} />}
+
 		{jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
 	</head>
 	<body>

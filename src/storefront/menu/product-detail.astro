@@ -92,12 +92,14 @@ const rootAttributes = {
       hidden={!hasImage}
       class="w-full h-62 bg-[url('/images/bg.png')] bg-contain md:h-auto bg-neutral-200 relative overflow-hidden flex-shrink-0"
     >
-      <img
-        data-detail-image
-        src={product?.image?.url ?? ""}
-        alt={product?.image?.alt ?? product?.name ?? ""}
-        class="w-full h-full object-contain"
-      />
+      {hasImage && (
+        <img
+          data-detail-image
+          src={product?.image?.url}
+          alt={product?.image?.alt ?? product?.name ?? ""}
+          class="w-full h-full object-contain"
+        />
+      )}
     </div>
 
     <!-- 2. CONTENT & ACTIONS SECTION -->
@@ -270,7 +272,8 @@ const rootAttributes = {
 
 <script>
   import { cartService } from "../services/cart.service.js";
-  import { readJson } from "../utils/dom";
+  import { readJson, readBusinessHours } from "../utils/dom";
+  import { isOpenAt } from "../services/business-hours.service.js";
   import { precio } from "../utils/format.js";
   import { OrderMessage, WhatsApp } from "../utils/whatsapp.js";
 
@@ -350,6 +353,11 @@ const rootAttributes = {
     // 4. Add to cart: mutate cart directly and close modal
     const addBtn = target.closest<HTMLButtonElement>("[data-add-to-cart]");
     if (addBtn && !addBtn.disabled) {
+      if (!isOpenAt(readBusinessHours())) {
+        cartService.showBusinessClosedModal();
+        return;
+      }
+
       const root = addBtn.closest("[data-product-detail]");
       if (!root) return;
 
@@ -383,6 +391,11 @@ const rootAttributes = {
     // 5. WhatsApp single-product order
     const waBtn = target.closest<HTMLButtonElement>("[data-whatsapp-order]");
     if (waBtn && !waBtn.disabled) {
+      if (!isOpenAt(readBusinessHours())) {
+        cartService.showBusinessClosedModal();
+        return;
+      }
+
       const root = waBtn.closest("[data-product-detail]");
       if (!root) return;
 

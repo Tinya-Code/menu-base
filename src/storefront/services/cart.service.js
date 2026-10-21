@@ -1,4 +1,5 @@
 import { ReactiveValue } from '../utils/reactive.js';
+import { isOpenAt } from './business-hours.service.js';
 
 /**
  * CartService — the order cart, reactive on purpose.
@@ -115,6 +116,19 @@ export class CartService {
    * @returns {this}
    */
   addItem(product, quantity = 1, selectedEntry = null) {
+    if (typeof document !== 'undefined') {
+      const hoursEl = document.getElementById('business-hours-data');
+      if (hoursEl) {
+        try {
+          const raw = JSON.parse(hoursEl.getAttribute('data-business-hours') || 'null');
+          if (!isOpenAt(raw)) {
+            this.showBusinessClosedModal();
+            return this;
+          }
+        } catch {}
+      }
+    }
+
     const currentItems = this.items.get();
 
     const entryId = selectedEntry ? `-${selectedEntry.qty}-${selectedEntry.price}` : '';

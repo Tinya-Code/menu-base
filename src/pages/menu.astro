@@ -46,18 +46,7 @@ import FlyerModal from '../storefront/ui/flyer-modal.astro';
 import ReviewModal from '../storefront/ui/review-modal.astro';
 
 import { loadStorefront } from '../storefront/services/index.js';
-import type {
-  BusinessHours,
-  Combo,
-  Decorations,
-  MenuBlock as MenuBlockData,
-  MenuCategory,
-  MenuProduct,
-  Promotion,
-  RestaurantInfo,
-  RestaurantProfile,
-  RestaurantSettings,
-} from '../storefront/types/menu';
+import type { MenuCategory, MenuProduct } from '../storefront/types/menu';
 
 /** Storefront payload loaded once at build time. */
 const {
@@ -113,7 +102,7 @@ const hoursJson =
   rawHours === undefined ? null : JSON.stringify(rawHours).replace(/</g, '\\u003c');
 ---
 
-<Layout seo={settings?.seo ?? null}>
+<Layout title="Menú" seo={settings?.seo ?? null}>
   <div data-menu-page>
     <CategoryNav categories={allCategories} />
 
@@ -250,8 +239,9 @@ const hoursJson =
   }
 
   <script>
-    import { readProduct, readJson } from '../storefront/utils/dom';
+    import { readProduct, readJson, readBusinessHours } from '../storefront/utils/dom';
     import { cartService } from '../storefront/services/cart.service.js';
+    import { isOpenAt } from '../storefront/services/business-hours.service.js';
 
     // ─── Product dialog ──────────────────────────────────────────────────────
     // Every product has its own pre-rendered dialog in the DOM, hidden by
@@ -290,6 +280,10 @@ const hoursJson =
       // 1. Add button click
       const addButton = target.closest('[data-add-button]');
       if (addButton) {
+        if (!isOpenAt(readBusinessHours())) {
+          cartService.showBusinessClosedModal();
+          return;
+        }
         const templateCard = target.closest('[data-template-card]');
         if (templateCard) {
           const product = readProduct(templateCard);

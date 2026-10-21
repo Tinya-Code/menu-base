@@ -255,7 +255,7 @@ let priceRangesPromise = null;
  * Price ranges — only the v1 adapter uses this (join inside `getMenu`).
  * @returns {Promise<{ data: any[] }>}
  */
-export function getPriceRanges() {
+function getPriceRanges() {
   if (!priceRangesPromise) {
     priceRangesPromise = resolveResource('priceRanges', { data: [] }).then((response) => {
       if (!Array.isArray(response?.data)) {
@@ -463,17 +463,3 @@ export async function getGalleryCategories(blocks = []) {
   }
   return result;
 }
-
-/** Backward-compatible singleton proxy. */
-export const menuService = {
-  load: loadMenu,
-  getMenu,
-  getCombos,
-  getPromotions,
-  getDecorations,
-  getFlyers,
-  getGallery,
-  getGalleryCategories,
-  getRestaurantInfo,
-  getPriceRanges,
-};
