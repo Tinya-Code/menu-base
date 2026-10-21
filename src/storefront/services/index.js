@@ -8,6 +8,7 @@ import {
   getPromotions,
   getDecorations,
   getFlyers,
+  getGallery,
   getGalleryCategories,
 } from './menu.service.js';
 import {
@@ -25,6 +26,7 @@ export {
   getPromotions,
   getDecorations,
   getFlyers,
+  getGallery,
   getGalleryCategories,
   getRestaurantData,
   getGoogleReviewLink,
@@ -50,11 +52,12 @@ export {
  *   businessHours,
  *   googleMapsUrl,
  *   flyers,
+ *   gallery,
  * } = await loadStorefront();
  * ```
  */
 export async function loadStorefront() {
-  const [menuPayload, restaurantData, flyers] = await Promise.all([
+  const [menuPayload, restaurantData, flyers, gallery] = await Promise.all([
     loadMenu().catch((error) => {
       console.error('[loadStorefront] menu load failed:', error);
       return { blocks: [], combos: [], promotions: [], decorations: {} };
@@ -71,11 +74,16 @@ export async function loadStorefront() {
       };
     }),
     getFlyers().catch(() => ({ enabled: false, delay_seconds: 20, items: [] })),
+    getGallery().catch((error) => {
+      console.error('[loadStorefront] gallery load failed:', error);
+      return [];
+    }),
   ]);
 
   return {
     ...menuPayload,
     ...restaurantData,
     flyers,
+    gallery,
   };
 }

@@ -289,3 +289,28 @@ export interface RestaurantProfile {
 export interface RestaurantInfo {
   data: RestaurantSettings;
 }
+
+/** Types of media supported by the gallery. */
+export type GalleryItemType = 'image' | 'video' | 'embed';
+
+/** One item in the gallery (image, direct video, or embedded iframe/player). */
+export interface GalleryItem {
+  id: string;
+  title: string;
+  category: string;
+  type?: GalleryItemType;
+  url?: string;
+  embed_html?: string;
+  poster?: string;
+  alt?: string;
+  description?: string;
+  aspect_ratio?: '16/9' | '9/16' | '1/1' | '4/3' | string;
+}
+
+/** Category group of gallery items. */
+export interface GalleryCategory {
+  id: string;
+  name: string;
+  description?: string;
+  items: GalleryItem[];
+}

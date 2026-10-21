@@ -191,12 +191,24 @@ async function runSmoke() {
     assert.ok(categoryHeadings.length > 0, 'Expected at least one category heading');
     assert.ok(categoryHeadings.includes('Rolls'));
 
-    // 13. Grid renders expected image count (21 items)
+    // 13. Grid renders expected item count (at least 21 items) and contains video and iframe embeds
     const galleryItemsCount = (await client.send('Runtime.evaluate', {
       expression: 'document.querySelectorAll("[data-gallery-item]").length',
     })).result.value;
-    console.log('  [PASS] Gallery image items count:', galleryItemsCount);
-    assert.equal(galleryItemsCount, 21, 'Expected 21 gallery items with photos');
+    console.log('  [PASS] Gallery items count:', galleryItemsCount);
+    assert.ok(galleryItemsCount >= 21, `Expected at least 21 gallery items, found ${galleryItemsCount}`);
+
+    const hasVideo = (await client.send('Runtime.evaluate', {
+      expression: 'document.querySelectorAll("video").length > 0',
+    })).result.value;
+    console.log('  [PASS] Gallery video element present:', hasVideo);
+    assert.ok(hasVideo, 'Expected at least one video element');
+
+    const hasIframe = (await client.send('Runtime.evaluate', {
+      expression: 'document.querySelectorAll("iframe").length > 0',
+    })).result.value;
+    console.log('  [PASS] Gallery iframe element present:', hasIframe);
+    assert.ok(hasIframe, 'Expected at least one iframe embed element');
 
     // 14. Footer present on /galeria
     const galeriaFooterPresent = (await client.send('Runtime.evaluate', {

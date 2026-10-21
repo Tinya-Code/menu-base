@@ -393,13 +393,48 @@ export async function getFlyers() {
 }
 
 /**
- * Gallery dataset derived from menu blocks: returns categories that have products with photos.
- * Ordered exactly as the menu renders.
+ * Load gallery items from `src/data/api/gallery.json`.
+ * Supports image, video, and iframe embeds (YouTube, TikTok, Facebook).
+ *
+ * @returns {Promise<Array<import('../types/menu.js').GalleryCategory>>}
+ */
+export async function getGallery() {
+  try {
+    const raw = (await import('../../data/api/gallery.json')).default;
+    const items = Array.isArray(raw?.data) ? raw.data : [];
+
+    const categoryMap = new Map();
+    for (const item of items) {
+      const catName = item.category || 'General';
+      if (!categoryMap.has(catName)) {
+        categoryMap.set(catName, {
+          id: catName.toLowerCase().replace(/\s+/g, '-'),
+          name: catName,
+          items: [],
+        });
+      }
+      categoryMap.get(catName).items.push(item);
+    }
+
+    return Array.from(categoryMap.values());
+  } catch (error) {
+    console.warn('[MenuService] Failed to load gallery.json fixture:', error);
+    return [];
+  }
+}
+
+/**
+ * Gallery dataset: returns categories from `gallery.json` or derived from menu blocks.
  *
  * @param {Array<import('../types/menu.js').MenuBlock>} [blocks]
- * @returns {Array<{ id: string, name: string, description?: string, products: Array<import('../types/menu.js').MenuProduct> }>}
+ * @returns {Promise<Array<import('../types/menu.js').GalleryCategory>>}
  */
-export function getGalleryCategories(blocks = []) {
+export async function getGalleryCategories(blocks = []) {
+  const fixtureGallery = await getGallery();
+  if (fixtureGallery.length > 0) {
+    return fixtureGallery;
+  }
+
   const result = [];
   if (!Array.isArray(blocks)) return result;
 
@@ -413,7 +448,15 @@ export function getGalleryCategories(blocks = []) {
           id: category.id,
           name: category.name,
           description: category.description ?? '',
-          products,
+          items: products.map((p) => ({
+            id: p.id,
+            title: p.name,
+            category: category.name,
+            type: 'image',
+            url: p.image.url,
+            alt: p.image.alt || p.name,
+            description: p.description || '',
+          })),
         });
       }
     }
@@ -429,6 +472,7 @@ export const menuService = {
   getPromotions,
   getDecorations,
   getFlyers,
+  getGallery,
   getGalleryCategories,
   getRestaurantInfo,
   getPriceRanges,
