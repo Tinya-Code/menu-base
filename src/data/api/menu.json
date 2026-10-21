@@ -42,7 +42,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": true,
@@ -69,7 +73,11 @@
                     }
                   ],
                   "min_price": 15.5,
-                  "max_price": 15.5
+                  "max_price": 15.5,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -108,7 +116,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -147,7 +159,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -186,7 +202,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": true,
@@ -225,7 +245,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -264,7 +288,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -303,7 +331,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -342,7 +374,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -381,7 +417,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -420,7 +460,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -459,7 +503,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -498,7 +546,11 @@
                     }
                   ],
                   "min_price": 18,
-                  "max_price": 63
+                  "max_price": 63,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -635,7 +687,11 @@
                     }
                   ],
                   "min_price": 17,
-                  "max_price": 46
+                  "max_price": 46,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": true,
@@ -670,7 +726,11 @@
                     }
                   ],
                   "min_price": 17,
-                  "max_price": 46
+                  "max_price": 46,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": true,
@@ -705,7 +765,11 @@
                     }
                   ],
                   "min_price": 17,
-                  "max_price": 46
+                  "max_price": 46,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -740,7 +804,11 @@
                     }
                   ],
                   "min_price": 17,
-                  "max_price": 46
+                  "max_price": 46,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -775,7 +843,11 @@
                     }
                   ],
                   "min_price": 17,
-                  "max_price": 46
+                  "max_price": 46,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -810,7 +882,11 @@
                     }
                   ],
                   "min_price": 17,
-                  "max_price": 46
+                  "max_price": 46,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,
@@ -845,7 +921,11 @@
                     }
                   ],
                   "min_price": 17,
-                  "max_price": 46
+                  "max_price": 46,
+                  "units_label": {
+                    "one": "Unidad",
+                    "other": "Unidades"
+                  }
                 },
                 "qty_label": null,
                 "is_recommended": false,

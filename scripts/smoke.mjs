@@ -182,6 +182,13 @@ async function runSmoke() {
     console.log('  [PASS] Card click opens dialog:', dialogOpened);
     assert.ok(dialogOpened);
 
+    // 9b. Entry labels use the API-owned units_label wording
+    const entryLabelText = (await client.send('Runtime.evaluate', {
+      expression: 'document.querySelector("[data-product-detail-host]:not([hidden]) [data-entry-label]")?.textContent?.trim() ?? null',
+    })).result.value;
+    console.log('  [PASS] Sticky-bar entry label:', entryLabelText);
+    assert.equal(entryLabelText, '12 Unidades');
+
     console.log('=== Checking /galeria ===');
     await navigateAndWait(`${BASE_URL}/galeria`);
 

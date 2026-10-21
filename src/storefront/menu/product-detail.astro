@@ -23,6 +23,7 @@ import Plus from "../icons/plus.astro";
 import ShoppingBag from "../icons/shopping-bag.astro";
 import X from "../icons/x.astro";
 import { precio } from "../utils/format.js";
+import { entryLabel } from "../utils/entry-label";
 import type { MenuProduct, PriceRangeEntry, Promotion } from "../types/menu";
 
 interface Props {
@@ -92,14 +93,16 @@ const rootAttributes = {
       hidden={!hasImage}
       class="w-full h-62 bg-[url('/images/bg.png')] bg-contain md:h-auto bg-neutral-200 relative overflow-hidden flex-shrink-0"
     >
-      {hasImage && (
-        <img
-          data-detail-image
-          src={product?.image?.url}
-          alt={product?.image?.alt ?? product?.name ?? ""}
-          class="w-full h-full object-contain"
-        />
-      )}
+      {
+        hasImage && (
+          <img
+            data-detail-image
+            src={product?.image?.url}
+            alt={product?.image?.alt ?? product?.name ?? ""}
+            class="w-full h-full object-contain"
+          />
+        )
+      }
     </div>
 
     <!-- 2. CONTENT & ACTIONS SECTION -->
@@ -164,7 +167,7 @@ const rootAttributes = {
                     >
                       <div class="flex flex-col">
                         <span class="font-display text-sm md:text-lg text-secondary group-hover:text-accent transition-colors">
-                          {entry.qty} Unidades
+                          {entryLabel(entry, priceRange?.units_label)}
                         </span>
                         {entry.bonus && (
                           <span class="text-[9px] md:text-[10px] font-bold text-accent-muted">
@@ -204,7 +207,7 @@ const rootAttributes = {
                   hidden={!selectedEntry}
                   class="text-[10px] font-bold text-secondary/40 uppercase tracking-widest mt-1"
                 >
-                  {selectedEntry ? `${selectedEntry.qty} Unids.` : ""}
+                  {entryLabel(selectedEntry, priceRange?.units_label)}
                 </span>
               )
             }
@@ -275,6 +278,7 @@ const rootAttributes = {
   import { readJson, readBusinessHours } from "../utils/dom";
   import { isOpenAt } from "../services/business-hours.service.js";
   import { precio } from "../utils/format.js";
+  import { entryLabel } from "../utils/entry-label";
   import { OrderMessage, WhatsApp } from "../utils/whatsapp.js";
 
   const SELECTED_CLASSES = ["border-accent", "bg-accent/5"];
@@ -313,11 +317,17 @@ const rootAttributes = {
       const entry = readJson(entryButton, "data-entry");
       if (!entry) return;
 
+      const product = readJson(root, "data-product");
+
       const price = root.querySelector("[data-current-price]");
       if (price) price.textContent = precio(entry.price);
 
       const label = root.querySelector("[data-entry-label]");
-      if (label) label.textContent = `${entry.qty} Unids.`;
+      if (label)
+        label.textContent = entryLabel(
+          entry,
+          product?.price_range?.units_label,
+        );
       return;
     }
 
@@ -423,6 +433,7 @@ const rootAttributes = {
           name: product.name,
           quantity,
           entry: selectedEntry,
+          unitsLabel: product?.price_range?.units_label,
         }),
       );
     }

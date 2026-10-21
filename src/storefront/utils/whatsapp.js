@@ -4,6 +4,8 @@
  * Pure functions only: nothing here touches the DOM until `open()` is called,
  * so the class is safe to import in server-rendered code.
  */
+import { entryLabel } from './entry-label.js';
+
 export class WhatsApp {
   /**
    * Storefront country code: `wa.me` expects the international number with
@@ -220,14 +222,14 @@ export class OrderMessage {
   /**
    * Single-product message used by the product detail dialog.
    *
-   * @param {{ name: string, quantity?: number, entry?: { qty: string|number, price: string|number, bonus?: string } | null }} product
+   * @param {{ name: string, quantity?: number, entry?: { qty: string|number, price: string|number, bonus?: string, label?: string } | null, unitsLabel?: { one: string, other: string } | null }} product
    * @returns {string}
    */
-  static forProduct({ name, quantity = 1, entry = null }) {
+  static forProduct({ name, quantity = 1, entry = null, unitsLabel = null }) {
     let message = `Hola, quisiera pedir ${quantity}x ${name}`;
 
     if (entry) {
-      message += ` (${entry.qty} unds - S/ ${entry.price})`;
+      message += ` (${entryLabel(entry, unitsLabel)} - S/ ${entry.price})`;
       if (entry.bonus) message += ` + ${entry.bonus}`;
     }
 

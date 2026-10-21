@@ -16,6 +16,8 @@ export interface PriceRangeEntry {
   price: number;
   /** Optional bonus label rendered under the quantity. */
   bonus?: string;
+  /** Display label for named sizes ("Familiar"); overrides the qty wording. */
+  label?: string;
 }
 
 /** A product's size/quantity ladder, embedded in the product itself. */
@@ -23,6 +25,8 @@ export interface ResolvedPriceRange {
   id: string;
   name?: string;
   entries: PriceRangeEntry[];
+  /** API-owned singular/plural unit wording ("Unidad"/"Unidades"). */
+  units_label?: { one: string; other: string };
   /** Computed by the API — the UI derives nothing. */
   min_price: number;
   /** Computed by the API — the UI derives nothing. */

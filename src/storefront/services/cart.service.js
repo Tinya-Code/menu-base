@@ -1,5 +1,6 @@
 import { ReactiveValue } from '../utils/reactive.js';
 import { isOpenAt } from './business-hours.service.js';
+import { entryLabel } from '../utils/entry-label.js';
 
 /**
  * CartService — the order cart, reactive on purpose.
@@ -112,7 +113,7 @@ export class CartService {
    *
    * @param {{ id: any, name: string, price?: number, image?: { url?: string } }} product — any v2 orderable (`MenuProduct` | `Combo` | `Promotion`)
    * @param {number} [quantity]
-   * @param {{ qty: number, price: number, bonus?: string } | null} [selectedEntry]
+   * @param {{ qty: number, price: number, bonus?: string, label?: string } | null} [selectedEntry]
    * @returns {this}
    */
   addItem(product, quantity = 1, selectedEntry = null) {
@@ -147,14 +148,14 @@ export class CartService {
     const rawPrice = selectedEntry ? selectedEntry.price : product.price;
     const resolvedPrice = typeof rawPrice === 'number' && !Number.isNaN(rawPrice) ? rawPrice : 0;
 
-    const entryLabel = selectedEntry
-      ? ` — ${selectedEntry.qty} und${Number(selectedEntry.qty) !== 1 ? 's' : ''}`
+    const entrySuffix = selectedEntry
+      ? ` — ${entryLabel(selectedEntry, product.price_range?.units_label)}`
       : '';
 
     const newItem = {
       id: cartItemId,
       originalProductId: product.id,
-      name: `${product.name}${entryLabel}`,
+      name: `${product.name}${entrySuffix}`,
       price: resolvedPrice,
       quantity,
       image_url: product.image?.url,
@@ -163,6 +164,7 @@ export class CartService {
             qty: selectedEntry.qty,
             price: selectedEntry.price,
             bonus: selectedEntry.bonus,
+            label: selectedEntry.label,
           }
         : undefined,
     };

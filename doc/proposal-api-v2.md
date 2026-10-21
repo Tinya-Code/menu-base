@@ -72,6 +72,7 @@ Because the site is a **static build**, the safest cutover is one PR: API v2 + f
       { "qty": 36, "price": 49 },
       { "qty": 48, "price": 63 }
     ],
+    "units_label": { "one": "Unidad", "other": "Unidades" },
     "min_price": 18,
     "max_price": 63
   },
@@ -84,6 +85,15 @@ Because the site is a **static build**, the safest cutover is one PR: API v2 + f
 ```
 
 A flat product is identical with `"price_range": null` and its real `price`. `min_price`/`max_price` are computed by the API — the UI badge and dialog no longer derive anything.
+
+**Unit wording is API-owned.** `units_label` carries the singular/plural pair the UI renders after the qty (`entryLabel()` in `src/storefront/utils/entry-label.js` is the single consumer; it falls back to `Unidad`/`Unidades` only for payloads that predate the field). **Named sizes** (e.g. pizzas) are entries with a `label` that overrides the qty wording entirely:
+
+```json
+"entries": [
+  { "qty": 1, "price": 22, "label": "Mediana" },
+  { "qty": 1, "price": 30, "label": "Familiar" }
+]
+```
 
 **Category — before → after:** add `slug` + optional `seo {title, description}` (categories are the future anchor of in-page anchors and possible `/menu/<slug>` routes). Keep `block_id`.
 

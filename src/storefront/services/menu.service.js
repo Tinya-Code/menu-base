@@ -86,6 +86,7 @@ function toV2Product(raw, priceRanges) {
     qty: Number(e.qty),
     price: Number(e.price),
     ...(e.bonus ? { bonus: e.bonus } : {}),
+    ...(e.label ? { label: String(e.label) } : {}),
   }));
 
   const priceRange =
@@ -94,6 +95,14 @@ function toV2Product(raw, priceRanges) {
           id: matched.id,
           name: matched.name,
           entries,
+          ...(matched.units_label
+            ? {
+                units_label: {
+                  one: String(matched.units_label.one),
+                  other: String(matched.units_label.other),
+                },
+              }
+            : {}),
           min_price: Math.min(...entries.map((e) => e.price)),
           max_price: Math.max(...entries.map((e) => e.price)),
         }
