@@ -18,6 +18,7 @@
  *   - "divider"      — Elegant spacing line
  */
 import { buildHrefResolver } from './resolve-href.js';
+import { landingFileSchema, parseFixture } from '../schemas';
 
 /**
  * @typedef {Object} LandingMeta
@@ -38,13 +39,15 @@ import { buildHrefResolver } from './resolve-href.js';
  * @returns {Promise<LandingConfig>}
  */
 async function loadFixture() {
+  let raw;
   try {
-    const raw = (await import('../../data/api/landing.json')).default;
-    return /** @type {LandingConfig} */ (raw);
+    raw = (await import('../../data/api/landing.json')).default;
   } catch (error) {
     console.warn('[LandingService] Failed to load landing.json fixture:', error);
     return { meta: {}, blocks: [] };
   }
+  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
+  return parseFixture('landing.json', landingFileSchema, raw);
 }
 
 /**

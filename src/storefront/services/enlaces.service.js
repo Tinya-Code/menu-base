@@ -16,6 +16,7 @@
  *   "https://..." → external absolute URL — kept as-is
  */
 import { buildHrefResolver } from './resolve-href.js';
+import { enlacesFileSchema, parseFixture } from '../schemas';
 
 /**
  * @typedef {Object} EnlacesMeta
@@ -36,12 +37,14 @@ import { buildHrefResolver } from './resolve-href.js';
  * @returns {Promise<EnlacesConfig>}
  */
 async function loadFixture() {
+  let raw;
   try {
-    const raw = (await import('../../data/api/enlaces.json')).default;
-    return /** @type {EnlacesConfig} */ (raw);
+    raw = (await import('../../data/api/enlaces.json')).default;
   } catch {
     return { meta: { title: '', tagline: '', logo_url: null, theme: 'dark' }, blocks: [] };
   }
+  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
+  return parseFixture('enlaces.json', enlacesFileSchema, raw);
 }
 
 /**

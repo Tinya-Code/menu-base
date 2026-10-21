@@ -1,6 +1,11 @@
 /**
  * Storefront data shapes — the API v2 contract (doc/proposal-api-v2.md §2).
  *
+ * Runtime validation lives in `src/storefront/schemas/` (Zod): every fixture
+ * is parsed at its loader boundary and a violation fails the build. Keep this
+ * file in sync with those schemas — this file owns the DOCUMENTATION, the
+ * schemas own the ENFORCEMENT.
+ *
  * Every type is near-1:1 with the payload `menu.service.js` /
  * `restaurant.service.js` emit: v2 responses are self-contained (embedded
  * price ranges, real numbers, unified combo/promotion shape) and carry a
@@ -14,8 +19,8 @@ export interface PriceRangeEntry {
   qty: number;
   /** Unit price. */
   price: number;
-  /** Optional bonus label rendered under the quantity. */
-  bonus?: string;
+  /** Optional bonus label rendered under the quantity (v1 raw value may be numeric). */
+  bonus?: string | number;
   /** Display label for named sizes ("Familiar"); overrides the qty wording. */
   label?: string;
 }
@@ -262,6 +267,8 @@ export interface RestaurantSettings {
   whatsapp: WhatsappConfig;
   timezone: string;
   currency: string;
+  /** UI locale (`"es"`); the v1 adapter defaults it. */
+  language: string;
   delivery: DeliveryConfig;
   payment_methods: string[];
   max_order_quantity: number;

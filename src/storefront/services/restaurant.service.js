@@ -1,4 +1,5 @@
 import { getRestaurantInfo } from './menu.service.js';
+import { isSchemaViolationError } from '../schemas';
 
 /**
  * Fetch and shape the restaurant profile and settings for build time.
@@ -12,6 +13,8 @@ import { getRestaurantInfo } from './menu.service.js';
  */
 export async function getRestaurantData() {
   const info = await getRestaurantInfo().catch((error) => {
+    // Contract violations must fail the build — only transport failures fall back.
+    if (isSchemaViolationError(error)) throw error;
     console.warn('[RestaurantService] could not load restaurant info.', error);
     return null;
   });

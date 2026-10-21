@@ -94,9 +94,35 @@ Required for a working site:
 - **Design slots**: per-block card designs are wired in `src/pages/menu.astro` — the port point
   documented in `doc/menu-cards.md`.
 
+## Data contract (schemas)
+
+Every fixture is validated at its loader boundary by Zod schemas in
+`src/storefront/schemas/` (one file per fixture + `errors.ts` + barrel). The
+schemas ARE the executable v2 contract (`doc/proposal-api-v2.md`):
+
+- **A fixture that violates its schema fails the build** with the exact path,
+  e.g. `[schemas] settings.json failed contract validation: → data.phone:
+  Expected string, received number`. Transport failures (missing file,
+  network in `PUBLIC_DATA_MODE=api`) keep their silent fallbacks — contract
+  violations never do.
+- **Strict objects**: unknown keys are rejected (catches typos like
+  `enabeld`). Exceptions: `menu` blocks/categories are non-strict because the
+  v1 API payload passes through them unmapped.
+- **Discriminated unions**: `landing.json` / `enlaces.json` blocks and
+  `gallery.json` items are typed by their `type` field; a wrong value lists
+  every valid type in the error.
+- **Optional fields** mirror consumer tolerance: anything the loaders
+  default (`?.` / `??`) or the v1 adapter may omit is optional; everything
+  the fixtures always ship is required.
+- When adding a fixture or a new block type, extend the matching schema
+  first — the build then enforces it for every future edit.
+- Note: `astro build` type-erases TypeScript — the schemas are the runtime
+  gate; `src/storefront/types/menu.ts` stays the documentation and must be
+  kept in sync by hand.
+
 ## Verification
 
-1. `pnpm build` — expects 4 pages.
+1. `pnpm build` — expects 4 pages (this also proves every fixture passes its schema).
 2. `node scripts/smoke.mjs` — drives headless Chrome over CDP against the preview server
    (`pnpm preview`, default `localhost:4322`). Checks: menu card/dialog counts, cart flows,
    gallery items/modal, landing CTA, footer links.

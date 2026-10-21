@@ -1,4 +1,15 @@
 import { api } from './api.js';
+import {
+  combosFileSchema,
+  decorationsFileSchema,
+  flyersFileSchema,
+  galleryFileSchema,
+  menuDataSchema,
+  menuFileSchema,
+  parseFixture,
+  promotionsFileSchema,
+  settingsFileSchema,
+} from '../schemas';
 
 // ─── Data mode ────────────────────────────────────────────────────────────────
 // `local` (default): reads v2 JSON fixtures from `src/data/api/`.
@@ -18,9 +29,9 @@ const IS_LOCAL = import.meta.env.PUBLIC_DATA_MODE !== 'api';
  * @returns {Promise<import('../types/menu.js').Decorations>}
  */
 async function loadDecorations() {
+  let raw;
   try {
-    const raw = (await import('../../data/api/decorations.json')).default;
-    return /** @type {import('../types/menu.js').Decorations} */ (raw);
+    raw = (await import('../../data/api/decorations.json')).default;
   } catch {
     return /** @type {import('../types/menu.js').Decorations} */ ({
       background: '/images/bg.png',
@@ -29,6 +40,8 @@ async function loadDecorations() {
       blocks: {},
     });
   }
+  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
+  return parseFixture('decorations.json', decorationsFileSchema, raw);
 }
 
 // ─── v1 → v2 adapters (TEMP) ─────────────────────────────────────────────────
@@ -194,6 +207,7 @@ function toV2Settings(payload) {
       },
       timezone: 'America/Lima',
       currency: 'PEN',
+      language: 'es',
       delivery: {
         enabled: payload.delivery_enabled === 'Activo',
         fee: Number(payload.delivery_fee),
@@ -206,8 +220,11 @@ function toV2Settings(payload) {
         facebook: nonEmpty(payload.facebook),
         instagram: nonEmpty(payload.instagram),
       },
+      google_maps: null,
       business_hours,
       logo_url: nonEmpty(payload.logo_url),
+      header_bg: null,
+      footer_bg: null,
       tags: Array.isArray(payload.tags) ? payload.tags : [],
       seo: { ...SEO_DEFAULTS },
     },
@@ -284,9 +301,13 @@ function getPriceRanges() {
  */
 export async function getMenu() {
   const response = await resolveResource('menu', { data: {} });
-  const blocks = Array.isArray(response?.data?.blocks) ? response.data.blocks : [];
 
   if (IS_LOCAL) {
+    // Contract check on the raw fixture — before normalisation, so a missing
+    // `products` array fails the build instead of being silently filled.
+    const file = parseFixture('menu.json', menuFileSchema, response);
+    const blocks = file.data.blocks;
+
     return {
       blocks: blocks.map((block) => ({
         ...block,
@@ -298,11 +319,15 @@ export async function getMenu() {
     };
   }
 
+  // Network failure already fell back to `{ data: {} }` inside resolveResource.
+  const blocks = Array.isArray(response?.data?.blocks) ? response.data.blocks : [];
+
   // TEMP: v1→v2 adapter
   const rangesResponse = await getPriceRanges();
   const priceRanges = Array.isArray(rangesResponse?.data) ? rangesResponse.data : [];
 
-  return {
+  // Contract check on the adapter output (network fallback parses as `[]`).
+  return parseFixture('menu.json (v2 output)', menuDataSchema, {
     blocks: blocks.map((block) => ({
       ...block,
       categories: (block.categories ?? []).map((cat) => ({
@@ -310,7 +335,7 @@ export async function getMenu() {
         products: (cat.products ?? []).map((p) => toV2Product(p, priceRanges)),
       })),
     })),
-  };
+  });
 }
 
 /**
@@ -321,14 +346,17 @@ export async function getRestaurantInfo() {
   const response = await resolveResource('settings', null);
   if (!response) return null;
 
-  // Local fixture is already v2 — return as-is.
-  if (IS_LOCAL) return response;
+  // Local fixture is already v2 — parse it as-is.
+  if (IS_LOCAL) return parseFixture('settings.json', settingsFileSchema, response);
 
   // Remote v1 payload: adapt only if it has the v1 sentinel key.
   const payload = response?.data;
-  if (payload?.restaurant_name) return toV2Settings(payload);
+  if (payload?.restaurant_name) {
+    return parseFixture('settings.json (v2 output)', settingsFileSchema, toV2Settings(payload));
+  }
 
-  return response;
+  // Remote payload already v2-shaped — hold it to the same contract.
+  return parseFixture('settings.json (v2 output)', settingsFileSchema, response);
 }
 
 /**
@@ -345,12 +373,14 @@ export function getDecorations() {
  */
 export async function getCombos() {
   const response = await resolveResource('combos', { data: [] });
+
+  if (IS_LOCAL) return parseFixture('combos.json', combosFileSchema, response);
+
+  // TEMP: v1→v2 adapter (network fallback already returned `{ data: [] }`).
   const items = Array.isArray(response?.data) ? response.data : [];
-
-  if (IS_LOCAL) return { data: items };
-
-  // TEMP: v1→v2 adapter
-  return { data: items.map(toV2Combo) };
+  return parseFixture('combos.json (v2 output)', combosFileSchema, {
+    data: items.map(toV2Combo),
+  });
 }
 
 /**
@@ -359,12 +389,14 @@ export async function getCombos() {
  */
 export async function getPromotions() {
   const response = await resolveResource('promotions', { data: [] });
+
+  if (IS_LOCAL) return parseFixture('promotions.json', promotionsFileSchema, response);
+
+  // TEMP: v1→v2 adapter (network fallback already returned `{ data: [] }`).
   const items = Array.isArray(response?.data) ? response.data : [];
-
-  if (IS_LOCAL) return { data: items };
-
-  // TEMP: v1→v2 adapter
-  return { data: items.map(toV2Promotion) };
+  return parseFixture('promotions.json (v2 output)', promotionsFileSchema, {
+    data: items.map(toV2Promotion),
+  });
 }
 
 /**
@@ -393,12 +425,14 @@ export async function loadMenu() {
  * @returns {Promise<import('../types/menu.js').FlyersConfig>}
  */
 export async function getFlyers() {
+  let raw;
   try {
-    const raw = (await import('../../data/api/flyers.json')).default;
-    return /** @type {import('../types/menu.js').FlyersConfig} */ (raw);
+    raw = (await import('../../data/api/flyers.json')).default;
   } catch {
     return { enabled: false, delay_seconds: 20, items: [] };
   }
+  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
+  return parseFixture('flyers.json', flyersFileSchema, raw);
 }
 
 /**
@@ -408,28 +442,31 @@ export async function getFlyers() {
  * @returns {Promise<Array<import('../types/menu.js').GalleryCategory>>}
  */
 export async function getGallery() {
+  let raw;
   try {
-    const raw = (await import('../../data/api/gallery.json')).default;
-    const items = Array.isArray(raw?.data) ? raw.data : [];
-
-    const categoryMap = new Map();
-    for (const item of items) {
-      const catName = item.category || 'General';
-      if (!categoryMap.has(catName)) {
-        categoryMap.set(catName, {
-          id: catName.toLowerCase().replace(/\s+/g, '-'),
-          name: catName,
-          items: [],
-        });
-      }
-      categoryMap.get(catName).items.push(item);
-    }
-
-    return Array.from(categoryMap.values());
+    raw = (await import('../../data/api/gallery.json')).default;
   } catch (error) {
     console.warn('[MenuService] Failed to load gallery.json fixture:', error);
     return [];
   }
+
+  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
+  const items = parseFixture('gallery.json', galleryFileSchema, raw).data;
+
+  const categoryMap = new Map();
+  for (const item of items) {
+    const catName = item.category || 'General';
+    if (!categoryMap.has(catName)) {
+      categoryMap.set(catName, {
+        id: catName.toLowerCase().replace(/\s+/g, '-'),
+        name: catName,
+        items: [],
+      });
+    }
+    categoryMap.get(catName).items.push(item);
+  }
+
+  return Array.from(categoryMap.values());
 }
 
 /**
