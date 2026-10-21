@@ -8,6 +8,7 @@ import {
   getPromotions,
   getDecorations,
   getFlyers,
+  getGalleryCategories,
 } from './menu.service.js';
 import {
   getRestaurantData,
@@ -24,6 +25,7 @@ export {
   getPromotions,
   getDecorations,
   getFlyers,
+  getGalleryCategories,
   getRestaurantData,
   getGoogleReviewLink,
   restaurantService,

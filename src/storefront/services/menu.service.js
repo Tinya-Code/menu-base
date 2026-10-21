@@ -392,6 +392,35 @@ export async function getFlyers() {
   }
 }
 
+/**
+ * Gallery dataset derived from menu blocks: returns categories that have products with photos.
+ * Ordered exactly as the menu renders.
+ *
+ * @param {Array<import('../types/menu.js').MenuBlock>} [blocks]
+ * @returns {Array<{ id: string, name: string, description?: string, products: Array<import('../types/menu.js').MenuProduct> }>}
+ */
+export function getGalleryCategories(blocks = []) {
+  const result = [];
+  if (!Array.isArray(blocks)) return result;
+
+  for (const block of blocks) {
+    for (const category of block.categories ?? []) {
+      const products = (category.products ?? []).filter(
+        (p) => Boolean(p.image?.url) && !p.is_hidden
+      );
+      if (products.length > 0) {
+        result.push({
+          id: category.id,
+          name: category.name,
+          description: category.description ?? '',
+          products,
+        });
+      }
+    }
+  }
+  return result;
+}
+
 /** Backward-compatible singleton proxy. */
 export const menuService = {
   load: loadMenu,
@@ -400,6 +429,7 @@ export const menuService = {
   getPromotions,
   getDecorations,
   getFlyers,
+  getGalleryCategories,
   getRestaurantInfo,
   getPriceRanges,
 };
