@@ -78,7 +78,7 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
               </h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {category.items.map((item) => {
                 const embedUrl = resolveEmbedUrl(item);
                 const isVideo = item.type === 'video' || (!item.type && Boolean(item.url?.endsWith('.mp4') || item.url?.endsWith('.webm')));
