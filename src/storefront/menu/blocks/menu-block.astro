@@ -19,6 +19,9 @@
  * - `decoration-left`  — grid cell(s) BEFORE the categories
  * - `decoration-right` — grid cell(s) AFTER the categories
  * - `extra`            — extra grid cell(s) after the decorations
+ * - `card`             — per-product design override (function child
+ *                        receiving `(product, canOrder)`); falls back to
+ *                        TemplateCard per product
  * - default            — content at the end of the section
  */
 import TemplateCard from '../cards/template-card.astro';
@@ -34,7 +37,6 @@ interface Props {
   cardsClass?: string;
   categorySectionClass?: string;
   canOrder?: boolean;
-  cardComponent?: any;
 }
 
 const {
@@ -45,7 +47,6 @@ const {
   cardsClass = '',
   categorySectionClass = '',
   canOrder = true,
-  cardComponent: Card = TemplateCard,
 } = Astro.props;
 
 const leftDecorations = decorations.filter((d) => d.slot === 'left');
@@ -64,6 +65,19 @@ const hasLeft = Astro.slots.has('decoration-left') || leftDecorations.length > 0
 const hasRight = Astro.slots.has('decoration-right') || rightDecorations.length > 0;
 const hasDecorations = hasLeft || hasRight;
 const hasCustomSlot = Astro.slots.has('default');
+
+// Per-product override: render the `card` function-child once per product.
+const customCards = new Map<string, string>();
+if (Astro.slots.has('card')) {
+  for (const cat of categories) {
+    for (const product of cat.products ?? []) {
+      customCards.set(
+        `${cat.id}:${product.id}`,
+        await Astro.slots.render('card', [product, canOrder]),
+      );
+    }
+  }
+}
 ---
 
 {
@@ -87,9 +101,14 @@ const hasCustomSlot = Astro.slots.has('default');
             <TemplateSectionTitle title={cat.name ?? ''} description={cat.description || ''} />
 
             <div class={`grid ${cardsClass}`}>
-              {(cat.products ?? []).map((product) => (
-                <Card product={product} canOrder={canOrder} />
-              ))}
+              {(cat.products ?? []).map((product) => {
+                const html = customCards.get(`${cat.id}:${product.id}`);
+                return html !== undefined ? (
+                  <Fragment set:html={html} />
+                ) : (
+                  <TemplateCard product={product} canOrder={canOrder} />
+                );
+              })}
             </div>
           </section>
         ))}

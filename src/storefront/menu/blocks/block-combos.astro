@@ -8,10 +8,14 @@
  * - `title`       — section heading (default `'Combos'`)
  * - `description` — section sub-text (default `'Combos especiales para compartir'`)
  *
+ * Named slot:
+ * - `card` — per-combo design override (function child receiving
+ *   `(combo, canOrder)`); falls back to TemplateComboCard per combo.
+ *
  * Combo cards expose a `data-combo` payload; the page dispatches the bubbling
  * `add-to-cart` CustomEvent for them (see `src/pages/index.astro`).
  */
-import ComboCard from '../cards/combo-card.astro';
+import TemplateComboCard from '../cards/combo/template-combo-card.astro';
 import TemplateSectionTitle from '../template-section-title.astro';
 import Slider from '../../ui/slider.astro';
 import type { Combo } from '../../types/menu';
@@ -21,7 +25,6 @@ interface Props {
   canOrder?: boolean;
   title?: string;
   description?: string;
-  cardComponent?: any;
 }
 
 const {
@@ -29,25 +32,31 @@ const {
   canOrder = true,
   title = 'Combos',
   description = 'Combos especiales para compartir',
-  cardComponent: Card = ComboCard,
 } = Astro.props;
 
-const hasCustomSlot = Astro.slots.has('default');
+// Per-item override: render the `card` function-child once per combo.
+const customCards = new Map<string, string>();
+if (Astro.slots.has('card')) {
+  for (const combo of combos) {
+    customCards.set(combo.id, await Astro.slots.render('card', [combo, canOrder]));
+  }
+}
 ---
 
 {
-  (combos.length > 0 || hasCustomSlot) && (
+  combos.length > 0 && (
     <section class="relative py-12 px-8">
       <TemplateSectionTitle title={title} description={description} />
 
       <Slider showArrows={true}>
-        {hasCustomSlot ? (
-          <slot />
-        ) : (
-          combos.map((combo) => (
-            <Card combo={combo} canOrder={canOrder} />
-          ))
-        )}
+        {combos.map((combo) => {
+          const html = customCards.get(combo.id);
+          return html !== undefined ? (
+            <Fragment set:html={html} />
+          ) : (
+            <TemplateComboCard combo={combo} canOrder={canOrder} />
+          );
+        })}
       </Slider>
     </section>
   )
