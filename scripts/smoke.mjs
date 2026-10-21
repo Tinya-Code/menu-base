@@ -1,8 +1,10 @@
 import { spawn } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 
 const CHROME_PATH = '/Users/alejandro/Library/Caches/ms-playwright/chromium_headless_shell-1208/chrome-headless-shell-mac-arm64/chrome-headless-shell';
 const BASE_URL = process.env.PREVIEW_URL || 'http://localhost:4322';
+const settingsFixture = JSON.parse(readFileSync('src/data/api/settings.json', 'utf8')).data;
 
 class CDPClient {
   constructor(wsUrl) {
@@ -234,7 +236,67 @@ async function runSmoke() {
     console.log('  [PASS] Gallery footer present:', galeriaFooterPresent);
     assert.ok(galeriaFooterPresent);
 
-    // 16. Check 0 console problems
+    console.log('=== Checking /enlaces ===');
+    await navigateAndWait(`${BASE_URL}/enlaces`);
+
+    // 16. Enlaces title assertion
+    const enlacesTitle = (await client.send('Runtime.evaluate', { expression: 'document.title' })).result.value;
+    console.log('  [PASS] Enlaces title:', enlacesTitle);
+    assert.equal(enlacesTitle, 'Enlaces | Mr Nikkei6.9');
+
+    // 17. SiteHeader on /enlaces contains exactly two nav links (Menú, Galería) and neither is active
+    const enlacesNavLinks = JSON.parse((await client.send('Runtime.evaluate', {
+      expression: 'JSON.stringify(Array.from(document.querySelectorAll("header nav a")).map(a => ({ text: a.innerText.trim(), active: a.className.includes("border-primary") })))',
+    })).result.value);
+    console.log('  [PASS] Enlaces nav links:', enlacesNavLinks);
+    assert.deepEqual(enlacesNavLinks, [
+      { text: 'MENÚ', active: false },
+      { text: 'GALERÍA', active: false },
+    ]);
+
+    // 18. Social links resolve to settings URLs
+    const instagramHref = (await client.send('Runtime.evaluate', {
+      expression: 'document.querySelector("[data-link-instagram]")?.getAttribute("href")',
+    })).result.value;
+    console.log('  [PASS] Instagram href resolves to settings:', instagramHref === settingsFixture.social_media.instagram);
+    assert.equal(instagramHref, settingsFixture.social_media.instagram);
+
+    const facebookHref = (await client.send('Runtime.evaluate', {
+      expression: 'document.querySelector("[data-link-facebook]")?.getAttribute("href")',
+    })).result.value;
+    console.log('  [PASS] Facebook href resolves to settings:', facebookHref === settingsFixture.social_media.facebook);
+    assert.equal(facebookHref, settingsFixture.social_media.facebook);
+
+    const mapsHref = (await client.send('Runtime.evaluate', {
+      expression: 'document.querySelector("[data-link-maps]")?.getAttribute("href")',
+    })).result.value;
+    console.log('  [PASS] Google Maps href resolves to settings:', mapsHref === settingsFixture.google_maps);
+    assert.equal(mapsHref, settingsFixture.google_maps);
+
+    // 19. TikTok button is absent while fixture value is null
+    const tiktokPresent = (await client.send('Runtime.evaluate', {
+      expression: '!!document.querySelector("[data-link-tiktok]")',
+    })).result.value;
+    console.log('  [PASS] TikTok button absent when null:', !tiktokPresent);
+    assert.equal(tiktokPresent, false);
+
+    // 20. Landing CTA reaches /enlaces
+    await navigateAndWait(`${BASE_URL}/`);
+    const ctaReached = (await client.send('Runtime.evaluate', {
+      expression: 'document.querySelector("main a[href=\'/enlaces\']")?.getAttribute("href")',
+    })).result.value;
+    console.log('  [PASS] Landing CTA to enlaces resolves:', ctaReached === '/enlaces');
+    assert.equal(ctaReached, '/enlaces');
+
+    // 21. Footer present on /enlaces
+    await navigateAndWait(`${BASE_URL}/enlaces`);
+    const enlacesFooterPresent = (await client.send('Runtime.evaluate', {
+      expression: '!!document.querySelector("footer")',
+    })).result.value;
+    console.log('  [PASS] Enlaces footer present:', enlacesFooterPresent);
+    assert.ok(enlacesFooterPresent);
+
+    // 22. Check 0 console problems
     console.log('  Console problems count:', consoleProblems.length);
     if (consoleProblems.length > 0) {
       console.warn('  Problems found:', consoleProblems);
