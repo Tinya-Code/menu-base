@@ -56,10 +56,10 @@ Cierre: landing shows hero + 3 CTAs + footer; smoke green.
 
 Objetivo: gallery page sourced from existing data (no new endpoint): product photos grouped by category.
 
-- [ ] Derive the gallery dataset server-side (src/storefront/services/menu.service.js or a small helper next to it: read the menu from `loadStorefront()`, return categories with their products that have `image.url`, ordered as the menu renders; no browser fetch, no fixture changes).
-- [ ] Create the gallery page (src/pages/galeria.astro: Layout + SiteHeader + responsive image grid grouped by category — `loading="lazy"`, alt from `image.alt`, `precio`-free plain layout with tokens — + Footer).
-- [ ] Set the gallery SEO title (src/pages/galeria.astro: `title="Galería"` through the Layout title prop).
-- [ ] Extend the CDP smoke for the gallery (script: grid renders the expected image count, a category heading exists, nav shows Galería active, footer present, 0 console problems).
+- [x] Derive the gallery dataset server-side (src/storefront/services/menu.service.js or a small helper next to it: read the menu from `loadStorefront()`, return categories with their products that have `image.url`, ordered as the menu renders; no browser fetch, no fixture changes) — `f0902ec`.
+- [x] Create the gallery page (src/pages/galeria.astro: Layout + SiteHeader + responsive image grid grouped by category — `loading="lazy"`, alt from `image.alt`, `precio`-free plain layout with tokens — + Footer) — `dc423d3`.
+- [x] Set the gallery SEO title (src/pages/galeria.astro: `title="Galería"` through the Layout title prop) — `dc423d3`.
+- [x] Extend the CDP smoke for the gallery (script: grid renders the expected image count, a category heading exists, nav shows Galería active, footer present, 0 console problems) — `e38c80c`.
 
 Cierre: `/galeria` renders all menu product photos grouped by category; smoke green.
 
