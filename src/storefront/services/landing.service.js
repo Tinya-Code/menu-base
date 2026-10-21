@@ -18,7 +18,7 @@
  *   - "divider"      — Elegant spacing line
  */
 import { buildHrefResolver } from './resolve-href.js';
-import { landingFileSchema, parseFixture } from '../schemas';
+import { resolveLocal } from '../data/endpoints.js';
 
 /**
  * @typedef {Object} LandingMeta
@@ -33,22 +33,6 @@ import { landingFileSchema, parseFixture } from '../schemas';
  * @property {any[]} [blocks]
  * @property {any[]} [media] - Backward-compatible media key
  */
-
-/**
- * Load the raw landing fixture.
- * @returns {Promise<LandingConfig>}
- */
-async function loadFixture() {
-  let raw;
-  try {
-    raw = (await import('../../data/api/landing.json')).default;
-  } catch (error) {
-    console.warn('[LandingService] Failed to load landing.json fixture:', error);
-    return { meta: {}, blocks: [] };
-  }
-  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
-  return parseFixture('landing.json', landingFileSchema, raw);
-}
 
 /**
  * Default fallback blocks if landing.json does not define blocks.
@@ -72,7 +56,8 @@ function defaultBlocks() {
  * @returns {Promise<{ meta: LandingMeta; blocks: any[] }>}
  */
 export async function getLanding(settings, promotions = [], menuBlocks = []) {
-  const config = await loadFixture();
+  // Contract-validated fixture (missing file → the entry's `{meta,blocks}` fallback).
+  const config = resolveLocal('landing');
   const resolve = buildHrefResolver(settings);
 
   // If `blocks` is not present, construct default blocks using legacy `media` key if present

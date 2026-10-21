@@ -16,7 +16,7 @@
  *   "https://..." → external absolute URL — kept as-is
  */
 import { buildHrefResolver } from './resolve-href.js';
-import { enlacesFileSchema, parseFixture } from '../schemas';
+import { resolveLocal } from '../data/endpoints.js';
 
 /**
  * @typedef {Object} EnlacesMeta
@@ -31,21 +31,6 @@ import { enlacesFileSchema, parseFixture } from '../schemas';
  * @property {EnlacesMeta} meta
  * @property {any[]} blocks
  */
-
-/**
- * Load the raw enlaces fixture.
- * @returns {Promise<EnlacesConfig>}
- */
-async function loadFixture() {
-  let raw;
-  try {
-    raw = (await import('../../data/api/enlaces.json')).default;
-  } catch {
-    return { meta: { title: '', tagline: '', logo_url: null, theme: 'dark' }, blocks: [] };
-  }
-  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
-  return parseFixture('enlaces.json', enlacesFileSchema, raw);
-}
 
 /**
  * Resolve the `sublabel` field: if it equals "phone" replace with the
@@ -74,7 +59,8 @@ function resolveSublabel(sublabel, settings) {
  * @returns {Promise<{ meta: EnlacesMeta; blocks: any[] }>}
  */
 export async function getEnlaces(settings, galleryItems = [], menuBlocks = []) {
-  const config = await loadFixture();
+  // Contract-validated fixture (missing file → the entry's meta/blocks fallback).
+  const config = resolveLocal('enlaces');
   const resolve = buildHrefResolver(settings);
 
   const blocks = (config.blocks ?? [])

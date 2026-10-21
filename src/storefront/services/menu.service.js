@@ -1,15 +1,6 @@
 import { api } from './api.js';
-import {
-  combosFileSchema,
-  decorationsFileSchema,
-  flyersFileSchema,
-  galleryFileSchema,
-  menuDataSchema,
-  menuFileSchema,
-  parseFixture,
-  promotionsFileSchema,
-  settingsFileSchema,
-} from '../schemas';
+import { parseFixture } from '../schemas';
+import { ENDPOINTS, loadFixture, resolveLocal } from '../data/endpoints.js';
 
 // ─── Data mode ────────────────────────────────────────────────────────────────
 // `local` (default): reads v2 JSON fixtures from `src/data/api/`.
@@ -19,30 +10,6 @@ import {
 // No env var → local mode, so the app works out of the box without config.
 /** @type {boolean} */
 const IS_LOCAL = import.meta.env.PUBLIC_DATA_MODE !== 'api';
-
-// ─── Decorations ─────────────────────────────────────────────────────────────
-
-/**
- * Ready-to-render decorations. Always loaded from the local fixture because
- * there is no remote endpoint for decorations yet.
- *
- * @returns {Promise<import('../types/menu.js').Decorations>}
- */
-async function loadDecorations() {
-  let raw;
-  try {
-    raw = (await import('../../data/api/decorations.json')).default;
-  } catch {
-    return /** @type {import('../types/menu.js').Decorations} */ ({
-      background: '/images/bg.png',
-      header_background: null,
-      footer_background: null,
-      blocks: {},
-    });
-  }
-  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
-  return parseFixture('decorations.json', decorationsFileSchema, raw);
-}
 
 // ─── v1 → v2 adapters (TEMP) ─────────────────────────────────────────────────
 // Delete these when GAS emits the v2 payload (doc/proposal-api-v2.md §5).
@@ -233,42 +200,36 @@ function toV2Settings(payload) {
 
 // ─── Resource resolver ────────────────────────────────────────────────────────
 
-const RESOURCES = {
-  menu: 'menu',
-  priceRanges: 'price-range',
-  settings: 'settings',
-  combos: 'combos',
-  promotions: 'promotions',
-};
+/**
+ * Local fixture or remote endpoint for this entry?
+ * (Single source of truth, mirrored by `resolveResource`.)
+ * @param {(typeof ENDPOINTS)[keyof typeof ENDPOINTS]} entry
+ */
+function isLocalEntry(entry) {
+  return entry.mode === 'local' || (entry.mode === 'auto' && IS_LOCAL);
+}
 
 /**
- * Resolve one resource: local JSON fixture (default) or remote GAS endpoint.
+ * Resolve one resource per the endpoint manifest: local fixture when the
+ * entry's mode says so, otherwise the remote GAS endpoint. Transport failure
+ * (missing fixture file / network error) → the entry's fallback; schema
+ * violations are thrown by the caller's `parseFixture`, never here.
  *
- * @param {keyof typeof RESOURCES} name
- * @param {any} [fallback]
+ * @param {keyof typeof ENDPOINTS} name
  * @returns {Promise<any>}
  */
-async function resolveResource(name, fallback = { data: [] }) {
-  if (IS_LOCAL) {
-    switch (name) {
-      case 'menu':
-        return (await import('../../data/api/menu.json')).default;
-      case 'settings':
-        return (await import('../../data/api/settings.json')).default;
-      case 'combos':
-        return (await import('../../data/api/combos.json')).default;
-      case 'promotions':
-        return (await import('../../data/api/promotions.json')).default;
-      default:
-        return fallback;
-    }
-  }
+async function resolveResource(name) {
+  const entry = ENDPOINTS[name];
+  if (!entry.enabled) return entry.fallback;
+
+  if (isLocalEntry(entry)) return loadFixture(entry.fixture) ?? entry.fallback;
+  if (!entry.resource) return entry.fallback;
 
   try {
-    return await api.with('json', RESOURCES[name]).get();
+    return await api.with('json', entry.resource).get();
   } catch (error) {
     console.warn(`[MenuService] "${name}" request failed, using fallback.`, error);
-    return fallback;
+    return entry.fallback;
   }
 }
 
@@ -283,7 +244,7 @@ let priceRangesPromise = null;
  */
 function getPriceRanges() {
   if (!priceRangesPromise) {
-    priceRangesPromise = resolveResource('priceRanges', { data: [] }).then((response) => {
+    priceRangesPromise = resolveResource('priceRanges').then((response) => {
       if (!Array.isArray(response?.data)) {
         console.warn('[MenuService] price-ranges payload missing "data" array.', response);
       }
@@ -300,12 +261,13 @@ function getPriceRanges() {
  * @returns {Promise<{ blocks: any[] }>}
  */
 export async function getMenu() {
-  const response = await resolveResource('menu', { data: {} });
+  const entry = ENDPOINTS.menu;
+  const response = await resolveResource('menu');
 
-  if (IS_LOCAL) {
+  if (isLocalEntry(entry)) {
     // Contract check on the raw fixture — before normalisation, so a missing
     // `products` array fails the build instead of being silently filled.
-    const file = parseFixture('menu.json', menuFileSchema, response);
+    const file = parseFixture(entry.fixture, entry.schema, response);
     const blocks = file.data.blocks;
 
     return {
@@ -319,22 +281,24 @@ export async function getMenu() {
     };
   }
 
-  // Network failure already fell back to `{ data: {} }` inside resolveResource.
   const blocks = Array.isArray(response?.data?.blocks) ? response.data.blocks : [];
 
   // TEMP: v1→v2 adapter
   const rangesResponse = await getPriceRanges();
   const priceRanges = Array.isArray(rangesResponse?.data) ? rangesResponse.data : [];
 
-  // Contract check on the adapter output (network fallback parses as `[]`).
-  return parseFixture('menu.json (v2 output)', menuDataSchema, {
-    blocks: blocks.map((block) => ({
-      ...block,
-      categories: (block.categories ?? []).map((cat) => ({
-        ...cat,
-        products: (cat.products ?? []).map((p) => toV2Product(p, priceRanges)),
+  // Contract check on the adapter output — wrapped into the file shape so the
+  // ONE `menu.json` schema validates both origins (network fallback parses as []).
+  return parseFixture('menu.json (v2 output)', entry.schema, {
+    data: {
+      blocks: blocks.map((block) => ({
+        ...block,
+        categories: (block.categories ?? []).map((cat) => ({
+          ...cat,
+          products: (cat.products ?? []).map((p) => toV2Product(p, priceRanges)),
+        })),
       })),
-    })),
+    },
   });
 }
 
@@ -343,28 +307,30 @@ export async function getMenu() {
  * @returns {Promise<import('../types/menu.js').RestaurantInfo | null>}
  */
 export async function getRestaurantInfo() {
-  const response = await resolveResource('settings', null);
+  const entry = ENDPOINTS.settings;
+  const response = await resolveResource('settings');
   if (!response) return null;
 
   // Local fixture is already v2 — parse it as-is.
-  if (IS_LOCAL) return parseFixture('settings.json', settingsFileSchema, response);
+  if (isLocalEntry(entry)) return parseFixture(entry.fixture, entry.schema, response);
 
   // Remote v1 payload: adapt only if it has the v1 sentinel key.
   const payload = response?.data;
   if (payload?.restaurant_name) {
-    return parseFixture('settings.json (v2 output)', settingsFileSchema, toV2Settings(payload));
+    return parseFixture('settings.json (v2 output)', entry.schema, toV2Settings(payload));
   }
 
   // Remote payload already v2-shaped — hold it to the same contract.
-  return parseFixture('settings.json (v2 output)', settingsFileSchema, response);
+  return parseFixture('settings.json (v2 output)', entry.schema, response);
 }
 
 /**
- * Ready-to-render decorations — loaded from `src/data/api/decorations.json`.
+ * Ready-to-render decorations — always the local fixture (manifest mode
+ * `'local'`; no remote endpoint exists yet).
  * @returns {Promise<import('../types/menu.js').Decorations>}
  */
-export function getDecorations() {
-  return loadDecorations();
+export async function getDecorations() {
+  return resolveLocal('decorations');
 }
 
 /**
@@ -372,13 +338,14 @@ export function getDecorations() {
  * @returns {Promise<{ data: any[] }>}
  */
 export async function getCombos() {
-  const response = await resolveResource('combos', { data: [] });
+  const entry = ENDPOINTS.combos;
+  const response = await resolveResource('combos');
 
-  if (IS_LOCAL) return parseFixture('combos.json', combosFileSchema, response);
+  if (isLocalEntry(entry)) return parseFixture(entry.fixture, entry.schema, response);
 
   // TEMP: v1→v2 adapter (network fallback already returned `{ data: [] }`).
   const items = Array.isArray(response?.data) ? response.data : [];
-  return parseFixture('combos.json (v2 output)', combosFileSchema, {
+  return parseFixture('combos.json (v2 output)', entry.schema, {
     data: items.map(toV2Combo),
   });
 }
@@ -388,13 +355,14 @@ export async function getCombos() {
  * @returns {Promise<{ data: any[] }>}
  */
 export async function getPromotions() {
-  const response = await resolveResource('promotions', { data: [] });
+  const entry = ENDPOINTS.promotions;
+  const response = await resolveResource('promotions');
 
-  if (IS_LOCAL) return parseFixture('promotions.json', promotionsFileSchema, response);
+  if (isLocalEntry(entry)) return parseFixture(entry.fixture, entry.schema, response);
 
   // TEMP: v1→v2 adapter (network fallback already returned `{ data: [] }`).
   const items = Array.isArray(response?.data) ? response.data : [];
-  return parseFixture('promotions.json (v2 output)', promotionsFileSchema, {
+  return parseFixture('promotions.json (v2 output)', entry.schema, {
     data: items.map(toV2Promotion),
   });
 }
@@ -420,38 +388,23 @@ export async function loadMenu() {
 }
 
 /**
- * Load promotional flyers from `src/data/api/flyers.json`.
- * Always local — no remote endpoint for flyers.
+ * Load promotional flyers (manifest entry `'flyers'` — fixture only).
  * @returns {Promise<import('../types/menu.js').FlyersConfig>}
  */
 export async function getFlyers() {
-  let raw;
-  try {
-    raw = (await import('../../data/api/flyers.json')).default;
-  } catch {
-    return { enabled: false, delay_seconds: 20, items: [] };
-  }
-  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
-  return parseFixture('flyers.json', flyersFileSchema, raw);
+  return resolveLocal('flyers');
 }
 
 /**
- * Load gallery items from `src/data/api/gallery.json`.
+ * Load gallery items (manifest entry `'gallery'` — fixture only).
  * Supports image, video, and iframe embeds (YouTube, TikTok, Facebook).
  *
  * @returns {Promise<Array<import('../types/menu.js').GalleryCategory>>}
  */
 export async function getGallery() {
-  let raw;
-  try {
-    raw = (await import('../../data/api/gallery.json')).default;
-  } catch (error) {
-    console.warn('[MenuService] Failed to load gallery.json fixture:', error);
-    return [];
-  }
-
-  // Contract check runs OUTSIDE the catch: a corrupt fixture fails the build.
-  const items = parseFixture('gallery.json', galleryFileSchema, raw).data;
+  // Missing fixture → empty list (silent transport fallback); a corrupt one
+  // throws and fails the build.
+  const items = resolveLocal('gallery').data;
 
   const categoryMap = new Map();
   for (const item of items) {

@@ -94,6 +94,35 @@ Required for a working site:
 - **Design slots**: per-block card designs are wired in `src/pages/menu.astro` — the port point
   documented in `doc/menu-cards.md`.
 
+## Endpoint manifest
+
+`src/storefront/data/endpoints.js` declares every data source in one `ENDPOINTS`
+object — the single place to edit when a source changes (fixture, remote
+endpoint, contract, fallback). Loaders no longer hardcode where data comes from.
+
+Per entry:
+
+| Field      | Meaning |
+| ---------- | ------- |
+| `enabled`  | `false` skips the source entirely → `fallback`. |
+| `mode`     | `'auto'` = local fixture, remote endpoint when `PUBLIC_DATA_MODE=api`; `'local'` = always the fixture; `'remote'` = always the endpoint. |
+| `fixture`  | JSON file under `src/data/api/` (`null` → no local origin). |
+| `resource` | Name on the GAS API (`null` → local-only source). |
+| `schema`   | Zod contract every resolved payload must pass (`null` → not held to the v2 contract, e.g. the raw v1 price-ranges join input). |
+| `fallback` | Value returned on TRANSPORT failure only (missing file / network error) — a schema violation still fails the build. |
+
+Recipes:
+
+- **Switch a source to the remote API**: set `mode` to `'remote'` (or leave
+  `'auto'` and set `PUBLIC_DATA_MODE=api`).
+- **Disable a source**: `enabled: false` — consumers get `fallback` with no I/O.
+- **Add a source**: drop the JSON in `src/data/api/`, add its schema to
+  `src/storefront/schemas/`, declare the entry, then call
+  `resolveLocal('<key>')` from your loader.
+- Helpers: `loadFixture(name)` (raw JSON or `null`), `resolveLocal(name)`
+  (fixture + contract check + fallback); remote-capable entries go through
+  `resolveResource(name)` in `menu.service.js`, which reads the same entry.
+
 ## Data contract (schemas)
 
 Every fixture is validated at its loader boundary by Zod schemas in
