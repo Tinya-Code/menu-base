@@ -1,0 +1,93 @@
+---
+/**
+ * Gallery page (`src/pages/galeria.astro`, route `/galeria`).
+ *
+ * Sourced server-side from menu blocks: product photos grouped by category.
+ * Plain layout with tokens, precio-free.
+ */
+import Layout from '../storefront/layout/Layout.astro';
+import SiteHeader from '../storefront/layout/site-header.astro';
+import Footer from '../storefront/layout/footer.astro';
+import { loadStorefront, getGalleryCategories } from '../storefront/services/index.js';
+
+const {
+  blocks,
+  restaurant,
+  settings,
+  businessHours,
+  decorations,
+} = await loadStorefront();
+
+const galleryCategories = getGalleryCategories(blocks);
+const footerBg = decorations?.footer_bg ?? settings?.footer_bg ?? null;
+---
+
+<Layout title="Galería" seo={settings?.seo}>
+  <div class="min-h-screen flex flex-col bg-secondary text-primary-text font-body selection:bg-primary selection:text-white">
+    <SiteHeader restaurant={restaurant} settings={settings} />
+
+    <main class="flex-1 px-6 py-12 sm:py-20 max-w-7xl mx-auto w-full">
+      <!-- Page Header -->
+      <header class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+        <h1 class="text-5xl sm:text-7xl font-display text-white leading-none tracking-tight">
+          Nuestra Galería<span class="text-primary">.</span>
+        </h1>
+        <p class="text-base sm:text-xl text-primary-text/75 font-normal">
+          Conocé el arte y la frescura detrás de cada una de nuestras preparaciones nikkei.
+        </p>
+      </header>
+
+      <!-- Categories with Photos -->
+      <div class="space-y-16">
+        {galleryCategories.map((category) => (
+          <section class="space-y-8" data-gallery-category={category.name}>
+            <div class="border-b border-white/10 pb-4 flex items-baseline justify-between">
+              <h2 class="text-3xl sm:text-4xl font-display text-white tracking-tight flex items-center gap-3">
+                <span>{category.name}</span>
+                <span class="text-xs font-sans font-bold uppercase tracking-wider text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                  {category.products.length} {category.products.length === 1 ? 'plato' : 'platos'}
+                </span>
+              </h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {category.products.map((product) => (
+                <article
+                  class="group bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-5 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.15)]"
+                  data-gallery-item={product.id}
+                >
+                  <div class="relative w-full aspect-square flex items-center justify-center rounded-2xl bg-secondary/60 overflow-hidden mb-4 p-4">
+                    <img
+                      src={product.image.url}
+                      alt={product.image.alt || product.name}
+                      loading="lazy"
+                      class="w-full h-full object-contain transform group-hover:scale-110 group-hover:-rotate-2 transition-transform duration-500 ease-out drop-shadow-xl"
+                    />
+                  </div>
+
+                  <h3 class="text-xl sm:text-2xl font-display text-white leading-snug group-hover:text-primary transition-colors">
+                    {product.name}
+                  </h3>
+
+                  {product.description && (
+                    <p class="text-xs sm:text-sm text-primary-text/60 mt-2 line-clamp-2 leading-relaxed">
+                      {product.description}
+                    </p>
+                  )}
+                </article>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </main>
+
+    <Footer
+      restaurant={restaurant}
+      settings={settings}
+      businessHours={businessHours}
+      footerBg={footerBg}
+      class="mt-20 block"
+    />
+  </div>
+</Layout>
