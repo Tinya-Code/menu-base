@@ -210,14 +210,31 @@ async function runSmoke() {
     console.log('  [PASS] Gallery iframe element present:', hasIframe);
     assert.ok(hasIframe, 'Expected at least one iframe embed element');
 
-    // 14. Footer present on /galeria
+    // 14. Gallery modal present and opens on item click with media
+    const modalOpened = (await client.send('Runtime.evaluate', {
+      expression: `(() => {
+        const modal = document.getElementById("gallery-modal");
+        const firstItem = document.querySelector("[data-gallery-item]");
+        if (!modal || !firstItem) return false;
+        firstItem.click();
+        const mediaInjected = (modal.querySelector("[data-modal-media]")?.children.length || 0) > 0;
+        const isVisible = !modal.hasAttribute("hidden");
+        const closeBtn = modal.querySelector("[data-modal-close]");
+        closeBtn?.click();
+        return isVisible && mediaInjected;
+      })()`,
+    })).result.value;
+    console.log('  [PASS] Gallery modal opens on item click with media:', modalOpened);
+    assert.ok(modalOpened, 'Expected gallery modal to open with media content on item click');
+
+    // 15. Footer present on /galeria
     const galeriaFooterPresent = (await client.send('Runtime.evaluate', {
       expression: '!!document.querySelector("footer")',
     })).result.value;
     console.log('  [PASS] Gallery footer present:', galeriaFooterPresent);
     assert.ok(galeriaFooterPresent);
 
-    // 15. Check 0 console problems
+    // 16. Check 0 console problems
     console.log('  Console problems count:', consoleProblems.length);
     if (consoleProblems.length > 0) {
       console.warn('  Problems found:', consoleProblems);

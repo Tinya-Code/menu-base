@@ -9,6 +9,7 @@
 import Layout from '../storefront/layout/Layout.astro';
 import SiteHeader from '../storefront/layout/site-header.astro';
 import Footer from '../storefront/layout/footer.astro';
+import GalleryModal from '../storefront/ui/gallery-modal.astro';
 import { loadStorefront, getGalleryCategories } from '../storefront/services/index.js';
 import type { GalleryCategory, GalleryItem } from '../storefront/types/menu';
 
@@ -87,10 +88,11 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
 
                 return (
                   <article
-                    class={`group bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-5 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.15)] ${
+                    class={`group bg-surface/5 border border-white/10 hover:border-primary/50 rounded-3xl p-5 flex flex-col items-center text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_20px_40px_rgba(220,38,38,0.15)] cursor-pointer ${
                       isAspect916 ? 'sm:col-span-1 md:row-span-2' : ''
                     }`}
                     data-gallery-item={item.id}
+                    data-gallery-data={JSON.stringify(item)}
                   >
                     <!-- Media Container -->
                     <div class={`relative w-full rounded-2xl bg-secondary/80 overflow-hidden mb-4 ${
@@ -151,5 +153,8 @@ function resolveEmbedUrl(item: GalleryItem): string | null {
       footerBg={footerBg}
       class="mt-20 block"
     />
+
+    <!-- Expanded Media Modal (Lightbox) -->
+    <GalleryModal />
   </div>
 </Layout>
