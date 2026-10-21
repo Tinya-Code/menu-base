@@ -7,17 +7,18 @@
  *   sidebar-cart → product-detail (mounted hidden) → restaurant-closed-modal
  *
  * Data (F5): this page is the single orchestrator. It loads every payload
- * (menu, price ranges, restaurant settings + hours) in frontmatter and passes
- * the resolved values to components as props — nothing under the domain
- * packages fetches, neither at build time nor in the browser.
+ * (menu, restaurant settings + hours) in frontmatter and passes the resolved
+ * values to components as props — nothing under the domain packages fetches,
+ * neither at build time nor in the browser. v2 products embed their price
+ * range, so there is no `price-range` join anywhere anymore (proposal §2.2/§3).
  *
  * Assembly (F7): the page also composes the menu itself — promotions,
  * combos and the seven explicit MenuBlock declarations (block-1 … block-7)
  * with their decoration slots — and projects that content through the
  * `menu-page` shell's slot. Construction order mirrors Angular
  * `src/app/base-template/index.ts`. The few values the client
- * scripts still need (hours, settings, price ranges) ship as hidden JSON
- * attributes rendered below and read back by the script.
+ * scripts still need (hours, settings) ship as hidden JSON attributes
+ * rendered below and read back by the script.
  *
  * There is no `forkJoin`, no `isLoading` signal and no 800 ms `hidden`
  * artefact: the page ships ready.
@@ -29,21 +30,22 @@
  * (`src/utils/events.ts`): delegated card clicks, `add-to-cart` → cart, and
  * the dialog open/close listeners.
  */
-import Layout from '../layout/Layout.astro';
-import MenuPage from '../layout/menu-page.astro';
-import CategoryNav from '../menu/category-nav.astro';
-import MenuBlock from '../menu/blocks/menu-block.astro';
-import BlockCombos from '../menu/blocks/block-combos.astro';
-import BlockPromotions from '../menu/blocks/block-promotions.astro';
-import IllustrationCell from '../menu/blocks/illustration-cell.astro';
-import CartTrigger from '../commerce/cart/cart-trigger.astro';
-import WhatsAppButton from '../ui/whatsapp-button.astro';
-import SidebarCart from '../commerce/cart/sidebar-cart.astro';
-import ProductDetail from '../menu/product-detail.astro';
-import RestaurantClosedModal from '../ui/restaurant-closed-modal.astro';
+import Layout from '../storefront/layout/Layout.astro';
+import MenuPage from '../storefront/layout/menu-page.astro';
+import CategoryNav from '../storefront/menu/category-nav.astro';
+import MenuBlock from '../storefront/menu/blocks/menu-block.astro';
+import BlockCombos from '../storefront/menu/blocks/block-combos.astro';
+import BlockPromotions from '../storefront/menu/blocks/block-promotions.astro';
+import IllustrationCell from '../storefront/menu/blocks/illustration-cell.astro';
+import CartTrigger from '../storefront/commerce/cart/cart-trigger.astro';
+import WhatsAppButton from '../storefront/ui/whatsapp-button.astro';
+import SidebarCart from '../storefront/commerce/cart/sidebar-cart.astro';
+import ProductDetail from '../storefront/menu/product-detail.astro';
+import RestaurantClosedModal from '../storefront/ui/restaurant-closed-modal.astro';
+import FlyerModal from '../storefront/ui/flyer-modal.astro';
+import ReviewModal from '../storefront/ui/review-modal.astro';
 
-import { menuService } from '../services/menu.service.js';
-import { restaurantService } from '../services/restaurant.service.js';
+import { loadStorefront } from '../storefront/services/index.js';
 import type {
   BusinessHours,
   Combo,
@@ -51,51 +53,32 @@ import type {
   MenuBlock as MenuBlockData,
   MenuCategory,
   MenuProduct,
-  OrderConfig,
-  PriceRange,
   Promotion,
   RestaurantInfo,
   RestaurantProfile,
   RestaurantSettings,
-  WhatsappConfig,
-} from '../types/menu';
+} from '../storefront/types/menu';
 
-/** What the menu payload must resolve to before it reaches the components. */
-interface MenuPayload {
-  blocks: MenuBlockData[];
-  combos: Combo[];
-  promotions: Promotion[];
-  decorations: Partial<Decorations>;
-}
-
-/** Same data Angular's `forkJoin` resolved, minus the artificial delay. */
-const menuPayload: MenuPayload = await menuService.load().catch((error) => {
-  console.error('[menu] could not load the menu payload.', error);
-  return { blocks: [], combos: [], promotions: [], decorations: {} };
-});
-const { blocks, combos, promotions, decorations } = menuPayload;
-
-/** Price ranges and the restaurant payload — also loaded only here (F5). */
-await Promise.all([
-  menuService.getPriceRanges().catch(() => {}),
-  restaurantService.load().catch(() => {}),
-]);
-
-const priceRanges: PriceRange[] = menuService.priceRanges;
-const restaurantInfo: RestaurantInfo | null = restaurantService.info;
-const restaurant: RestaurantProfile | null = restaurantService.restaurant;
-const settings: RestaurantSettings | null = restaurantService.settings;
-const orderConfig: OrderConfig | null = restaurantService.orderConfig;
-const whatsappConfig: WhatsappConfig | null = restaurantService.whatsappConfig;
-
-/** Raw schedule; `undefined` when the settings payload never arrived. */
-const rawHours: BusinessHours | undefined = restaurantService.businessConfig?.business_hours;
-const businessHours: BusinessHours = rawHours ?? {};
+/** Storefront payload loaded once at build time. */
+const {
+  blocks,
+  combos,
+  promotions,
+  decorations,
+  restaurant,
+  settings,
+  rawHours,
+  businessHours,
+  googleMapsUrl,
+  flyers,
+  info: restaurantInfo,
+} = await loadStorefront();
 
 /** Ordering rules every card and dialog renders from. */
-const canOrder = orderConfig?.delivery_enabled ?? true;
-const maxOrderQuantity = orderConfig?.max_order_quantity ?? 99;
-const whatsappPhone = whatsappConfig?.number ?? '';
+const canOrder = settings?.delivery?.enabled ?? true;
+const maxOrderQuantity = settings?.max_order_quantity ?? 99;
+const whatsappPhone = settings?.whatsapp?.number ?? '';
+const whatsappTemplate = settings?.whatsapp?.message_template ?? null;
 
 /** `allCategories` from `Menu.ngOnInit` — `{ category }` wrappers. */
 const allCategories: Array<{ category: MenuCategory }> = blocks.flatMap((block) =>
@@ -106,15 +89,6 @@ const allCategories: Array<{ category: MenuCategory }> = blocks.flatMap((block) 
 const allProducts: MenuProduct[] = blocks.flatMap((block) =>
   (block.categories ?? []).flatMap((category) => category.products ?? []),
 );
-
-/**
- * The dialog renders one product at build time; prefer one with a price range
- * so the options list markup exists client-side, then refill it on click.
- */
-const placeholderProduct: MenuProduct =
-  allProducts.find((product) => product?.price_range_id) ??
-  allProducts[0] ??
-  ({} as MenuProduct);
 
 /** One block's categories by id — each MenuBlock declaration renders one block. */
 const cats = (id: string) => blocks.find((block) => block?.id === id)?.categories ?? [];
@@ -129,9 +103,6 @@ const hasContent = blocks.length > 0 || combos.length > 0 || promotions.length >
  */
 const postresImages: { url?: string }[] = [];
 
-/** Serialized payloads the client scripts read back — all rendered below. */
-const priceRangesJson = JSON.stringify(priceRanges).replace(/</g, '\\u003c');
-const restaurantInfoJson = JSON.stringify(restaurantInfo).replace(/</g, '\\u003c');
 
 /**
  * The hours attribute is omitted entirely when the schedule never arrived:
@@ -142,7 +113,7 @@ const hoursJson =
   rawHours === undefined ? null : JSON.stringify(rawHours).replace(/</g, '\\u003c');
 ---
 
-<Layout title="Carta">
+<Layout seo={settings?.seo ?? null}>
   <div data-menu-page>
     <CategoryNav categories={allCategories} />
 
@@ -151,6 +122,8 @@ const hoursJson =
       settings={settings}
       businessHours={businessHours}
       background={decorations.background}
+      headerBg={decorations.header_background ?? settings?.header_bg}
+      footerBg={decorations.footer_background ?? settings?.footer_bg}
     >
       <div class:list={['h-full w-auto mx-2', hasContent && 'py-12']}>
         <BlockPromotions promotions={promotions} canOrder={canOrder} />
@@ -160,37 +133,18 @@ const hoursJson =
         <!-- block-1: maki rail + barco parallax -->
         <MenuBlock
           categories={cats('block-1')}
+          decorations={decorations.blocks?.['block-1']}
           canOrder={canOrder}
-          priceRanges={priceRanges}
           outerClass="grid-cols-4 md:grid-cols-12 gap-x-12 gap-y-16"
           categorySectionClass="col-span-3 md:col-span-8"
           cardsClass="grid-cols-2 md:grid-cols-3 gap-8"
-          sectionAttrs={{
-            'data-block-1': '',
-            'data-maki-urls': JSON.stringify(decorations.block1?.makis ?? []),
-          }}
-        >
-          <div
-            slot="decoration-left"
-            class="relative hidden md:block col-span-0 md:col-span-2 h-full"
-            data-maki-container
-          />
-          <div slot="decoration-right" class="relative md:block col-span-1 md:col-span-2 h-full">
-            <img
-              src={decorations.block1?.barco}
-              alt="Alitas Fondo"
-              class="absolute top-0 -right-28 md:-right-48 min-w-[300px] md:min-w-[400px] object-contain will-change-transform transition-transform duration-300 ease-out"
-              data-anim="parallax"
-              data-barco
-            />
-          </div>
-        </MenuBlock>
+          sectionAttrs={{ 'data-block-1': '' }}
+        />
 
         <!-- block-2: plain categories, single column → 2-up cards -->
         <MenuBlock
           categories={cats('block-2')}
           canOrder={canOrder}
-          priceRanges={priceRanges}
           outerClass="grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-16 items-start"
           cardsClass="grid-cols-1 md:grid-cols-2"
         />
@@ -198,23 +152,17 @@ const hoursJson =
         <!-- block-3: full-width header row with the alitas decorations -->
         <MenuBlock
           categories={cats('block-3')}
+          decorations={decorations.blocks?.['block-3']}
           canOrder={canOrder}
-          priceRanges={priceRanges}
           outerClass="relative grid-cols-1 md:grid-cols-12 gap-x-12 gap-y-8 items-start"
           categorySectionClass="col-span-12 md:col-span-8"
           cardsClass="grid-cols-3 md:grid-cols-4 gap-6"
-        >
-          <div slot="decoration-left" class="justify-between flex col-span-12 h-60 md:col-span-12 md:h-0">
-            <img src={decorations.block3?.alitasFondo} alt="Alitas Fondo" class="h-full md:h-auto md:w-130 md:absolute top-10 -right-35" />
-            <img src={decorations.block3?.alitas2Fondo} alt="Alitas 2 Fondo" class="h-full md:h-auto md:w-130 md:absolute bottom-10 -right-35" />
-          </div>
-        </MenuBlock>
+        />
 
         <!-- block-4: same layout as block-2 -->
         <MenuBlock
           categories={cats('block-4')}
           canOrder={canOrder}
-          priceRanges={priceRanges}
           outerClass="grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-16 items-start"
           cardsClass="grid-cols-1 md:grid-cols-2"
         />
@@ -223,7 +171,6 @@ const hoursJson =
         <MenuBlock
           categories={cats('block-5')}
           canOrder={canOrder}
-          priceRanges={priceRanges}
           outerClass="grid-cols-1 md:grid-cols-1 gap-x-12 gap-y-16 items-start"
           cardsClass="grid-cols-2 md:grid-cols-2"
         />
@@ -231,22 +178,17 @@ const hoursJson =
         <!-- block-6: cocktail column decoration on the left -->
         <MenuBlock
           categories={cats('block-6')}
+          decorations={decorations.blocks?.['block-6']}
           canOrder={canOrder}
-          priceRanges={priceRanges}
           outerClass="grid-cols-5 md:grid-cols-12 md:gap-12 items-start"
           categorySectionClass="w-full col-span-4 md:col-span-8"
           cardsClass="grid-cols-2 md:grid-cols-2"
-        >
-          <div slot="decoration-left" class="w-full relative h-full col-span-1 flex justify-center items-center md:col-span-4">
-            <img src={decorations.block6?.coctelesVertical} alt class="absolute md:static -left-70 min-w-[500px] md:min-w-[450px] h-auto" />
-          </div>
-        </MenuBlock>
+        />
 
         <!-- block-7: dessert illustration cell -->
         <MenuBlock
           categories={cats('block-7')}
           canOrder={canOrder}
-          priceRanges={priceRanges}
           outerClass="grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-16 items-start"
           cardsClass="grid-cols-2 md:grid-cols-1"
         >
@@ -265,26 +207,42 @@ const hoursJson =
 
     <CartTrigger />
 
-    <WhatsAppButton phone={whatsappPhone} message={whatsappConfig?.message_template ?? null} />
+    <WhatsAppButton phone={whatsappPhone} message={whatsappTemplate} />
 
-    <SidebarCart orderConfig={orderConfig} whatsappConfig={whatsappConfig} />
+    <SidebarCart settings={settings} />
 
-    <!-- Product detail: mounted hidden, revealed (and refilled) on click. -->
-    <div data-product-detail-host hidden>
-      <ProductDetail
-        product={placeholderProduct}
-        priceRanges={priceRanges}
-        maxQuantity={maxOrderQuantity}
-        canOrder={canOrder}
-        whatsappPhone={whatsappPhone}
-      />
-    </div>
+    <!-- Product dialogs: one per product and promotion, all hidden.
+         Revealed on card click. -->
+    {allProducts.map((product) => (
+      <div data-product-detail-host={product.id} hidden>
+        <ProductDetail
+          product={product}
+          maxQuantity={maxOrderQuantity}
+          canOrder={canOrder}
+          whatsappPhone={whatsappPhone}
+        />
+      </div>
+    ))}
+    {promotions.map((promotion) => (
+      <div data-product-detail-host={promotion.id} hidden>
+        <ProductDetail
+          product={promotion}
+          maxQuantity={maxOrderQuantity}
+          canOrder={canOrder}
+          whatsappPhone={whatsappPhone}
+        />
+      </div>
+    ))}
 
     <RestaurantClosedModal businessHours={businessHours} />
+    <FlyerModal flyers={flyers} />
+    <ReviewModal
+      googleMapsUrl={googleMapsUrl}
+      restaurantName={restaurant?.name}
+      delaySeconds={120}
+    />
   </div>
 
-  <div id="price-ranges-data" data-price-ranges={priceRangesJson} hidden></div>
-  <div id="restaurant-info-data" data-restaurant-info={restaurantInfoJson} hidden></div>
   {
     hoursJson !== null && (
       <div id="business-hours-data" data-business-hours={hoursJson} hidden></div>
@@ -292,143 +250,23 @@ const hoursJson =
   }
 
   <script>
-    import { emit, on } from '../utils/events';
-    import { readJson, readProduct } from '../utils/dom';
-    import { precio } from '../utils/format.js';
-    import { cartService } from '../services/cart.service.js';
-    import { restaurantService } from '../services/restaurant.service.js';
-    import { findPriceRange } from '../services/menu.service.js';
-    import type {
-      MenuProduct,
-      OrderableProduct,
-      PriceRange,
-      PriceRangeEntry,
-      RestaurantInfo,
-    } from '../types/menu';
+    import { readProduct, readJson } from '../storefront/utils/dom';
+    import { cartService } from '../storefront/services/cart.service.js';
 
-    // The settings payload ships with the page: replay it into the shared
-    // service so the cart totals read the values the build used. Every cart is
-    // still empty while the modules evaluate, so nothing visible renders
-    // before this line (F5).
-    restaurantService.hydrate(
-      readJson<RestaurantInfo | null>(
-        document.getElementById('restaurant-info-data'),
-        'data-restaurant-info',
-        null,
-      ),
-    );
+    // ─── Product dialog ──────────────────────────────────────────────────────
+    // Every product has its own pre-rendered dialog in the DOM, hidden by
+    // default. On card click we just reveal the matching one by product ID.
 
-    const ENTRY_BASE_CLASSES =
-      'flex items-center justify-between p-2.5 rounded-xl md:rounded-2xl border-2 border-secondary/5 hover:border-accent/30 transition-all text-left group';
-    const ENTRY_SELECTED_CLASSES = ['border-accent', 'bg-accent/5'];
-    const FALLBACK_DESCRIPTION =
-      'Un clásico preparado con los secretos mejor guardados de nuestra cocina.';
+    let activeHost: HTMLElement | null = null;
 
-    const host = document.querySelector<HTMLElement>('[data-product-detail-host]');
-    const root = document.querySelector<HTMLElement>('[data-product-detail]');
-
-    const priceRanges: PriceRange[] = (() => {
-      const parsed = readJson<PriceRange[] | null>(
-        document.getElementById('price-ranges-data'),
-        'data-price-ranges',
-        null,
+    const openDialog = (productId: string) => {
+      const host = document.querySelector<HTMLElement>(
+        `[data-product-detail-host="${productId}"]`,
       );
-      return Array.isArray(parsed) ? parsed : [];
-    })();
+      if (!host) return;
 
-    const escapeHtml = (value: unknown) =>
-      String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-
-    /** Rebuild the price options for the product that is about to open. */
-    const renderEntries = (root: HTMLElement, range: PriceRange | null) => {
-      const list = root.querySelector<HTMLElement>('[data-entry-list]');
-      const grid = root.querySelector<HTMLElement>('[data-entry-grid]');
-      if (!list || !grid) return null;
-
-      const candidate = range?.entries;
-      const entries: PriceRangeEntry[] = Array.isArray(candidate) ? candidate : [];
-
-      list.hidden = entries.length === 0;
-      list.setAttribute('data-selected-index', entries.length > 0 ? '0' : '');
-      grid.innerHTML = entries
-        .map(
-          (entry, index) => `
-            <button
-              data-entry-index="${index}"
-              data-entry='${JSON.stringify(entry).replace(/'/g, '&#39;')}'
-              type="button"
-              class="${ENTRY_BASE_CLASSES}${index === 0 ? ' border-accent bg-accent/5' : ''}"
-            >
-              <div class="flex flex-col">
-                <span class="font-display text-sm md:text-lg text-secondary group-hover:text-accent transition-colors">
-                  ${escapeHtml(entry.qty)} Unidades
-                </span>
-                ${
-                  entry.bonus
-                    ? `<span class="text-[9px] md:text-[10px] font-bold text-accent-muted">${escapeHtml(entry.bonus)}</span>`
-                    : ''
-                }
-              </div>
-              <span class="font-display text-base md:text-xl text-secondary">${precio(Number(entry.price))}</span>
-            </button>`,
-        )
-        .join('');
-
-      return entries.length > 0 ? entries[0] : null;
-    };
-
-    /** Paint the dialog with the product the user clicked. */
-    const fill = (product: MenuProduct) => {
-      if (!root) return;
-
-      root.setAttribute('data-product', JSON.stringify(product));
-
-      const name = root.querySelector<HTMLElement>('[data-detail-name]');
-      if (name) name.textContent = product?.name ?? '';
-
-      const description = root.querySelector<HTMLElement>('[data-detail-description]');
-      if (description) description.textContent = product?.description || FALLBACK_DESCRIPTION;
-
-      const imageSection = root.querySelector<HTMLElement>('[data-detail-image-section]');
-      const image = root.querySelector<HTMLImageElement>('[data-detail-image]');
-      const dialog = root.querySelector<HTMLElement>('[data-detail-dialog]');
-      const hasImage = Boolean(product?.image_url);
-
-      if (imageSection) imageSection.hidden = !hasImage;
-      if (image) {
-        image.src = product?.image_url ?? '';
-        image.alt = product?.name ?? '';
-      }
-      if (dialog) {
-        dialog.classList.toggle('md:grid-cols-2', hasImage);
-        dialog.classList.toggle('md:grid-cols-1', !hasImage);
-      }
-
-      const range = findPriceRange(priceRanges, product?.price_range_id);
-      const firstEntry = renderEntries(root, range);
-
-      const price = root.querySelector<HTMLElement>('[data-current-price]');
-      if (price) {
-        const value = firstEntry
-          ? Number(firstEntry.price)
-          : product?.price === null || product?.price === undefined || product?.price === ''
-            ? 0
-            : Number(product.price);
-        price.textContent = Number.isNaN(value) ? '' : precio(value);
-      }
-
-      const label = root.querySelector<HTMLElement>('[data-entry-label]');
-      if (label) {
-        label.hidden = !firstEntry;
-        label.textContent = firstEntry ? `${firstEntry.qty} Unids.` : '';
-      }
-
-      // Reset the stepper to 1 (the Angular dialog mounts fresh each time).
-      const stepper = root.querySelector<HTMLElement>('[data-quantity]');
+      // Reset the stepper to 1 every time the dialog opens.
+      const stepper = host.querySelector<HTMLElement>('[data-quantity]');
       if (stepper) {
         stepper.setAttribute('data-qty-value', '1');
         const qtyLabel = stepper.querySelector<HTMLElement>('[data-qty-label]');
@@ -438,85 +276,62 @@ const hoursJson =
         if (dec) dec.disabled = true;
         if (inc) inc.disabled = false;
       }
+
+      host.hidden = false;
+      activeHost = host;
+      document.documentElement.style.overflow = 'hidden';
     };
 
-    // ─── Event contract (see `src/utils/events.ts`) ─────────────────────────
-    // The page is the single owner of every cross-component collaboration:
-    // cards are pure markup, the add button only announces its press, and the
-    // product dialog only announces its actions.
-
-    on('product-click', (detail) => {
-      const product = detail?.product;
-      if (!host || !product) return;
-
-      fill(product);
-      host.hidden = false;
-      document.documentElement.style.overflow = 'hidden';
-    });
-
-    on('close-product-detail', () => {
-      if (!host) return;
-      host.hidden = true;
-      document.documentElement.style.overflow = '';
-    });
-
-    /**
-     * The one owner of `add-to-cart`: dispatchers never touch the cart
-     * themselves (they used to run `addItem` as the event's "default action"
-     * after `emit(...) === false` — a vetoed dispatch still skips the add).
-     */
-    on('add-to-cart', (detail, event) => {
-      if (event.defaultPrevented) return;
-      cartService.addItem(detail.product, detail.quantity, detail.selectedEntry);
-    });
-
-    // Card body click → `product-click` (delegation replaces the per-card
-    // scripts; combo cards never opened the dialog, so they stay inert).
+    // ─── Direct click delegation ─────────────────────────────────────────────
     document.addEventListener('click', (event) => {
-      const target = event.target instanceof Element ? event.target : null;
-      const card = target?.closest('[data-template-card], [data-promotion-card]');
-      if (!card) return;
-      // The add button owns this click (it announces `add-button-click`).
-      if (target?.closest('[data-add-button]')) return;
-      // "Ver más" toggles the clamp in place, it never opens the dialog.
-      if (target?.closest('[data-toggle-description]')) return;
-
-      const product = readProduct(card);
-      if (product) emit('product-click', { product });
-    });
-
-    // "＋" click → straight to the cart, or the dialog when the product needs
-    // a price-range selection (the old per-card `add-button-click` handlers).
-    on('add-button-click', (_detail, event) => {
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
 
-      const templateCard = target.closest('[data-template-card]');
-      if (templateCard) {
-        const product = readProduct(templateCard);
-        if (!product) return;
-
-        if (templateCard.getAttribute('data-has-range') === 'true') {
-          emit('product-click', { product });
+      // 1. Add button click
+      const addButton = target.closest('[data-add-button]');
+      if (addButton) {
+        const templateCard = target.closest('[data-template-card]');
+        if (templateCard) {
+          const product = readProduct(templateCard);
+          if (!product) return;
+          if (templateCard.getAttribute('data-has-range') === 'true') {
+            openDialog(product.id);
+            return;
+          }
+          cartService.addItem(product, 1);
           return;
         }
 
-        emit('add-to-cart', { product, quantity: 1, selectedEntry: undefined });
+        const comboCard = target.closest('[data-combo-card]');
+        if (comboCard) {
+          const combo = readJson<{ id: string; name: string; price: number } | null>(
+            comboCard,
+            'data-combo',
+            null,
+          );
+          if (combo) cartService.addItem(combo, 1);
+          return;
+        }
+
+        const promotionCard = target.closest('[data-promotion-card]');
+        if (promotionCard) {
+          const promotion = readJson<{ id: string; name: string; price: number } | null>(
+            promotionCard,
+            'data-promotion',
+            null,
+          );
+          if (promotion) cartService.addItem(promotion, 1);
+          return;
+        }
         return;
       }
 
-      const comboCard = target.closest('[data-combo-card]');
-      if (comboCard) {
-        const combo = readJson<OrderableProduct | null>(comboCard, 'data-combo', null);
-        if (combo) emit('add-to-cart', { product: combo, quantity: 1, selectedEntry: undefined });
-        return;
-      }
-
-      const promotionCard = target.closest('[data-promotion-card]');
-      if (promotionCard) {
-        const promotion = readJson<OrderableProduct | null>(promotionCard, 'data-promotion', null);
-        if (promotion)
-          emit('add-to-cart', { product: promotion, quantity: 1, selectedEntry: undefined });
+      // 2. Card click (opens dialog)
+      const card = target.closest('[data-template-card], [data-promotion-card]');
+      if (card) {
+        if (target.closest('[data-toggle-description]')) return;
+        const product = readProduct(card);
+        if (product) openDialog(product.id);
       }
     });
   </script>

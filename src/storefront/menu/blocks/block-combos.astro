@@ -1,0 +1,54 @@
+---
+/**
+ * BlockCombos — slider of combo cards with its own section title.
+ *
+ * Props:
+ * - `combos`      — combos rendered inside the slider (required, defaults to `[]`)
+ * - `canOrder`    — forwarded to each card (page-loaded ordering flag)
+ * - `title`       — section heading (default `'Combos'`)
+ * - `description` — section sub-text (default `'Combos especiales para compartir'`)
+ *
+ * Combo cards expose a `data-combo` payload; the page dispatches the bubbling
+ * `add-to-cart` CustomEvent for them (see `src/pages/index.astro`).
+ */
+import ComboCard from '../cards/combo-card.astro';
+import TemplateSectionTitle from '../template-section-title.astro';
+import Slider from '../../ui/slider.astro';
+import type { Combo } from '../../types/menu';
+
+interface Props {
+  combos?: Combo[];
+  canOrder?: boolean;
+  title?: string;
+  description?: string;
+  cardComponent?: any;
+}
+
+const {
+  combos = [],
+  canOrder = true,
+  title = 'Combos',
+  description = 'Combos especiales para compartir',
+  cardComponent: Card = ComboCard,
+} = Astro.props;
+
+const hasCustomSlot = Astro.slots.has('default');
+---
+
+{
+  (combos.length > 0 || hasCustomSlot) && (
+    <section class="relative py-12 px-8">
+      <TemplateSectionTitle title={title} description={description} />
+
+      <Slider showArrows={true}>
+        {hasCustomSlot ? (
+          <slot />
+        ) : (
+          combos.map((combo) => (
+            <Card combo={combo} canOrder={canOrder} />
+          ))
+        )}
+      </Slider>
+    </section>
+  )
+}

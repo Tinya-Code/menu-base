@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "id": "43756cc2-b8ab-491c-a056-735dd8180b18",
+      "name": "Combo Maquilovers",
+      "description": "24 cortes (4 sabores a elección) + 6 alistas + 1 Gaseosa personal",
+      "image": {
+        "url": "https://res.cloudinary.com/dopud1hkc/image/upload/v1778948237/combo_43756cc2-b8ab-491c-a056-735dd8180b18.png",
+        "alt": "Combo Maquilovers — Mr Nikkei6.9"
+      },
+      "price": 53,
+      "price_before": null
+    },
+    {
+      "id": "773fee12-347b-4855-93bf-8829cb66f58f",
+      "name": "Combo familiar",
+      "description": "48 cortes (4 sabores a elección) + 2 gaseosa (250ml)",
+      "image": {
+        "url": "https://res.cloudinary.com/dopud1hkc/image/upload/v1778948274/combo_773fee12-347b-4855-93bf-8829cb66f58f.png",
+        "alt": "Combo familiar — Mr Nikkei6.9"
+      },
+      "price": 85,
+      "price_before": null
+    }
+  ]
+}

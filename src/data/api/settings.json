@@ -1,0 +1,95 @@
+{
+  "data": {
+    "name": "MR NIKKEI6.9",
+    "phone": "918778647",
+    "address": "Av. Manchay Mz.D - Lt.14, Lima Metropolitana 15594",
+    "geo": {
+      "lat": -12.113977,
+      "lng": -76.871191
+    },
+    "whatsapp": {
+      "number": "918778647",
+      "message_template": "Hola Mr Nikkei6.9, quisiera ordenar:"
+    },
+    "timezone": "America/Lima",
+    "currency": "PEN",
+    "language": "es",
+    "delivery": {
+      "enabled": true,
+      "fee": 5,
+      "zones": []
+    },
+    "payment_methods": [
+      "efectivo",
+      "yape"
+    ],
+    "max_order_quantity": 20,
+    "social_media": {
+      "tiktok": null,
+      "facebook": "https://web.facebook.com/profile.php?id=100088828158141",
+      "instagram": "https://www.instagram.com/sushi_nikkei6.9?fbclid=IwY2xjawRl8A9leHRuA2FlbQIxMABicmlkETFrbVlaMlpHYjBZSUI4Tlc5c3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHs3dwgEMDWk_S7_rS9zO8q2WOicYl2bl4az-nTDPD9pPY8Hb9q63YDSCfure_aem_CokNyc3QPJS0XP-q5n_kyg"
+    },
+    "google_maps": "https://www.google.com/maps/search/?api=1&query=-12.113977,-76.871191",
+    "business_hours": {
+      "thu": {
+        "isOpen": true,
+        "open": "11:00",
+        "close": "22:30"
+      },
+      "wed": {
+        "isOpen": true,
+        "open": "11:00",
+        "close": "22:30"
+      },
+      "sun": {
+        "isOpen": true,
+        "open": "11:00",
+        "close": "22:30"
+      },
+      "tue": {
+        "isOpen": true,
+        "open": "11:00",
+        "close": "22:30"
+      },
+      "fri": {
+        "isOpen": true,
+        "open": "11:00",
+        "close": "22:30"
+      },
+      "sat": {
+        "isOpen": true,
+        "open": "10:00",
+        "close": "22:30"
+      },
+      "mon": {
+        "isOpen": true,
+        "open": "11:00",
+        "close": "22:30"
+      }
+    },
+    "logo_url": null,
+    "header_bg": null,
+    "footer_bg": null,
+    "tags": [],
+    "seo": {
+      "site_name": "MR NIKKEI6.9",
+      "title": "Mr Nikkei6.9 — Sushi y delivery en Lima",
+      "title_template": "%s | Mr Nikkei6.9",
+      "description": "Sushi artesanal en Lima. Delivery a domicilio, combos y promociones.",
+      "keywords": [
+        "sushi lima",
+        "delivery sushi",
+        "mr nikkei"
+      ],
+      "og_image": null,
+      "twitter_card": "summary_large_image",
+      "locale": "es_PE",
+      "canonical_url": null,
+      "json_ld": {
+        "@type": "Restaurant",
+        "servesCuisine": "Peruvian, Japanese",
+        "priceRange": "$$"
+      }
+    }
+  }
+}

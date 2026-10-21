@@ -1,0 +1,69 @@
+@import "tailwindcss";
+/* You can add global styles to this file, and also import other style files */
+
+@font-face {
+  font-family: 'Makuton';
+  src: url('/fonts/Makuton.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/fonts/NotoSans-VariableFont_wdth,wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-stretch: 62.5% 100%;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-stretch: 62.5% 100%;
+  font-style: italic;
+  font-display: swap;
+}
+
+
+@theme {
+  /* Tipografías */
+  --font-display: 'Makuton', sans-serif;
+  --font-body: 'Noto Sans', sans-serif;
+  /* Colores base */
+  --color-primary: #dc2626; /* Rojo vibrante, moderno */
+  --color-secondary: #0a0a0a; /* Negro Zinc 950, premium */
+
+  /* Complementario */
+  --color-background: #fafafa; /* Blanco suave para balance */
+  --color-surface: #f4f4f5; /* Gris Zinc 100 para secciones */
+
+  /* Acentos */
+  --color-accent: #f59e0b; /* Ámbar/Dorado, toque de elegancia */
+  --color-accent-muted: #fbbf24; /* Ámbar suave para detalles */
+
+  /* Texto */
+  --color-primary-text: #ffffff; /* Texto sobre fondos oscuros */
+  --color-secondary-text: #0a0a0a; /* Texto sobre fondos claros */
+  --color-text-accent: #dc2626; /* Destacar títulos o precios */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Elements toggled from client scripts must lose to `hidden` even when a
+   utility sets an explicit `display` (flex, grid, …). */
+[hidden] {
+  display: none !important;
+}
+
+img {
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+

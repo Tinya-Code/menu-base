@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "delay_seconds": 20,
+  "show_once_per_session": true,
+  "items": [
+    {
+      "id": "flyer-promocion",
+      "title": "Sábado de Promo",
+      "image": "https://res.cloudinary.com/dopud1hkc/image/upload/v1778948345/promo_cffb90df-8bdd-4e74-8191-e8da455ec5d0.png",
+      "link": "#category-cffb90df-8bdd-4e74-8191-e8da455ec5d0",
+      "alt": "Sábado de Promo — 4 piezas de tus makis favoritos"
+    }
+  ]
+}

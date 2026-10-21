@@ -1,0 +1,83 @@
+---
+/**
+ * Layout — the HTML shell.
+ *
+ * Props:
+ * - `title` — page title fallback (used only when no `seo` block arrives)
+ * - `seo`   — the site-level `settings.seo` block (build-time prop, F5)
+ *
+ * Head rules (proposal §2.4): the `seo` block owns the document head —
+ * `<title>` via `seo.title` (falling back to `title_template` + site name),
+ * meta description/keywords, Open Graph, Twitter card, canonical (only when
+ * set) and one JSON-LD `@graph` (Organization + the API's `json_ld` object).
+ * Without an `seo` block the head stays minimal (title only), exactly like
+ * the pre-v2 page.
+ */
+import '../styles/global.css';
+import type { SiteSeo } from '../types/menu';
+
+interface Props {
+	title?: string;
+	seo?: SiteSeo | null;
+}
+
+const { title = 'Mr Nikkei', seo = null } = Astro.props;
+
+/** Document title: `seo.title`, else the template with the site/page name. */
+const documentTitle = seo
+	? seo.title || seo.title_template.replace('%s', title || seo.site_name)
+	: title;
+
+const description = seo?.description ?? '';
+const keywords = Array.isArray(seo?.keywords) ? seo.keywords : [];
+const canonical = seo?.canonical_url ?? '';
+const twitterCard = seo?.twitter_card ?? '';
+
+/** JSON-LD `@graph`: Organization (site) + whatever the API ships. */
+const jsonLd = seo
+	? JSON.stringify({
+			'@context': 'https://schema.org',
+			'@graph': [
+				{
+					'@type': 'Organization',
+					name: seo.site_name,
+					...(canonical ? { url: canonical } : {}),
+				},
+				seo.json_ld,
+			],
+		}).replace(/</g, '\\u003c')
+	: null;
+---
+
+<!doctype html>
+<html lang={seo?.locale?.split('_')[0] ?? 'es'}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{documentTitle}</title>
+		{description && <meta name="description" content={description} />}
+		{keywords.length > 0 && <meta name="keywords" content={keywords.join(', ')} />}
+		{canonical && <link rel="canonical" href={canonical} />}
+		{description && <meta property="og:description" content={description} />}
+		<meta property="og:title" content={documentTitle} />
+		<meta property="og:type" content="website" />
+		{seo?.og_image && <meta property="og:image" content={seo.og_image} />}
+		{twitterCard && <meta name="twitter:card" content={twitterCard} />}
+		{jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
+	</head>
+	<body>
+		<slot />
+	</body>
+</html>
+
+<style>
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+</style>
