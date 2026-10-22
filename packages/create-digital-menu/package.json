@@ -1,6 +1,6 @@
 {
   "name": "create-digital-menu",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Scaffold a digital menu storefront — Astro 7 + Tailwind v4 + typed data contract",
   "keywords": [
     "astro",
@@ -21,8 +21,7 @@
   },
   "files": [
     "cli.js",
-    "template",
-    "template/.gitignore"
+    "template"
   ],
   "engines": {
     "node": ">=20"

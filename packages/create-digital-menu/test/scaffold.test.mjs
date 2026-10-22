@@ -40,6 +40,12 @@ test('scaffolds the template into a new directory', () => {
   assert.ok(!existsSync(join(dir, '.env')));
   assert.ok(!existsSync(join(dir, 'AGENTS.md')), 'repo bookkeeping must not ship');
 
+  // npm turns .gitignore into .npmignore on install — the CLI must materialize
+  // the real .gitignore and leave no _gitignore/npmignore residue behind.
+  assert.ok(existsSync(join(dir, '.gitignore')), '.gitignore must exist after scaffold');
+  assert.ok(!existsSync(join(dir, '_gitignore')), '_gitignore must be renamed');
+  assert.ok(!existsSync(join(dir, '.npmignore')), 'no .npmignore residue');
+
   // Package renamed after the target folder.
   const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
   assert.equal(pkg.name, 'my-menu');

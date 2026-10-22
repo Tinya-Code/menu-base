@@ -3,6 +3,16 @@
 All notable changes to `create-digital-menu` are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/) — versions are semver.
 
+## 0.1.1 — 2026-10-21
+
+### Fixed
+
+- Ship the template ignore rules as `_gitignore` and materialize `.gitignore`
+  during scaffolding: npm renames `.gitignore` to `.npmignore` when a package is
+  installed, which left projects scaffolded from npm without ignore rules.
+- Scaffold tests now assert `.gitignore` exists and no `_gitignore` /
+  `.npmignore` residue remains.
+
 ## 0.1.0 — 2026-10-21
 
 ### Added

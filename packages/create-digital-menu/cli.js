@@ -3,7 +3,7 @@
  * create-digital-menu — scaffold a digital menu storefront.
  * Zero runtime dependencies; Node >= 20 (fs.cpSync).
  */
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -88,6 +88,13 @@ cpSync(TEMPLATE_DIR, dir, {
   filter: (src) => !EXCLUDE_NAMES.has(basename(src)) && !isEnvFile(basename(src)),
 });
 console.log(`✔ Template copied to ${dir}`);
+
+// npm renames .gitignore -> .npmignore when installing packages, so the
+// template ships `_gitignore`; materialize the real file here.
+const shippedIgnore = join(dir, '_gitignore');
+if (existsSync(shippedIgnore)) {
+  renameSync(shippedIgnore, join(dir, '.gitignore'));
+}
 
 // ── package name = target folder slug ────────────────────────────────────────
 const slug =
