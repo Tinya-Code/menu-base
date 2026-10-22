@@ -3,7 +3,7 @@
  * create-digital-menu — scaffold a digital menu storefront.
  * Zero runtime dependencies; Node >= 20 (fs.cpSync).
  */
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -89,12 +89,18 @@ cpSync(TEMPLATE_DIR, dir, {
 });
 console.log(`✔ Template copied to ${dir}`);
 
-// npm renames .gitignore -> .npmignore when installing packages, so the
-// template ships `_gitignore`; materialize the real file here.
-const shippedIgnore = join(dir, '_gitignore');
-if (existsSync(shippedIgnore)) {
-  renameSync(shippedIgnore, join(dir, '.gitignore'));
+// npm's installer renames .gitignore -> .npmignore inside installed packages.
+// The template dir must stay empty, so whatever arrived is ours: normalize it
+// back to .gitignore and drop any residue.
+const shippedIgnore = join(dir, '.gitignore');
+const npmIgnoreResidue = join(dir, '.npmignore');
+const underscoreIgnore = join(dir, '_gitignore');
+if (!existsSync(shippedIgnore)) {
+  if (existsSync(npmIgnoreResidue)) renameSync(npmIgnoreResidue, shippedIgnore);
+  else if (existsSync(underscoreIgnore)) renameSync(underscoreIgnore, shippedIgnore);
 }
+if (existsSync(npmIgnoreResidue)) rmSync(npmIgnoreResidue);
+if (existsSync(underscoreIgnore)) rmSync(underscoreIgnore);
 
 // ── package name = target folder slug ────────────────────────────────────────
 const slug =

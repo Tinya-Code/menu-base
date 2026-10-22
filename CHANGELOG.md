@@ -3,6 +3,16 @@
 All notable changes to `create-digital-menu` are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/) — versions are semver.
 
+## 0.1.2 — 2026-10-21
+
+### Fixed
+
+- Restore `template/.gitignore` as the pack-time ignore source (it must exist
+  in the tree so npm-packlist excludes `node_modules`, `dist`, and `.astro`),
+  and normalize whatever the installer delivers: the CLI maps an installed
+  `.npmignore` (npm's rename of `.gitignore`) back to `.gitignore` and removes
+  residue. This fixes the 0.1.1 tarball, which shipped ~10k dependency files.
+
 ## 0.1.1 — 2026-10-21
 
 ### Fixed
