@@ -92,7 +92,7 @@ export const ENDPOINTS = {
     resource: null,
     schema: decorationsFileSchema,
     fallback: {
-      background: '/images/bg.png',
+      background: 'https://picsum.photos/seed/menu-bg/400/400',
       header_background: null,
       footer_background: null,
       blocks: {},

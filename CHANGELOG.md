@@ -3,6 +3,22 @@
 All notable changes to `create-digital-menu` are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/) — versions are semver.
 
+## 0.2.0 — 2026-10-21
+
+### Changed
+
+- Ship a slim, fully generic package: drop `public/images/` and `public/fonts/`
+  from the template (13.9 MB → 0.6 MB unpacked, 138 files).
+- Decoration fixtures now point at remote URLs: the `fila-*` decorations use
+  their original Cloudinary links, and the remaining decorations/backgrounds
+  use `picsum.photos` placeholders. Hardcoded `/images/*` defaults in
+  `menu-page.astro`, `product-detail.astro`, `endpoints.js`, and
+  `developer-signature.astro` were replaced with remote URLs.
+- Load Noto Sans from the Google Fonts CDN (preconnect + stylesheet in
+  `Layout.astro`); remove the local `@font-face` declarations from
+  `tokens.css`. Self-hosting fonts is still documented as an option in that
+  file's comment.
+
 ## 0.1.2 — 2026-10-21
 
 ### Fixed

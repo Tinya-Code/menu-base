@@ -13,7 +13,7 @@
  * - `restaurant`    — restaurant profile forwarded to the header and footer
  * - `settings`      — restaurant settings forwarded to the footer
  * - `businessHours` — raw schedule forwarded to the footer
- * - `background`    — background image URL (`/images/bg.png` by default)
+ * - `background`    — background image URL (a remote URL by default)
  */
 import Header from './header.astro';
 import Footer from './footer.astro';
@@ -33,7 +33,7 @@ const {
   restaurant = null,
   settings = null,
   businessHours = {},
-  background = '/images/bg.png',
+  background = 'https://picsum.photos/seed/menu-bg/400/400',
   headerBg = null,
   footerBg = null,
 } = Astro.props;

@@ -5,7 +5,7 @@
  * Props:
  *   name   — developer name (default: "Pedro Alejandro")
  *   phone  — developer WhatsApp phone (default: "51924932128")
- *   image  — developer avatar image path (default: "/images/gato.jpg")
+ *   image  — developer avatar image URL (remote URL by default)
  *   class  — extra container classes
  */
 import ArrowUpRight from '../icons/arrow-up-right.astro';
@@ -21,7 +21,7 @@ interface Props {
 const {
   name = 'Pedro Alejandro',
   phone = '51924932128',
-  image = '/images/gato.jpg',
+  image = 'https://picsum.photos/seed/dev-avatar/112/112',
   class: className = '',
 } = Astro.props;
 
