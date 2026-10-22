@@ -1,6 +1,0 @@
-# Robots.txt for Mr Nikkei6.9 Storefront
-User-agent: *
-Allow: /
-
-# Sitemap
-Sitemap: https://mrnikkei69.com/sitemap-index.xml
