@@ -11,13 +11,18 @@
     "create",
     "create-*"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tinya-Code/menu-base.git"
+  },
   "type": "module",
   "bin": {
     "create-digital-menu": "./cli.js"
   },
   "files": [
     "cli.js",
-    "template"
+    "template",
+    "template/.gitignore"
   ],
   "engines": {
     "node": ">=20"
